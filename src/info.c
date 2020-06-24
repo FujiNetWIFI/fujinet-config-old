@@ -120,7 +120,7 @@ void info_run(void)
   print_ip(17,10,adapterConfig.netmask);
   print_mac(17,11,adapterConfig.macAddress);
   print_mac(17,12,adapterConfig.bssid);
-  screen_puts(17,13, VERSION_SHORT );
+  screen_puts(17,13, "VERSION_SHORT" );
 
   while (!kbhit()) { } // Wait for key.
   
