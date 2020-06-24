@@ -13,9 +13,10 @@
 #include "bar.h"
 #include "die.h"
 #include "config.h"
-#include "../../platformio/FujiNet_idf/include/version.h"
 
 unsigned char kchar;
+
+#define VERSION_SHORT v0.1.9
 
 extern union
 {
