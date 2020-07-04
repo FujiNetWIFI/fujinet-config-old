@@ -932,7 +932,7 @@ void diskulator_drive(void)
     screen_clear();
     bar_clear();
 
-    screen_puts(0, 0, "MOUNT TO DRIVE SLOTX");
+    screen_puts(0, 0, "MOUNT TO DRIVE SLOT");
     screen_puts(0, 21, "\xD9\x91\x8D\x98\x80\xAF\xB2\x80\xB2\xA5\xB4\xB5\xB2\xAE\x19PICK");
     screen_puts(20, 21, "\xD9\xA5\xB3\xA3\x19"
                         "ABORT  \xD9\xA5\x19"
@@ -961,29 +961,30 @@ void diskulator_drive(void)
         k = cgetc();
         switch (k)
         {
-        case 0x1C: // UP
+        case 0x1C: // ATASCII UP
         case '-':
             if (c > 0)
                 c--;
             break;
-        case 0x1D: // DOWN
+        case 0x1D: // ATASCII DOWN
         case '=':
             if (c < 7)
                 c++;
             break;
-        case 95: // SHIFT + UP ARROW
+        case '_': // SHIFT + UP ARROW
             luminanceIncrease();
             break;
-        case 124: // SHIFT + DOWN ARROW
+        case '|': // SHIFT + DOWN ARROW
             luminanceDecrease();
             break;
-        case 92: // SHIFT + LEFT ARROW
+        case '\\': // SHIFT + LEFT ARROW
             hueDecrease();
             break;
-        case 94: // SHIFT + RIGHT ARROW
+        case '^': // SHIFT + RIGHT ARROW
             hueIncrease();
             break;
-        case 'e': // E
+        case 'E': // Eject
+        case 'e':
             screen_puts(4, c + 2, "Empty                               ");
             memset(deviceSlots.slot[c].file, 0, sizeof(deviceSlots.slot[c].file));
             deviceSlots.slot[c].hostSlot = 0xFF;
@@ -992,15 +993,15 @@ void diskulator_drive(void)
         case 0x1B: // ESC
             drive_done = true;
             break;
-        case 0x31:
-        case 0x32:
-        case 0x33:
-        case 0x34:
-        case 0x35:
-        case 0x36:
-        case 0x37:
-        case 0x38:
-            c = k - 0x31;
+        case '1': // Drives 1-8
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case '8':
+            c = k - '1';
             bar_clear();
             bar_show(c + 3);
             goto rorw;
@@ -1015,9 +1016,9 @@ void diskulator_drive(void)
 
             k = cgetc();
 
-            if (k == 'r')
+            if (k == 'r' || k == 'R')
                 o |= 0x01;
-            else if (k == 'w')
+            else if (k == 'w' || k == 'W')
                 o |= 0x02;
             else if (k == 0x1B)
                 goto drive_slot_abort;
