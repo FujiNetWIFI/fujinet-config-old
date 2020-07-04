@@ -1,0 +1,22 @@
+{
+    "env": {
+        "cc65_home": "c:/binn/cc65"
+
+    },
+    "configurations": [
+        {
+            "name": "Atari 8-bit",
+            "includePath": [
+                "${cc65_home}/include/**",
+                "${workspaceFolder}/**"
+            ],
+            "defines": [
+            ],
+            "compilerPath": "${cc65_home}/bin/cc65.exe",
+            "cStandard":"c89",
+            "cppStandard":"gnu++98",
+            "intelliSenseMode":"gcc-x86"
+        }
+    ],
+    "version": 4
+}
