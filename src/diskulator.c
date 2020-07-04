@@ -43,14 +43,12 @@ extern unsigned char *dlist_ptr;
 extern unsigned short screen_memory;
 extern unsigned char *font_ptr;
 
-union
-{
+union {
     unsigned char host[8][32];
     unsigned char rawData[256];
 } hostSlots;
 
-union
-{
+union {
     struct
     {
         unsigned char hostSlot;
@@ -60,8 +58,7 @@ union
     unsigned char rawData[304];
 } deviceSlots;
 
-union
-{
+union {
     struct
     {
         unsigned short numSectors;
@@ -85,44 +82,44 @@ void luminanceIncrease()
 {
     backgroundLum++;
 
-    if ( backgroundLum > 7 )
+    if (backgroundLum > 7)
         backgroundLum = 0;
 
-    POKE(710, _gtia_mkcolor(backgroundHue,backgroundLum));
-    POKE(712, _gtia_mkcolor(backgroundHue,backgroundLum));
+    POKE(710, _gtia_mkcolor(backgroundHue, backgroundLum));
+    POKE(712, _gtia_mkcolor(backgroundHue, backgroundLum));
 }
 
 void luminanceDecrease()
 {
     backgroundLum--;
 
-    if ( backgroundLum < 0 )
+    if (backgroundLum < 0)
         backgroundLum = 7;
 
-    POKE(710, _gtia_mkcolor(backgroundHue,backgroundLum));
-    POKE(712, _gtia_mkcolor(backgroundHue,backgroundLum));
+    POKE(710, _gtia_mkcolor(backgroundHue, backgroundLum));
+    POKE(712, _gtia_mkcolor(backgroundHue, backgroundLum));
 }
 
 void hueDecrease()
 {
     backgroundHue--;
 
-    if ( backgroundHue < 0 )
-        backgroundHue=15;
+    if (backgroundHue < 0)
+        backgroundHue = 15;
 
-    POKE(710, _gtia_mkcolor(backgroundHue,backgroundLum));
-    POKE(712, _gtia_mkcolor(backgroundHue,backgroundLum));
+    POKE(710, _gtia_mkcolor(backgroundHue, backgroundLum));
+    POKE(712, _gtia_mkcolor(backgroundHue, backgroundLum));
 }
 
 void hueIncrease()
 {
     backgroundHue++;
 
-    if ( backgroundHue > 15 )
-        backgroundHue=0;
+    if (backgroundHue > 15)
+        backgroundHue = 0;
 
-    POKE(710, _gtia_mkcolor(backgroundHue,backgroundLum));
-    POKE(712, _gtia_mkcolor(backgroundHue,backgroundLum));
+    POKE(710, _gtia_mkcolor(backgroundHue, backgroundLum));
+    POKE(712, _gtia_mkcolor(backgroundHue, backgroundLum));
 }
 
 /**
@@ -133,7 +130,7 @@ void diskulator_read_host_slots(void)
     // Query for host slots
     OS.dcb.ddevic = 0x70;
     OS.dcb.dunit = 1;
-    OS.dcb.dcomnd = 0xF4;       // Get host slots
+    OS.dcb.dcomnd = 0xF4; // Get host slots
     OS.dcb.dstats = 0x40;
     OS.dcb.dbuf = &hostSlots.rawData;
     OS.dcb.dtimlo = 0x0f;
@@ -257,7 +254,7 @@ void diskulator_new_disk(unsigned char c, unsigned short ns, unsigned short ss)
 
     OS.dcb.ddevic = 0x70;
     OS.dcb.dunit = 1;
-    OS.dcb.dcomnd = 0xE7;       // TNFS Create Disk
+    OS.dcb.dcomnd = 0xE7; // TNFS Create Disk
     OS.dcb.dstats = 0x80;
     OS.dcb.dbuf = &newDisk.rawData;
     OS.dcb.dtimlo = 0xFE;
@@ -425,37 +422,44 @@ bool diskulator_host(void)
     {
         unsigned char d[6];
 
-	d[1]=0x20;
-	d[2]=0x31+c;
-	d[4]=0x20;
-	d[5]=0x00;
-   
-	if (deviceSlots.slot[c].file[0]!=0x00)
-	  {
-	    d[0]=deviceSlots.slot[c].hostSlot+0x31;
-	    d[3]=(deviceSlots.slot[c].mode==0x02 ? 'W' : 'R');
-	  }
-	else
-	  {
-	    d[0]=0x20;
-	    d[3]=0x20;
-	  }
-	
+        d[1] = 0x20;
+        d[2] = 0x31 + c;
+        d[4] = 0x20;
+        d[5] = 0x00;
+
+        if (deviceSlots.slot[c].file[0] != 0x00)
+        {
+            d[0] = deviceSlots.slot[c].hostSlot + 0x31;
+            d[3] = (deviceSlots.slot[c].mode == 0x02 ? 'W' : 'R');
+        }
+        else
+        {
+            d[0] = 0x20;
+            d[3] = 0x20;
+        }
+
         screen_puts(0, c + 11, d);
         screen_puts(5, c + 11, deviceSlots.slot[c].file[0] != 0x00 ? deviceSlots.slot[c].file : "Empty");
     }
 
-  rehosts:
+rehosts:
     // reset cursor
     c = 0;
 
-  rehosts_jump:
-    screen_puts(0, 20, "\xD9\xB2\xA5\xB4\xB5\xB2\xAE\x19Pick\xD9\xA5\x19" "Edit\xD9\xA4\x19" "Drives\xD9\xAF\xB0\xB4\xA9\xAF\xAE\x19" "Boot");
-    screen_puts(0, 21, "    \xD9\x91\x8D\x98\x19" "Drives \xD9\xDC\x91\x8D\x98\x19" "Hosts\xD9\xA3\x19" "Config");
+rehosts_jump:
+    screen_puts(0, 20, "\xD9\xB2\xA5\xB4\xB5\xB2\xAE\x19Pick\xD9\xA5\x19"
+                       "Edit\xD9\xA4\x19"
+                       "Drives\xD9\xAF\xB0\xB4\xA9\xAF\xAE\x19"
+                       "Boot");
+    screen_puts(0, 21, "    \xD9\x91\x8D\x98\x19"
+                       "Drives \xD9\xDC\x91\x8D\x98\x19"
+                       "Hosts\xD9\xA3\x19"
+                       "Config");
 
     bar_clear();
     bar_show(c + 2);
 
+    // Keyboard input in HOSTS area
     while (host_done == false)
     {
         // Quick boot
@@ -475,80 +479,85 @@ bool diskulator_host(void)
 
             switch (k)
             {
-                case 0x1C:         // UP
-                case '-':
-                    if (c > 0)
-                        c--;
-                    break;
-                case 0x1D:         // DOWN
-                case '=':
-                    if (c < 7)
-                        c++;
-                    break;
-                case 95:          // SHIFT + UP ARROW
-                    luminanceIncrease();
-                    break;
-                case 124:          // SHIFT + DOWN ARROW
-                    luminanceDecrease();
-                    break;
-                case 92:          // CTRL + LEFT ARROW
-                    hueDecrease();
-                    break;
-                case 94:          // CTRL + RIGHT ARROW
-                    hueIncrease();
-                    break;
-                case 0x38:
-                    c = k - 0x31;
-                    goto jump_to_devs;
-                    break;
-                case 0x40:         // special case for 8
-                    c = 7;
-                    break;
-                case 'c':          // config
-                    host_done = true;
-                    slot_done = true;
-                    ret = false;
-                    info_run();
-                    break;
-                case 'e':          // edit
-                    if (hostSlots.host[c][0] == 0x00)
-                    {
-                        screen_puts(3, c + 1, "                                    ");
-                    }
-                    screen_input(4, c + 1, hostSlots.host[c]);
-                    if (hostSlots.host[c][0] == 0x00)
-                    {
-                        screen_puts(5, c + 1, "Empty");
-                    }
+            case 0x1C: // ATASCII UP
+            case '-':
+                if (c > 0)
+                    c--;
+                break;
+            case 0x1D: // ATASCII DOWN
+            case '=':
+                if (c < 7)
+                    c++;
+                break;
+            case '_': // SHIFT + UP ARROW
+                luminanceIncrease();
+                break;
+            case '|': // SHIFT + DOWN ARROW
+                luminanceDecrease();
+                break;
+            case '\\': // SHIFT + LEFT ARROW
+                hueDecrease();
+                break;
+            case '^': // SHIFT + RIGHT ARROW
+                hueIncrease();
+                break;
+            case '1': // Drives 1-8
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+                c = k - '1';
+                goto jump_to_devs;
+                break;
+            case 'C': // Config
+            case 'c':
+                host_done = true;
+                slot_done = true;
+                ret = false;
+                info_run();
+                break;
+            case 'E': // Edit
+            case 'e':
+                if (hostSlots.host[c][0] == 0x00)
+                    screen_puts(3, c + 1, "                                    ");
+                screen_input(4, c + 1, hostSlots.host[c]);
+                if (hostSlots.host[c][0] == 0x00)
+                    screen_puts(5, c + 1, "Empty");
+                diskulator_write_host_slots();
+                break;
+            case 'D': // Drives
+            case 'd':
+                c = 0;
+            jump_to_devs:
+                host_done = true;
+                slot_done = false;
+                screen_puts(0, 20, "        \xD9\xA5\x19"
+                                   "Eject\xD9\xA8\x19Hosts\xD9\xAE\x19New          ");
+                break;
+            case 0x9B: // ENTER
+                selected_host = c;
+                if (hostSlots.host[selected_host][0] != 0x00)
+                {
+                    // Write hosts
                     diskulator_write_host_slots();
-                    break;
-                case 'd':
-                    c = 0;
-                jump_to_devs:
-                    host_done = true;
-                    slot_done = false;
-                    screen_puts(0, 20, "        \xD9\xA5\x19" "Eject\xD9\xA8\x19Hosts\xD9\xAE\x19New          ");
-                    break;
-                case 0x9B:         // ENTER
-                    selected_host = c;
-                    if (hostSlots.host[selected_host][0] != 0x00)
-                    {
-                        // Write hosts
-                        diskulator_write_host_slots();
 
-                        // Mount host
-                        diskulator_mount_host(c);
-                        memset(prefix, 0, sizeof(prefix));
-                        strcat(prefix, "/");
+                    // Mount host
+                    diskulator_mount_host(c);
+                    memset(prefix, 0, sizeof(prefix));
+                    strcat(prefix, "/");
 
-                        ret = true;
-                    }
-                    else
-                        ret = false;
-                    host_done = true;
-                    slot_done = true;
-                    break;
-            }
+                    ret = true;
+                }
+                else
+                    ret = false;
+                host_done = true;
+                slot_done = true;
+                break;
+            } // switch
+
             if (k > 0)
             {
                 bar_clear();
@@ -568,6 +577,7 @@ bool diskulator_host(void)
 
     k = 0;
 
+    // Keyboard input in DRIVES area
     while (slot_done == false)
     {
         // Quick boot
@@ -583,85 +593,79 @@ bool diskulator_host(void)
             k = cgetc();
             switch (k)
             {
-            case 0x1C:         // UP
+            case 0x1C: // ATASCII UP
             case '-':
                 if (c > 0)
                     c--;
                 break;
-            case 0x1D:         // DOWN
+            case 0x1D: // ATASCII DOWN
             case '=':
                 if (c < 7)
                     c++;
                 break;
-            case 95:          // SHIFT + UP ARROW
+            case '_': // SHIFT + UP ARROW
                 luminanceIncrease();
                 break;
-            case 124:          // SHIFT + DOWN ARROW
+            case '|': // SHIFT + DOWN ARROW
                 luminanceDecrease();
                 break;
-            case 92:          // CTRL + LEFT ARROW
+            case '\\': // SHIFT + LEFT ARROW
                 hueDecrease();
                 break;
-            case 94:          // CTRL + RIGHT ARROW
+            case '^': // SHIFT + RIGHT ARROW
                 hueIncrease();
                 break;
-            case 0x21:
-            case 0x22:
-            case 0x23:
-            case 0x24:
-            case 0x25:
-            case 0x26:
-            case 0x27:
-                c = k - 0x21;
+            case '!': // Hosts 1-7
+            case '"':
+            case '#':
+            case '$':
+            case '%':
+            case '&':
+            case '\'':
+                c = k - '!';
                 slot_done = true;
                 host_done = false;
                 goto rehosts_jump;
                 break;
-            case 0x31:
-            case 0x32:
-            case 0x33:
-            case 0x34:
-            case 0x35:
-            case 0x36:
-            case 0x37:
-            case 0x38:
-                c = k - 0x31;
-                break;
-            case 0x40:         // special case for 8
+            case '@': // Special case for host 8
                 c = 7;
                 slot_done = true;
                 host_done = false;
                 goto rehosts_jump;
                 break;
-            case 'c':          // config
+            case 'C': // Config
+            case 'c':
                 host_done = true;
                 slot_done = true;
                 ret = false;
                 info_run();
                 break;
-            case 'h':          // Hosts
+            case 'H': // Hosts
+            case 'h':
                 slot_done = true;
                 host_done = false;
                 goto rehosts;
-            case 'e':          // EJECT
-              doeject:
+            case 'E': // Eject
+            case 'e':
+            doeject:
                 diskulator_umount_device(c);
-		screen_puts(0, c + 11, " ");
+                screen_puts(0, c + 11, " ");
                 screen_puts(3, c + 11, "  Empty                              ");
                 memset(deviceSlots.slot[c].file, 0, sizeof(deviceSlots.slot[c].file));
                 deviceSlots.slot[c].hostSlot = 0xFF;
                 diskulator_write_device_slots();
                 break;
-            case 'n':          // NEW
+            case 'N': // New disk
+            case 'n':
                 screen_puts(4, c + 11, "                                    ");
                 screen_puts(0, 20, "Enter filename of new ATR image        ");
                 screen_puts(0, 21, "                                       ");
                 memset(tmp_str, 0, sizeof(tmp_str));
                 memset(deviceSlots.slot[c].file, 0, sizeof(deviceSlots.slot[c].file));
-                
-// #8bitandmore             
-                retval  = screen_input(4, c + 11, deviceSlots.slot[c].file);
-                if ( strcmp( deviceSlots.slot[c].file, "" ) == 0 || retval == -1)
+
+                // #8bitandmore
+                retval = screen_input(4, c + 11, deviceSlots.slot[c].file);
+                if (strcmp(deviceSlots.slot[c].file, "") == 0 || retval == -1)
                 {
                     diskulator_umount_device(c);
                     screen_puts(0, c + 11, " ");
@@ -672,12 +676,16 @@ bool diskulator_host(void)
                     screen_puts(0, 20, "                                       ");
                     host_done = true;
                     slot_done = false;
-                    screen_puts(0, 20, "        \xD9\xA5\x19" "Eject\xD9\xA8\x19Hosts\xD9\xAE\x19New          ");
-                    screen_puts(0, 21, "    \xD9\x91\x8D\x98\x19" "Drives \xD9\xDC\x91\x8D\x98\x19" "Hosts\xD9\xA3\x19" "Config");
+                    screen_puts(0, 20, "        \xD9\xA5\x19"
+                                       "Eject\xD9\xA8\x19Hosts\xD9\xAE\x19New          ");
+                    screen_puts(0, 21, "    \xD9\x91\x8D\x98\x19"
+                                       "Drives \xD9\xDC\x91\x8D\x98\x19"
+                                       "Hosts\xD9\xA3\x19"
+                                       "Config");
                     break;
                 }
-//
-                           
+                //
+
                 screen_puts(0, 20, "Which Host Slot (1-8)?                 ");
                 screen_puts(0, 21, "                                       ");
                 memset(tmp_str, 0, sizeof(tmp_str));
@@ -685,8 +693,15 @@ bool diskulator_host(void)
                 deviceSlots.slot[c].hostSlot = atoi(tmp_str);
                 deviceSlots.slot[c].hostSlot -= 1;
                 diskulator_mount_host(deviceSlots.slot[c].hostSlot);
-                screen_puts(0, 20, "Size?\xD9\x91\x19" "90K  \xD9\x92\x19" "130K  \xD9\x93\x19" "180K  \xD9\x94\x19" "360K  ");
-                screen_puts(0, 21, "     \xD9\x95\x19" "720K \xD9\x96\x19" "1440K \xD9\x97\x19" "Custom          ");
+                screen_puts(0, 20, "Size?\xD9\x91\x19"
+                                   "90K  \xD9\x92\x19"
+                                   "130K  \xD9\x93\x19"
+                                   "180K  \xD9\x94\x19"
+                                   "360K  ");
+                screen_puts(0, 21, "     \xD9\x95\x19"
+                                   "720K \xD9\x96\x19"
+                                   "1440K \xD9\x97\x19"
+                                   "Custom          ");
                 memset(tmp_str, 0, sizeof(tmp_str));
                 screen_input(32, 21, tmp_str);
                 disk_type = atoi(tmp_str);
@@ -753,7 +768,8 @@ bool diskulator_host(void)
                 else
                     goto doeject;
                 break;
-            }
+            } // switch
+
             if (k > 0)
             {
                 bar_clear();
@@ -785,14 +801,16 @@ bool diskulator_select(void)
     //POKE(0x61B, 2);
     //POKE(0x61C, 2);
 
-  subdir:
+subdir:
     selector_done = false;
     screen_clear();
     bar_clear();
 
     screen_puts(0, 0, "    DISK IMAGES    ");
 
-    screen_puts(0, 21, "\xD9\xB2\xA5\xB4\xB5\xB2\xAE\x19" "PICK \xD9\xA5\xB3\xA3\x19" "ABORT");
+    screen_puts(0, 21, "\xD9\xB2\xA5\xB4\xB5\xB2\xAE\x19"
+                       "PICK \xD9\xA5\xB3\xA3\x19"
+                       "ABORT");
     screen_puts(24, 21, "                  ");
 
     screen_puts(0, 1, prefix);
@@ -839,39 +857,39 @@ bool diskulator_select(void)
 
         switch (k)
         {
-        case 0x1C:             // Up
+        case 0x1C: // Up
         case '-':
             if (e > 0)
                 e--;
             break;
-        case 0x1D:             // Down
+        case 0x1D: // Down
         case '=':
-            if (e < num_entries-1)
+            if (e < num_entries - 1)
                 e++;
             break;
-        case 95:          // SHIFT + UP ARROW
+        case 95: // SHIFT + UP ARROW
             luminanceIncrease();
             break;
-        case 124:          // SHIFT + DOWN ARROW
+        case 124: // SHIFT + DOWN ARROW
             luminanceDecrease();
             break;
-        case 92:          // CTRL + LEFT ARROW
+        case 92: // CTRL + LEFT ARROW
             hueDecrease();
             break;
-        case 94:          // CTRL + RIGHT ARROW
+        case 94: // CTRL + RIGHT ARROW
             hueIncrease();
             break;
-        case 0x1B:             // ESC
+        case 0x1B: // ESC
             selector_done = true;
             memset(path, 0, sizeof(path));
             bar_set_color(0x97);
             ret = false;
             goto image_done;
             break;
-        case 0x9B:             // Enter
+        case 0x9B: // Enter
             bar_set_color(0x97);
 
-            if (files[e][strlen(files[e]) - 1] == '/')  // subdir
+            if (files[e][strlen(files[e]) - 1] == '/') // subdir
             {
                 selector_done = false;
                 strcat(prefix, files[e]);
@@ -893,7 +911,7 @@ bool diskulator_select(void)
             k = 0;
         }
     }
-  image_done:
+image_done:
     return ret;
 }
 
@@ -916,7 +934,9 @@ void diskulator_drive(void)
 
     screen_puts(0, 0, "MOUNT TO DRIVE SLOTX");
     screen_puts(0, 21, "\xD9\x91\x8D\x98\x80\xAF\xB2\x80\xB2\xA5\xB4\xB5\xB2\xAE\x19PICK");
-    screen_puts(20, 21, "\xD9\xA5\xB3\xA3\x19" "ABORT  \xD9\xA5\x19" "EJECT ");
+    screen_puts(20, 21, "\xD9\xA5\xB3\xA3\x19"
+                        "ABORT  \xD9\xA5\x19"
+                        "EJECT ");
     diskulator_read_device_slots();
 
     // Display drive slots
@@ -941,35 +961,35 @@ void diskulator_drive(void)
         k = cgetc();
         switch (k)
         {
-        case 0x1C:             // UP
+        case 0x1C: // UP
         case '-':
             if (c > 0)
                 c--;
             break;
-        case 0x1D:             // DOWN
+        case 0x1D: // DOWN
         case '=':
             if (c < 7)
                 c++;
             break;
-        case 95:          // SHIFT + UP ARROW
+        case 95: // SHIFT + UP ARROW
             luminanceIncrease();
             break;
-        case 124:          // SHIFT + DOWN ARROW
+        case 124: // SHIFT + DOWN ARROW
             luminanceDecrease();
             break;
-        case 92:          // SHIFT + LEFT ARROW
+        case 92: // SHIFT + LEFT ARROW
             hueDecrease();
             break;
-        case 94:          // SHIFT + RIGHT ARROW
+        case 94: // SHIFT + RIGHT ARROW
             hueIncrease();
             break;
-        case 'e':              // E
+        case 'e': // E
             screen_puts(4, c + 2, "Empty                               ");
             memset(deviceSlots.slot[c].file, 0, sizeof(deviceSlots.slot[c].file));
             deviceSlots.slot[c].hostSlot = 0xFF;
             diskulator_write_device_slots();
             break;
-        case 0x1B:             // ESC
+        case 0x1B: // ESC
             drive_done = true;
             break;
         case 0x31:
@@ -985,9 +1005,10 @@ void diskulator_drive(void)
             bar_show(c + 3);
             goto rorw;
             break;
-        case 0x9B:             // RETURN
-          rorw:
-            screen_puts(0, 21, "\xD9\xB2\xA5\xB4\xB5\xB2\xAE\x19R/O     \xD9\xB7\x19R/W     \xD9\xA5\xB3\xA3\x19" "ABORT             ");
+        case 0x9B: // RETURN
+        rorw:
+            screen_puts(0, 21, "\xD9\xB2\xA5\xB4\xB5\xB2\xAE\x19R/O     \xD9\xB7\x19R/W     \xD9\xA5\xB3\xA3\x19"
+                               "ABORT             ");
             //screen_puts(11, 21, "");
 
             o = 0;
@@ -1007,7 +1028,7 @@ void diskulator_drive(void)
 
             diskulator_write_device_slots();
             diskulator_mount_device(c, o);
-          drive_slot_abort:
+        drive_slot_abort:
             drive_done = true;
             break;
         }
@@ -1028,7 +1049,7 @@ void diskulator_run(void)
     bool host_selected = false;
     bool disk_selected = false;
 
-    if (GTIA_READ.consol == 0x04)       // Option
+    if (GTIA_READ.consol == 0x04) // Option
     {
         diskulator_read_host_slots();
         diskulator_read_device_slots();
