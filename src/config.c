@@ -433,7 +433,7 @@ void config_run(void)
                 y--;
             else if (((k == 0x1D) || (k == '=')) && (y < num_networks[0]))
                 y++;
-            else if (k == 'x')
+            else if ((k == 'X') || (k == 'x'))
             {
                 done = true;
                 config_hidden_net();

@@ -753,7 +753,7 @@ rehosts_jump:
                 screen_puts(0, 21, "                                        ");
                 screen_input(21, 20, tmp_str);
 
-                if (tmp_str[0] == 'y')
+                if ((tmp_str[0] == 'Y') || (tmp_str[0] == 'y'))
                 {
                     screen_puts(0, 20, "Creating new Disk                       ");
                     screen_puts(0, 21, "                                        ");
@@ -1016,9 +1016,9 @@ void diskulator_drive(void)
 
             k = cgetc();
 
-            if (k == 'r' || k == 'R')
+            if ((k == 'R') || (k == 'r'))
                 o |= 0x01;
-            else if (k == 'w' || k == 'W')
+            else if ((k == 'W') || (k == 'w'))
                 o |= 0x02;
             else if (k == 0x1B)
                 goto drive_slot_abort;
