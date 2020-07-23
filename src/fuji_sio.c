@@ -7,6 +7,7 @@
 #include <stddef.h>
 #include <string.h>
 #include "sio.h"
+#include "fuji_sio.h"
 
 /**
  * Return number of networks
