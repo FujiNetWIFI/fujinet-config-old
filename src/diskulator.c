@@ -846,7 +846,14 @@ subdir:
     while (1)
     {
         if (kbhit())
+	  {
+	    rtclr();
             k = cgetc();
+	  }
+	else if (OS.rtclok[2]>100)
+	  {
+	    bar_set_color(0x44);
+	  }
 	
         switch (k)
         {
