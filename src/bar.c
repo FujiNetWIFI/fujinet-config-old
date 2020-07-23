@@ -23,39 +23,20 @@ void bar_clear(void)
  */
 void bar_show(unsigned char y)
 {
-  unsigned char scrpos=((y<<2)+16);
+  unsigned char scrpos=((y<<2)+16)+384;
+  unsigned char pmgcount=5;
 
   bar_clear();
   
-  // First the missiles (rightmost portion of bar)
-  bar_pmbase[384+scrpos+0]=0xFF;
-  bar_pmbase[384+scrpos+1]=0xFF;
-  bar_pmbase[384+scrpos+2]=0xFF;
-  bar_pmbase[384+scrpos+3]=0xFF;
+  do {
+    bar_pmbase[scrpos+0]=0xFF;
+    bar_pmbase[scrpos+1]=0xFF;
+    bar_pmbase[scrpos+2]=0xFF;
+    bar_pmbase[scrpos+3]=0xFF;
+    scrpos = scrpos + 0x80;
+    pmgcount--;
+  } while (pmgcount == 0);
 
-  // Then the players (p0)
-  bar_pmbase[512+scrpos+0]=0xFF;
-  bar_pmbase[512+scrpos+1]=0xFF;
-  bar_pmbase[512+scrpos+2]=0xFF;
-  bar_pmbase[512+scrpos+3]=0xFF;
-
-  // P1
-  bar_pmbase[640+scrpos+0]=0xFF;
-  bar_pmbase[640+scrpos+1]=0xFF;
-  bar_pmbase[640+scrpos+2]=0xFF;
-  bar_pmbase[640+scrpos+3]=0xFF;
-
-  // P2
-  bar_pmbase[768+scrpos+0]=0xFF;
-  bar_pmbase[768+scrpos+1]=0xFF;
-  bar_pmbase[768+scrpos+2]=0xFF;
-  bar_pmbase[768+scrpos+3]=0xFF;
-
-  // P3
-  bar_pmbase[896+scrpos+0]=0xFF;
-  bar_pmbase[896+scrpos+1]=0xFF;
-  bar_pmbase[896+scrpos+2]=0xFF;
-  bar_pmbase[896+scrpos+3]=0xFF;  
 }
 
 /**
