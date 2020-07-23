@@ -16,6 +16,8 @@
 
 unsigned char kchar;
 
+extern unsigned char successful;
+
 #define VERSION_SHORT v0 .1.9
 
 extern union {
@@ -88,7 +90,7 @@ void info_run(void)
     POKE(0x610, 2);
 
     screen_puts(0, 4, "  #FUJINET  CONFIG  ");
-    screen_puts(11, 15, "Press \xD9\xA3\x19 reconnect");
+    screen_puts(7, 15, "\xD9\xA3\x19RECONNECT \xD9\xB3\x19" "CHANGE SSID");
     screen_puts(9, 16, "Any other key to return");
     screen_puts(5, 5, "      SSID:");
     screen_puts(5, 6, "  Hostname:");
@@ -131,6 +133,15 @@ void info_run(void)
     {
         config_connect();
     }
+    else if (kchar == 'S' || kchar == 's')
+      {
+	POKE(0x60A,2);
+	POKE(0x60B,2);
+	POKE(0x61B,6);
+	POKE(0x61C,6);
+	successful = false;
+	config_run();
+      }
 
     // Patch it back
     POKE(0x60A, 2);
