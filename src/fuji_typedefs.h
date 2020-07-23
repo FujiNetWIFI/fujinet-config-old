@@ -2,8 +2,8 @@
  * CONFIG custom types
  */
 
-#ifndef TYPEDEFS_H
-#define TYPEDEFS_H
+#ifndef FUJI_TYPEDEFS_H
+#define FUJI_TYPEDEFS_H
 
 #include "const.h"
 
@@ -78,4 +78,4 @@ typedef union {
     unsigned char rawData[42];
 } NewDisk;
 
-#endif /* TYPEDEFS_H */
+#endif /* FUJI_TYPEDEFS_H */

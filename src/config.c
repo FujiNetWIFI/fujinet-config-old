@@ -11,7 +11,7 @@
 #include "sio.h"
 #include "bar.h"
 #include "die.h"
-#include "typedefs.h"
+#include "fuji_typedefs.h"
 #include "color.h"
 
 bool _configured = false;

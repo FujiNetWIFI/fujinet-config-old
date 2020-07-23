@@ -5,6 +5,8 @@
 #ifndef FUJINET_SIO_H
 #define FUJINET_SIO_H
 
+#include "fuji_typedefs.h"
+
 /**
  * Return number of networks
  */

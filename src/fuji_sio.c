@@ -7,7 +7,6 @@
 #include <stddef.h>
 #include <string.h>
 #include "sio.h"
-#include "typedefs.h"
 
 /**
  * Return number of networks
