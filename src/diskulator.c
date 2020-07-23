@@ -16,6 +16,7 @@
 #include "bar.h"
 #include "die.h"
 #include "info.h"
+#include "color.h"
 
 unsigned char prefix[256] = "/";
 unsigned char path[256];
@@ -35,8 +36,6 @@ unsigned char k;
 unsigned char zx[2];
 
 int retval = 0;
-int backgroundHue = 0;
-int backgroundLum = 0;
 
 extern unsigned char *video_ptr;
 extern unsigned char *dlist_ptr;
@@ -76,50 +75,6 @@ union {
 void diskulator_boot(void)
 {
     asm("jmp $E477");
-}
-
-void luminanceIncrease()
-{
-    backgroundLum++;
-
-    if (backgroundLum > 7)
-        backgroundLum = 0;
-
-    POKE(710, _gtia_mkcolor(backgroundHue, backgroundLum));
-    POKE(712, _gtia_mkcolor(backgroundHue, backgroundLum));
-}
-
-void luminanceDecrease()
-{
-    backgroundLum--;
-
-    if (backgroundLum < 0)
-        backgroundLum = 7;
-
-    POKE(710, _gtia_mkcolor(backgroundHue, backgroundLum));
-    POKE(712, _gtia_mkcolor(backgroundHue, backgroundLum));
-}
-
-void hueDecrease()
-{
-    backgroundHue--;
-
-    if (backgroundHue < 0)
-        backgroundHue = 15;
-
-    POKE(710, _gtia_mkcolor(backgroundHue, backgroundLum));
-    POKE(712, _gtia_mkcolor(backgroundHue, backgroundLum));
-}
-
-void hueIncrease()
-{
-    backgroundHue++;
-
-    if (backgroundHue > 15)
-        backgroundHue = 0;
-
-    POKE(710, _gtia_mkcolor(backgroundHue, backgroundLum));
-    POKE(712, _gtia_mkcolor(backgroundHue, backgroundLum));
 }
 
 /**
