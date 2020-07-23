@@ -7,9 +7,6 @@
 #ifndef DISKULATOR_H
 #define DISKULATOR_H
 
-#define FILE_MAXLEN 36
-#define FILES_MAXCOUNT 16
-
 /**
  * Run the Diskulator
  */

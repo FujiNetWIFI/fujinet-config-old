@@ -11,6 +11,8 @@
 #include "sio.h"
 #include "bar.h"
 #include "die.h"
+#include "typedefs.h"
+#include "color.h"
 
 bool _configured = false;
 bool hidden_network_selected = false;
@@ -18,11 +20,6 @@ bool hidden_network_selected = false;
 unsigned char config_sector[128];
 unsigned char wifiStatus;
 unsigned char successful = 0; // connection successful?
-
-#define COLOR_SETTING_NETWORK 0x66
-#define COLOR_SETTING_FAILED 0x33
-#define COLOR_SETTING_SUCCESSFUL 0xB4
-#define COLOR_CHECKING_NETWORK 0x26
 
 /**
  * Print the ssid at index i
@@ -225,6 +222,8 @@ void config_run(void)
 
     while (successful == false)
     {
+      AdapterConfig adapterConfig;
+      NetConfig netConfig;
         unsigned char mactmp[3];
 
         screen_clear();

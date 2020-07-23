@@ -5,6 +5,8 @@
 #ifndef TYPEDEFS_H
 #define TYPEDEFS_H
 
+#include "const.h"
+
 /**
  * Returned info for a single SSID entry
  * from a WiFi scan

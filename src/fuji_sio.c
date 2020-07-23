@@ -3,7 +3,11 @@
  */
 
 #include <atari.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <string.h>
 #include "sio.h"
+#include "typedefs.h"
 
 /**
  * Return number of networks
@@ -26,15 +30,15 @@ unsigned char fuji_sio_do_scan(unsigned char *num_networks)
 /**
  * Return Network entry from last scan
  */
-unsigned char fuji_sio_scan_result(unsigned char n)
+unsigned char fuji_sio_scan_result(unsigned char n, SSIDInfo* ssidInfo)
 {
     OS.dcb.ddevic = 0x70;
     OS.dcb.dunit = 1;
     OS.dcb.dcomnd = 0xFC; // Return scan result
     OS.dcb.dstats = 0x40; // Peripheral->Computer
-    OS.dcb.dbuf = &ssidInfo.rawData;
+    OS.dcb.dbuf = &ssidInfo->rawData;
     OS.dcb.dtimlo = 0x0F; // 15 second timeout
-    OS.dcb.dbyt = sizeof(ssidInfo.rawData);
+    OS.dcb.dbyt = sizeof(ssidInfo->rawData);
     OS.dcb.daux1 = n; // get entry #n
     siov();
 
@@ -44,15 +48,15 @@ unsigned char fuji_sio_scan_result(unsigned char n)
 /**
  * Write desired SSID and password to SIO
  */
-unsigned char fuji_sio_set_ssid(bool save)
+unsigned char fuji_sio_set_ssid(bool save, NetConfig* netConfig)
 {
     OS.dcb.ddevic = 0x70;
     OS.dcb.dunit = 1;
     OS.dcb.dcomnd = 0xFB; // Set SSID
     OS.dcb.dstats = 0x80; // Computer->Peripheral
-    OS.dcb.dbuf = &netConfig.rawData;
+    OS.dcb.dbuf = &netConfig->rawData;
     OS.dcb.dtimlo = 0x0f; // 15 second timeout
-    OS.dcb.dbyt = sizeof(netConfig.rawData);
+    OS.dcb.dbyt = sizeof(netConfig->rawData);
     OS.dcb.daux = save ? 1 : 0;
     siov();
 
@@ -62,7 +66,7 @@ unsigned char fuji_sio_set_ssid(bool save)
 /**
  * Get WiFi Network Status
  */
-unsigned char fuji_sio_get_wifi_status(void)
+unsigned char fuji_sio_get_wifi_status(unsigned char* wifiStatus)
 {
     OS.dcb.ddevic = 0x70;
     OS.dcb.dunit = 1;
@@ -80,16 +84,16 @@ unsigned char fuji_sio_get_wifi_status(void)
 /**
  * Read host slots
  */
-void fuji_sio_read_host_slots(void)
+void fuji_sio_read_host_slots(HostSlots* hostSlots)
 {
     // Query for host slots
     OS.dcb.ddevic = 0x70;
     OS.dcb.dunit = 1;
     OS.dcb.dcomnd = 0xF4; // Get host slots
     OS.dcb.dstats = 0x40;
-    OS.dcb.dbuf = &hostSlots.rawData;
+    OS.dcb.dbuf = &hostSlots->rawData;
     OS.dcb.dtimlo = 0x0f;
-    OS.dcb.dbyt = 256;
+    OS.dcb.dbyt = sizeof(hostSlots->rawData);
     OS.dcb.daux = 0;
     siov();
 }
@@ -97,13 +101,13 @@ void fuji_sio_read_host_slots(void)
 /**
  * Write host slots
  */
-void fuji_sio_write_host_slots(void)
+void fuji_sio_write_host_slots(HostSlots* hostSlots)
 {
     OS.dcb.ddevic = 0x70;
     OS.dcb.dunit = 1;
     OS.dcb.dcomnd = 0xF3;
     OS.dcb.dstats = 0x80;
-    OS.dcb.dbuf = &hostSlots.rawData;
+    OS.dcb.dbuf = &hostSlots->rawData;
     OS.dcb.dtimlo = 0x0f;
     OS.dcb.dbyt = 256;
     OS.dcb.daux = 0;
@@ -113,9 +117,9 @@ void fuji_sio_write_host_slots(void)
 /**
  * Mount a host slot
  */
-void fuji_sio_mount_host(unsigned char c)
+void fuji_sio_mount_host(unsigned char c, HostSlots* hostSlots)
 {
-    if (hostSlots.host[c][0] != 0x00)
+    if (hostSlots->host[c][0] != 0x00)
     {
         OS.dcb.ddevic = 0x70;
         OS.dcb.dunit = 1;
@@ -132,16 +136,16 @@ void fuji_sio_mount_host(unsigned char c)
 /**
  * Read drive tables
  */
-void fuji_sio_read_device_slots(void)
+void fuji_sio_read_device_slots(DeviceSlots* deviceSlots)
 {
     // Read Drive Tables
     OS.dcb.ddevic = 0x70;
     OS.dcb.dunit = 1;
     OS.dcb.dcomnd = 0xF2;
     OS.dcb.dstats = 0x40;
-    OS.dcb.dbuf = &deviceSlots.rawData;
+    OS.dcb.dbuf = &deviceSlots->rawData;
     OS.dcb.dtimlo = 0x0f;
-    OS.dcb.dbyt = sizeof(deviceSlots.rawData);
+    OS.dcb.dbyt = sizeof(deviceSlots->rawData);
     OS.dcb.daux = 0;
     siov();
 }
@@ -149,15 +153,15 @@ void fuji_sio_read_device_slots(void)
 /**
  * Write drive tables
  */
-void fuji_sio_write_device_slots(void)
+void fuji_sio_write_device_slots(DeviceSlots* deviceSlots)
 {
     OS.dcb.ddevic = 0x70;
     OS.dcb.dunit = 1;
     OS.dcb.dcomnd = 0xF1;
     OS.dcb.dstats = 0x80;
-    OS.dcb.dbuf = &deviceSlots.rawData;
+    OS.dcb.dbuf = &deviceSlots->rawData;
     OS.dcb.dtimlo = 0x0f;
-    OS.dcb.dbyt = sizeof(deviceSlots.rawData);
+    OS.dcb.dbyt = sizeof(deviceSlots->rawData);
     OS.dcb.daux = 0;
     siov();
 }
@@ -198,24 +202,25 @@ void fuji_sio_umount_device(unsigned char c)
 /**
  * Create New Disk
  */
-void fuji_sio_new_disk(unsigned char c, unsigned short ns, unsigned short ss)
+void fuji_sio_new_disk(unsigned char c, unsigned short ns, unsigned short ss, DeviceSlots* deviceSlots)
 {
-    newDisk.numSectors = ns;
-    newDisk.sectorSize = ss;
-    newDisk.hostSlot = deviceSlots.slot[c].hostSlot;
-    newDisk.deviceSlot = c;
-    strcpy(newDisk.filename, deviceSlots.slot[c].file);
-    deviceSlots.slot[c].mode = 0x02;
-
-    OS.dcb.ddevic = 0x70;
-    OS.dcb.dunit = 1;
-    OS.dcb.dcomnd = 0xE7; // TNFS Create Disk
-    OS.dcb.dstats = 0x80;
-    OS.dcb.dbuf = &newDisk.rawData;
-    OS.dcb.dtimlo = 0xFE;
-    OS.dcb.dbyt = sizeof(newDisk.rawData);
-    OS.dcb.daux = 0;
-    siov();
+  NewDisk newDisk;
+  newDisk.numSectors = ns;
+  newDisk.sectorSize = ss;
+  newDisk.hostSlot = deviceSlots->slot[c].hostSlot;
+  newDisk.deviceSlot = c;
+  strcpy(newDisk.filename, deviceSlots->slot[c].file);
+  deviceSlots->slot[c].mode = 0x02;
+  
+  OS.dcb.ddevic = 0x70;
+  OS.dcb.dunit = 1;
+  OS.dcb.dcomnd = 0xE7; // TNFS Create Disk
+  OS.dcb.dstats = 0x80;
+  OS.dcb.dbuf = &newDisk.rawData;
+  OS.dcb.dtimlo = 0xFE;
+  OS.dcb.dbyt = sizeof(newDisk.rawData);
+  OS.dcb.daux = 0;
+  siov();
 }
 
 /**

@@ -9,6 +9,7 @@
 
 #define SetChar(x,y,a) video_ptr[(x)+(y)*40]=(a);
 #define GetChar(x,y) video_ptr[(x)+(y)*40]
+
 #define GRAPHICS_0_SCREEN_SIZE (40*25)
 #define DISPLAY_LIST 0x0600
 #define DISPLAY_MEMORY 0x7400
