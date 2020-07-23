@@ -35,8 +35,8 @@ unsigned char k;
 unsigned char zx[2];
 
 int retval = 0;
-int backgroundHue = 0;
-int backgroundLum = 0;
+unsigned char backgroundHue = 0;
+unsigned char backgroundLum = 0;
 
 extern unsigned char *video_ptr;
 extern unsigned char *dlist_ptr;
