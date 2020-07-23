@@ -1047,9 +1047,6 @@ void diskulator_drive(void)
  */
 void diskulator_run(void)
 {
-    bool host_selected = false;
-    bool disk_selected = false;
-
     if (GTIA_READ.consol == 0x04) // Option
     {
         diskulator_read_host_slots();
@@ -1061,11 +1058,9 @@ void diskulator_run(void)
 
     while (diskulator_done == false)
     {
-        host_selected = diskulator_host();
-        if (host_selected == true)
+        if (diskulator_host() == true)
         {
-            disk_selected = diskulator_select();
-            if (disk_selected == true)
+            if (diskulator_select() == true)
             {
                 diskulator_drive();
             }
