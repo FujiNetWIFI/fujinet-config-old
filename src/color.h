@@ -5,9 +5,9 @@
 #ifndef COLOR_H
 #define COLOR_H
 
-void luminanceIncrease(void);
-void luminanceDecrease(void);
-void hueIncrease(void);
-void hueDecrease(void);
+void color_luminanceIncrease(void);
+void color_luminanceDecrease(void);
+void color_hueIncrease(void);
+void color_hueDecrease(void);
 
 #endif /* COLOR_H */

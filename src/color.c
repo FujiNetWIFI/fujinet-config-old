@@ -9,7 +9,7 @@
 int backgroundLum;
 int backgroundHue;
 
-void luminanceIncrease(void)
+void color_luminanceIncrease(void)
 {
     backgroundLum++;
 
@@ -20,7 +20,7 @@ void luminanceIncrease(void)
     POKE(712, _gtia_mkcolor(backgroundHue, backgroundLum));
 }
 
-void luminanceDecrease(void)
+void color_luminanceDecrease(void)
 {
     backgroundLum--;
 
@@ -31,7 +31,7 @@ void luminanceDecrease(void)
     POKE(712, _gtia_mkcolor(backgroundHue, backgroundLum));
 }
 
-void hueDecrease(void)
+void color_hueDecrease(void)
 {
     backgroundHue--;
 
@@ -42,7 +42,7 @@ void hueDecrease(void)
     POKE(712, _gtia_mkcolor(backgroundHue, backgroundLum));
 }
 
-void hueIncrease(void)
+void color_hueIncrease(void)
 {
     backgroundHue++;
 

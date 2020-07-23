@@ -445,16 +445,16 @@ rehosts_jump:
                     c++;
                 break;
             case '_': // SHIFT + UP ARROW
-                luminanceIncrease();
+                color_luminanceIncrease();
                 break;
             case '|': // SHIFT + DOWN ARROW
-                luminanceDecrease();
+                color_luminanceDecrease();
                 break;
             case '\\': // SHIFT + LEFT ARROW
-                hueDecrease();
+                color_hueDecrease();
                 break;
             case '^': // SHIFT + RIGHT ARROW
-                hueIncrease();
+                color_hueIncrease();
                 break;
             case '1': // Drives 1-8
             case '2':
@@ -559,16 +559,16 @@ rehosts_jump:
                     c++;
                 break;
             case '_': // SHIFT + UP ARROW
-                luminanceIncrease();
+                color_luminanceIncrease();
                 break;
             case '|': // SHIFT + DOWN ARROW
-                luminanceDecrease();
+                color_luminanceDecrease();
                 break;
             case '\\': // SHIFT + LEFT ARROW
-                hueDecrease();
+                color_hueDecrease();
                 break;
             case '^': // SHIFT + RIGHT ARROW
-                hueIncrease();
+                color_hueIncrease();
                 break;
             case '!': // Hosts 1-7
             case '"':
@@ -823,16 +823,16 @@ subdir:
                 e++;
             break;
         case 95: // SHIFT + UP ARROW
-            luminanceIncrease();
+            color_luminanceIncrease();
             break;
         case 124: // SHIFT + DOWN ARROW
-            luminanceDecrease();
+            color_luminanceDecrease();
             break;
         case 92: // CTRL + LEFT ARROW
-            hueDecrease();
+            color_hueDecrease();
             break;
         case 94: // CTRL + RIGHT ARROW
-            hueIncrease();
+            color_hueIncrease();
             break;
         case 0x1B: // ESC
             selector_done = true;
@@ -927,16 +927,16 @@ void diskulator_drive(void)
                 c++;
             break;
         case '_': // SHIFT + UP ARROW
-            luminanceIncrease();
+            color_luminanceIncrease();
             break;
         case '|': // SHIFT + DOWN ARROW
-            luminanceDecrease();
+            color_luminanceDecrease();
             break;
         case '\\': // SHIFT + LEFT ARROW
-            hueDecrease();
+            color_hueDecrease();
             break;
         case '^': // SHIFT + RIGHT ARROW
-            hueIncrease();
+            color_hueIncrease();
             break;
         case 'E': // Eject
         case 'e':
