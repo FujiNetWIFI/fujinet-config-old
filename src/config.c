@@ -15,40 +15,6 @@
 bool _configured = false;
 bool hidden_network_selected = false;
 
-union {
-    struct
-    {
-        char ssid[32];
-        signed char rssi;
-    };
-    unsigned char rawData[33];
-} ssidInfo;
-
-union {
-    struct
-    {
-        char ssid[32];
-        char password[64];
-    };
-    unsigned char rawData[96];
-} netConfig;
-
-union {
-    struct
-    {
-        char ssid[32];
-        char hostname[64];
-        unsigned char localIP[4];
-        unsigned char gateway[4];
-        unsigned char netmask[4];
-        unsigned char dnsIP[4];
-        unsigned char macAddress[6];
-        unsigned char bssid[6];
-        char fn_version[15];
-    };
-    unsigned char rawData[139];
-} adapterConfig;
-
 unsigned char config_sector[128];
 unsigned char wifiStatus;
 unsigned char successful = 0; // connection successful?

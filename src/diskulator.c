@@ -43,33 +43,6 @@ extern unsigned char *dlist_ptr;
 extern unsigned short screen_memory;
 extern unsigned char *font_ptr;
 
-union {
-    unsigned char host[8][32];
-    unsigned char rawData[256];
-} hostSlots;
-
-union {
-    struct
-    {
-        unsigned char hostSlot;
-        unsigned char mode;
-        unsigned char file[FILE_MAXLEN];
-    } slot[8];
-    unsigned char rawData[304];
-} deviceSlots;
-
-union {
-    struct
-    {
-        unsigned short numSectors;
-        unsigned short sectorSize;
-        unsigned char hostSlot;
-        unsigned char deviceSlot;
-        char filename[FILE_MAXLEN];
-    };
-    unsigned char rawData[42];
-} newDisk;
-
 /**
  * Do coldstart
  */

@@ -20,22 +20,6 @@ extern unsigned char successful;
 
 #define VERSION_SHORT v0 .1.9
 
-extern union {
-    struct
-    {
-        char ssid[32];
-        char hostname[64];
-        unsigned char localIP[4];
-        unsigned char gateway[4];
-        unsigned char netmask[4];
-        unsigned char dnsIP[4];
-        unsigned char macAddress[6];
-        unsigned char bssid[6];
-        char fn_version[15];
-    };
-    unsigned char rawData[139];
-} adapterConfig;
-
 /**
  * Print IP address at position
  */
