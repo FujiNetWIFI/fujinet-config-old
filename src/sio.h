@@ -3,3 +3,4 @@
  */
 
 void siov();
+void rtclr();
