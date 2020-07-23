@@ -278,8 +278,8 @@ bool configured(void)
  */
 bool config_wait_for_wifi(void)
 {
-    OS.rtclok[0] = OS.rtclok[1] = OS.rtclok[2] = 0;
-
+  rtclr();
+  
     while (1)
     {
         if ((OS.rtclok[2] & 0x3f) == 0)
@@ -293,8 +293,8 @@ bool config_wait_for_wifi(void)
                 //config_write();
                 config_set_ssid(true);
 
-                OS.rtclok[0] = OS.rtclok[1] = OS.rtclok[2] = 0;
-
+		rtclr();
+		
                 while (OS.rtclok[2] < 128)
                 {
                 } // Delay
@@ -315,7 +315,7 @@ bool config_wait_for_wifi(void)
         if (OS.rtclok[1] == 2) // we timed out...
         {
             screen_puts(0, 21, " COULD NOT CONNECT. ");
-            OS.rtclok[2] = 0;
+	    rtclr();
             while (OS.rtclok[2] < 128)
             {
             }
@@ -469,7 +469,7 @@ void config_run(void)
 
         done = false;
 
-        OS.rtclok[0] = OS.rtclok[1] = OS.rtclok[2] = 0;
-        config_wait_for_wifi();
+	rtclr();
+	config_wait_for_wifi();
     }
 }
