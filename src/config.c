@@ -200,32 +200,6 @@ void config_print_error(unsigned char s)
 }
 
 /**
- * Write config to "disk"
- */
-/* The SSID is saved as part of config_set_ssid
-*/
-/*
-void config_write(void)
-{
-  memset(&config_sector,0x00,sizeof(config_sector));
-
-  strcpy(&config_sector[0],netConfig.ssid);
-  strcpy(&config_sector[32],netConfig.password);
-  config_sector[127]=0xFF; // Now configured.
-  
-  OS.dcb.ddevic=0x31;
-  OS.dcb.dunit=1;
-  OS.dcb.dcomnd='P';
-  OS.dcb.dstats=0x80;
-  OS.dcb.dbuf=&config_sector;
-  OS.dcb.dtimlo=0x0F;
-  OS.dcb.dbyt=128;
-  OS.dcb.daux=720; // 720 = the config sector.
-  siov();
-}
-*/
-
-/**
  * Query FN for current config
  */
 void config_read(void)
@@ -252,17 +226,7 @@ bool configured(void)
         _configured = false;
         return _configured;
     }
-    /*
-  OS.dcb.ddevic=0x31;
-  OS.dcb.dunit=1;
-  OS.dcb.dcomnd='R'; // Is device configured?
-  OS.dcb.dstats=0x40; // Peripheral->Computer
-  OS.dcb.dbuf=&config_sector;
-  OS.dcb.dtimlo=0x0F; // 15 second timeout
-  OS.dcb.dbyt=128;      // single sector
-  OS.dcb.daux=720;
-  siov();
-  */
+
     config_read();
 
     if (netConfig.ssid[0] != '\0')
@@ -290,7 +254,6 @@ bool config_wait_for_wifi(void)
             if (wifiStatus == 3)
             {
                 OS.pcolr0 = OS.pcolr1 = OS.pcolr2 = OS.pcolr3 = COLOR_SETTING_SUCCESSFUL;
-                //config_write();
                 config_set_ssid(true);
 
 		rtclr();
