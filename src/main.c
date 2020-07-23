@@ -86,8 +86,7 @@ void setup(void)
 
   OS.chbas=0x78; // use the charset
   bar_clear();
-  bar_setup_regs();
-  
+  bar_setup_regs();  
 }
 
 void main(void)
