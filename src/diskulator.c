@@ -793,13 +793,6 @@ bool diskulator_select(void)
 
     POKE(0x60F, 2);
     POKE(0x610, 2);
-    //POKE(0x61B, 6);
-    //POKE(0x61C, 6);
-
-    //POKE(0x60F, 6);
-    //POKE(0x610, 6);
-    //POKE(0x61B, 2);
-    //POKE(0x61C, 2);
 
 subdir:
     selector_done = false;
