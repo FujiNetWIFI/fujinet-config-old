@@ -21,6 +21,23 @@ static HostSlots hostSlots;
 static DeviceSlots deviceSlots;
 
 /**
+ * Diskulator Screen setup
+ */
+void diskulator_screen_setup(void)
+{
+  screen_clear();
+  bar_clear();
+
+  POKE(0x60F,6);
+  POKE(0x610,6);
+  POKE(0x61B,2);
+  POKE(0x61C,2);
+
+  screen_puts(3,0,"TNFS HOST LIST");
+  screen_puts(24,9,"DRIVE SLOTS");
+}
+
+/**
  * Diskulator hosts/deviceslots screen.
  */
 bool diskulator_host(unsigned char* selected_host)
@@ -37,16 +54,6 @@ bool diskulator_host(unsigned char* selected_host)
   unsigned char prev_consol;
   int retval;
   
-  screen_clear();
-  bar_clear();
-  
-  // Temporarily patch display list for this screen.
-  POKE(0x60F, 6);
-  POKE(0x610, 6);
-  POKE(0x61B, 2);
-  POKE(0x61C, 2);
-  
-  screen_puts(0, 0, "   TNFS HOST LIST   ");
   
   fuji_sio_read_host_slots(&hostSlots);
   
@@ -73,8 +80,6 @@ bool diskulator_host(unsigned char* selected_host)
   
   // Display Device Slots
   fuji_sio_read_device_slots(&deviceSlots);
-  
-  screen_puts(20, 9, "    DRIVE SLOTS    ");
   
   // Display drive slots
   for (i = 0; i < 8; i++)
