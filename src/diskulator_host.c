@@ -5,14 +5,25 @@
 #include <atari.h>
 #include <stdbool.h>
 #include <peekpoke.h>
+#include <stdlib.h>
+#include <conio.h>
+#include <string.h>
 #include "diskulator_host.h"
 #include "screen.h"
 #include "bar.h"
+#include "fuji_typedefs.h"
+#include "fuji_sio.h"
+#include "die.h"
+#include "color.h"
+#include "info.h"
+
+static HostSlots hostSlots;
+static DeviceSlots deviceSlots;
 
 /**
  * Diskulator hosts/deviceslots screen.
  */
-bool diskulator_host(void)
+bool diskulator_host(unsigned char* selected_host)
 {
   char tmp_str[8];
   char disk_type;
@@ -22,6 +33,9 @@ bool diskulator_host(void)
   bool host_done = false;
   bool slot_done = true;
   char k = 0;
+  unsigned char i;
+  unsigned char prev_consol;
+  int retval;
   
   screen_clear();
   bar_clear();
@@ -34,7 +48,7 @@ bool diskulator_host(void)
   
   screen_puts(0, 0, "   TNFS HOST LIST   ");
   
-  diskulator_read_host_slots();
+  fuji_sio_read_host_slots(&hostSlots);
   
   if (OS.dcb.dstats != 0x01)
     {
@@ -43,39 +57,39 @@ bool diskulator_host(void)
     }
   
   // Display host slots
-  for (c = 0; c < 8; c++)
+  for (i = 0; i < 8; i++)
     {
-      unsigned char n = c + 1;
+      unsigned char n = i + 1;
       unsigned char nc[2];
       
       utoa(n, nc, 10);
-      screen_puts(2, c + 1, nc);
+      screen_puts(2, i + 1, nc);
       
-      if (hostSlots.host[c][0] != 0x00)
-	screen_puts(5, c + 1, hostSlots.host[c]);
+      if (hostSlots.host[i][0] != 0x00)
+	screen_puts(5, i + 1, hostSlots.host[i]);
       else
-	screen_puts(5, c + 1, "Empty");
+	screen_puts(5, i + 1, "Empty");
     }
   
   // Display Device Slots
-  diskulator_read_device_slots();
+  fuji_sio_read_device_slots(&deviceSlots);
   
   screen_puts(20, 9, "    DRIVE SLOTS    ");
   
   // Display drive slots
-  for (c = 0; c < 8; c++)
+  for (i = 0; i < 8; i++)
     {
       unsigned char d[6];
       
       d[1] = 0x20;
-      d[2] = 0x31 + c;
+      d[2] = 0x31 + i;
       d[4] = 0x20;
       d[5] = 0x00;
       
-      if (deviceSlots.slot[c].file[0] != 0x00)
+      if (deviceSlots.slot[i].file[0] != 0x00)
         {
-	  d[0] = deviceSlots.slot[c].hostSlot + 0x31;
-	  d[3] = (deviceSlots.slot[c].mode == 0x02 ? 'W' : 'R');
+	  d[0] = deviceSlots.slot[i].hostSlot + 0x31;
+	  d[3] = (deviceSlots.slot[i].mode == 0x02 ? 'W' : 'R');
         }
       else
         {
@@ -83,13 +97,13 @@ bool diskulator_host(void)
 	  d[3] = 0x20;
         }
       
-      screen_puts(0, c + 11, d);
-      screen_puts(5, c + 11, deviceSlots.slot[c].file[0] != 0x00 ? deviceSlots.slot[c].file : "Empty");
+      screen_puts(0, i + 11, d);
+      screen_puts(5, i + 11, deviceSlots.slot[i].file[0] != 0x00 ? deviceSlots.slot[i].file : "Empty");
     }
   
  rehosts:
   // reset cursor
-  c = 0;
+  i = 0;
   
  rehosts_jump:
   screen_puts(0, 20, "\xD9\xB2\xA5\xB4\xB5\xB2\xAE\x19Pick\xD9\xA5\x19"
@@ -102,7 +116,7 @@ bool diskulator_host(void)
 	      "Config");
   
   bar_clear();
-  bar_show(c + 2);
+  bar_show(i + 2);
   
   // Keyboard input in HOSTS area
   while (host_done == false)
@@ -110,9 +124,9 @@ bool diskulator_host(void)
       // Quick boot
       if (GTIA_READ.consol == 0x03)
         {
-	  diskulator_mount_all_hosts();
-	  diskulator_mount_all_devices();
-	  diskulator_boot();
+	  fuji_sio_mount_all_hosts(&deviceSlots, &hostSlots);
+	  fuji_sio_mount_all_devices(&deviceSlots);
+	  cold_boot();
         }
       
       if (kbhit())
@@ -126,13 +140,13 @@ bool diskulator_host(void)
             {
             case 0x1C: // ATASCII UP
             case '-':
-	      if (c > 0)
-		c--;
+	      if (i > 0)
+		i--;
 	      break;
             case 0x1D: // ATASCII DOWN
             case '=':
-	      if (c < 7)
-		c++;
+	      if (i < 7)
+		i++;
 	      break;
             case '_': // SHIFT + UP ARROW
 	      color_luminanceIncrease();
@@ -154,7 +168,7 @@ bool diskulator_host(void)
             case '6':
             case '7':
             case '8':
-	      c = k - '1';
+	      i = k - '1';
 	      goto jump_to_devs;
 	      break;
             case 'C': // Config
@@ -166,16 +180,16 @@ bool diskulator_host(void)
 	      break;
             case 'E': // Edit
             case 'e':
-	      if (hostSlots.host[c][0] == 0x00)
-		screen_puts(3, c + 1, "                                    ");
-	      screen_input(4, c + 1, hostSlots.host[c]);
-	      if (hostSlots.host[c][0] == 0x00)
-		screen_puts(5, c + 1, "Empty");
-	      diskulator_write_host_slots();
+	      if (hostSlots.host[i][0] == 0x00)
+		screen_puts(3, i + 1, "                                    ");
+	      screen_input(4, i + 1, hostSlots.host[i]);
+	      if (hostSlots.host[i][0] == 0x00)
+		screen_puts(5, i + 1, "Empty");
+	      fuji_sio_write_host_slots(&hostSlots);
 	      break;
             case 'D': // Drives
             case 'd':
-	      c = 0;
+	      i = 0;
             jump_to_devs:
 	      host_done = true;
 	      slot_done = false;
@@ -183,17 +197,14 @@ bool diskulator_host(void)
 			  "Eject\xD9\xA8\x19Hosts\xD9\xAE\x19New          ");
 	      break;
             case 0x9B: // ENTER
-	      selected_host = c;
-	      if (hostSlots.host[selected_host][0] != 0x00)
+	      *selected_host = i;
+	      if (hostSlots.host[i][0] != 0x00)
                 {
 		  // Write hosts
-		  diskulator_write_host_slots();
+		  fuji_sio_write_host_slots(&hostSlots);
 		  
 		  // Mount host
-		  diskulator_mount_host(c);
-		  memset(prefix, 0, sizeof(prefix));
-		  strcat(prefix, "/");
-		  
+		  fuji_sio_mount_host(i, &hostSlots);		  
 		  ret = true;
                 }
 	      else
@@ -206,7 +217,7 @@ bool diskulator_host(void)
 	  if (k > 0)
             {
 	      bar_clear();
-	      bar_show(c + 2);
+	      bar_show(i + 2);
 	      k = 0;
             }
         }
@@ -218,7 +229,7 @@ bool diskulator_host(void)
     bar_show(13);
   
   bar_clear();
-  bar_show(c + 13);
+  bar_show(i + 13);
   
   k = 0;
   
@@ -228,9 +239,9 @@ bool diskulator_host(void)
       // Quick boot
       if (GTIA_READ.consol == 0x03)
         {
-	  diskulator_mount_all_hosts();
-	  diskulator_mount_all_devices();
-	  diskulator_boot();
+	  fuji_sio_mount_all_hosts(&deviceSlots,&hostSlots);
+	  fuji_sio_mount_all_devices(&deviceSlots);
+	  cold_boot();
         }
       
       if (kbhit())
@@ -240,13 +251,13 @@ bool diskulator_host(void)
             {
             case 0x1C: // ATASCII UP
             case '-':
-	      if (c > 0)
-		c--;
+	      if (i > 0)
+		i--;
 	      break;
             case 0x1D: // ATASCII DOWN
             case '=':
-	      if (c < 7)
-		c++;
+	      if (i < 7)
+		i++;
 	      break;
             case '_': // SHIFT + UP ARROW
 	      color_luminanceIncrease();
@@ -267,13 +278,13 @@ bool diskulator_host(void)
             case '%':
             case '&':
             case '\'':
-	      c = k - '!';
+	      i = k - '!';
 	      slot_done = true;
 	      host_done = false;
 	      goto rehosts_jump;
 	      break;
             case '@': // Special case for host 8
-	      c = 7;
+	      i = 7;
 	      slot_done = true;
 	      host_done = false;
 	      goto rehosts_jump;
@@ -293,31 +304,31 @@ bool diskulator_host(void)
             case 'E': // Eject
             case 'e':
             doeject:
-	      diskulator_umount_device(c);
-	      screen_puts(0, c + 11, " ");
-	      screen_puts(3, c + 11, "  Empty                              ");
-	      memset(deviceSlots.slot[c].file, 0, sizeof(deviceSlots.slot[c].file));
-	      deviceSlots.slot[c].hostSlot = 0xFF;
-	      diskulator_write_device_slots();
+	      fuji_sio_umount_device(i);
+	      screen_puts(0, i + 11, " ");
+	      screen_puts(3, i + 11, "  Empty                              ");
+	      memset(deviceSlots.slot[i].file, 0, sizeof(deviceSlots.slot[i].file));
+	      deviceSlots.slot[i].hostSlot = 0xFF;
+	      fuji_sio_write_device_slots(&deviceSlots);
 	      break;
             case 'N': // New disk
             case 'n':
-	      screen_puts(4, c + 11, "                                    ");
+	      screen_puts(4, i + 11, "                                    ");
 	      screen_puts(0, 20, "Enter filename of new ATR image        ");
 	      screen_puts(0, 21, "                                       ");
 	      memset(tmp_str, 0, sizeof(tmp_str));
-	      memset(deviceSlots.slot[c].file, 0, sizeof(deviceSlots.slot[c].file));
+	      memset(deviceSlots.slot[i].file, 0, sizeof(deviceSlots.slot[i].file));
 	      
 	      // #8bitandmore
-	      retval = screen_input(4, c + 11, deviceSlots.slot[c].file);
-	      if (strcmp(deviceSlots.slot[c].file, "") == 0 || retval == -1)
+	      retval = screen_input(4, i + 11, deviceSlots.slot[i].file);
+	      if (strcmp(deviceSlots.slot[i].file, "") == 0 || retval == -1)
                 {
-		  diskulator_umount_device(c);
-		  screen_puts(0, c + 11, " ");
-		  screen_puts(3, c + 11, "  Empty                              ");
-		  memset(deviceSlots.slot[c].file, 0, sizeof(deviceSlots.slot[c].file));
-		  deviceSlots.slot[c].hostSlot = 0xFF;
-		  diskulator_write_device_slots();
+		  fuji_sio_umount_device(i);
+		  screen_puts(0, i + 11, " ");
+		  screen_puts(3, i + 11, "  Empty                              ");
+		  memset(deviceSlots.slot[i].file, 0, sizeof(deviceSlots.slot[i].file));
+		  deviceSlots.slot[i].hostSlot = 0xFF;
+		  fuji_sio_write_device_slots(&deviceSlots);
 		  screen_puts(0, 20, "                                       ");
 		  host_done = true;
 		  slot_done = false;
@@ -335,9 +346,9 @@ bool diskulator_host(void)
 	      screen_puts(0, 21, "                                       ");
 	      memset(tmp_str, 0, sizeof(tmp_str));
 	      screen_input(23, 20, tmp_str);
-	      deviceSlots.slot[c].hostSlot = atoi(tmp_str);
-	      deviceSlots.slot[c].hostSlot -= 1;
-	      diskulator_mount_host(deviceSlots.slot[c].hostSlot);
+	      deviceSlots.slot[i].hostSlot = atoi(tmp_str);
+	      deviceSlots.slot[i].hostSlot -= 1;
+	      fuji_sio_mount_host(deviceSlots.slot[i].hostSlot,&hostSlots);
 	      screen_puts(0, 20, "Size?\xD9\x91\x19"
 			  "90K  \xD9\x92\x19"
 			  "130K  \xD9\x93\x19"
@@ -402,12 +413,12 @@ bool diskulator_host(void)
                 {
 		  screen_puts(0, 20, "Creating new Disk                       ");
 		  screen_puts(0, 21, "                                        ");
-		  diskulator_new_disk(c, ns, ss);
+		  fuji_sio_new_disk(i, ns, ss, &deviceSlots);
 		  
 		  if (OS.dcb.dstats != 1)
 		    goto doeject;
 		  
-		  diskulator_write_device_slots();
+		  fuji_sio_write_device_slots(&deviceSlots);
 		  goto rehosts;
                 }
 	      else
@@ -418,7 +429,7 @@ bool diskulator_host(void)
 	  if (k > 0)
             {
 	      bar_clear();
-	      bar_show(c + 13);
+	      bar_show(i + 13);
 	      k = 0;
             }
         }

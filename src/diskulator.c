@@ -52,58 +52,6 @@ void diskulator_boot(void)
 }
 
 /**
- * Mount all Hosts
- */
-void diskulator_mount_all_hosts(void)
-{
-    unsigned char e;
-
-    bar_clear();
-    screen_clear();
-
-    screen_puts(0, 0, "MOUNTING ALL HOSTS");
-
-    for (e = 0; e < 8; e++)
-    {
-        if (deviceSlots.slot[e].hostSlot != 0xFF)
-        {
-            diskulator_mount_host(deviceSlots.slot[e].hostSlot);
-        }
-
-        if (OS.dcb.dstats != 0x01)
-        {
-            screen_puts(0, 21, "MOUNT ERROR!");
-            die();
-        }
-    }
-}
-
-/**
- * Mount all devices
- */
-void diskulator_mount_all_devices(void)
-{
-    unsigned char e;
-
-    bar_clear();
-    screen_clear();
-
-    screen_puts(0, 0, "MOUNTING ALL DEVICES");
-
-    for (e = 0; e < 8; e++)
-    {
-        if (deviceSlots.slot[e].hostSlot != 0xFF)
-            diskulator_mount_device(e, deviceSlots.slot[e].mode);
-
-        if (OS.dcb.dstats != 0x01)
-        {
-            screen_puts(0, 21, "MOUNT ERROR!");
-            die();
-        }
-    }
-}
-
-/**
  * Select an image
  */
 bool diskulator_select(void)
