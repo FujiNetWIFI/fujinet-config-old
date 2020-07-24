@@ -21,9 +21,82 @@ static HostSlots hostSlots;
 static DeviceSlots deviceSlots;
 
 /**
+ * Display device slots
+ */
+void diskulator_host_display_device_slots(void)
+{
+  unsigned char i;
+  
+  // Display Device Slots
+  fuji_sio_read_device_slots(&deviceSlots);
+
+  if (OS.dcb.dstats != 0x01)
+    {
+      screen_puts(21,0,"COULD NOT GET DEVICES!");
+      die();
+    }
+  
+  // Display drive slots
+  for (i = 0; i < 8; i++)
+    {
+      unsigned char d[6];
+      
+      d[1] = 0x20;
+      d[2] = 0x31 + i;
+      d[4] = 0x20;
+      d[5] = 0x00;
+      
+      if (deviceSlots.slot[i].file[0] != 0x00)
+        {
+	  d[0] = deviceSlots.slot[i].hostSlot + 0x31;
+	  d[3] = (deviceSlots.slot[i].mode == 0x02 ? 'W' : 'R');
+        }
+      else
+        {
+	  d[0] = 0x20;
+	  d[3] = 0x20;
+        }
+      
+      screen_puts(0, i + 11, d);
+      screen_puts(5, i + 11, deviceSlots.slot[i].file[0] != 0x00 ? deviceSlots.slot[i].file : "Empty");
+    }
+}
+
+/**
+ * Display host slots
+ */
+void diskulator_host_display_host_slots(void)
+{
+  unsigned char i;
+  
+  fuji_sio_read_host_slots(&hostSlots);
+
+  if (OS.dcb.dstats != 0x01)
+    {
+      screen_puts(21, 0, "COULD NOT GET HOSTS!");
+      die();
+    }
+  
+  // Display host slots
+  for (i = 0; i < 8; i++)
+    {
+      unsigned char n = i + 1;
+      unsigned char nc[2];
+      
+      utoa(n, nc, 10);
+      screen_puts(2, i + 1, nc);
+      
+      if (hostSlots.host[i][0] != 0x00)
+	screen_puts(5, i + 1, hostSlots.host[i]);
+      else
+	screen_puts(5, i + 1, "Empty");
+    }
+}
+
+/**
  * Diskulator Screen setup
  */
-void diskulator_screen_setup(void)
+void diskulator_host_screen_setup(void)
 {
   screen_clear();
   bar_clear();
@@ -53,58 +126,12 @@ bool diskulator_host(unsigned char* selected_host)
   unsigned char i;
   unsigned char prev_consol;
   int retval;
-  
-  
-  fuji_sio_read_host_slots(&hostSlots);
-  
-  if (OS.dcb.dstats != 0x01)
-    {
-      screen_puts(21, 0, "COULD NOT GET HOSTS!");
-      die();
-    }
-  
-  // Display host slots
-  for (i = 0; i < 8; i++)
-    {
-      unsigned char n = i + 1;
-      unsigned char nc[2];
-      
-      utoa(n, nc, 10);
-      screen_puts(2, i + 1, nc);
-      
-      if (hostSlots.host[i][0] != 0x00)
-	screen_puts(5, i + 1, hostSlots.host[i]);
-      else
-	screen_puts(5, i + 1, "Empty");
-    }
-  
-  // Display Device Slots
-  fuji_sio_read_device_slots(&deviceSlots);
-  
-  // Display drive slots
-  for (i = 0; i < 8; i++)
-    {
-      unsigned char d[6];
-      
-      d[1] = 0x20;
-      d[2] = 0x31 + i;
-      d[4] = 0x20;
-      d[5] = 0x00;
-      
-      if (deviceSlots.slot[i].file[0] != 0x00)
-        {
-	  d[0] = deviceSlots.slot[i].hostSlot + 0x31;
-	  d[3] = (deviceSlots.slot[i].mode == 0x02 ? 'W' : 'R');
-        }
-      else
-        {
-	  d[0] = 0x20;
-	  d[3] = 0x20;
-        }
-      
-      screen_puts(0, i + 11, d);
-      screen_puts(5, i + 11, deviceSlots.slot[i].file[0] != 0x00 ? deviceSlots.slot[i].file : "Empty");
-    }
+
+  diskulator_host_screen_setup();
+
+  diskulator_host_display_host_slots();
+
+  diskulator_host_display_device_slots();
   
  rehosts:
   // reset cursor
