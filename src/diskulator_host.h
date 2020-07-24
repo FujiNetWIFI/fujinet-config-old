@@ -7,6 +7,14 @@
 
 #include <stdbool.h>
 
+typedef enum _host_mode
+  {
+   HOSTS,
+   DEVICES,
+   CONFIG,
+   SELECTED
+  } HostMode;
+
 /**
  * Diskulator hosts/deviceslots screen.
  */
