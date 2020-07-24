@@ -47,8 +47,8 @@ void diskulator_host_display_hosts_keys(void)
  */
 void diskulator_host_display_devices_keys(void)
 {
-  screen_puts(0, 20, "        \xD9\xA5\x19"
-	      "Eject\xD9\xA8\x19Hosts\xD9\xAE\x19New          ");
+  screen_puts(0, 20, "           \xD9\xA5\x19"
+	      "Eject\xD9\xA8\x19Hosts          ");
 }
 
 /**
