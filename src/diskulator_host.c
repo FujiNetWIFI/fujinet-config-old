@@ -21,6 +21,17 @@ static HostSlots hostSlots;
 static DeviceSlots deviceSlots;
 
 /**
+ * Display common keys
+ */
+void diskulator_host_display_common_keys(void)
+{
+  screen_puts(0, 21, "    \xD9\x91\x8D\x98\x19"
+	      "Drives \xD9\xDC\x91\x8D\x98\x19"
+	      "Hosts\xD9\xA3\x19"
+	      "Config");
+}
+
+/**
  * Display hosts mode keys
  */
 void diskulator_host_display_hosts_keys(void)
@@ -29,10 +40,6 @@ void diskulator_host_display_hosts_keys(void)
 	      "Edit\xD9\xA4\x19"
 	      "Drives\xD9\xAF\xB0\xB4\xA9\xAF\xAE\x19"
 	      "Boot");
-  screen_puts(0, 21, "    \xD9\x91\x8D\x98\x19"
-	      "Drives \xD9\xDC\x91\x8D\x98\x19"
-	      "Hosts\xD9\xA3\x19"
-	      "Config");
 }
 
 /**
@@ -345,7 +352,8 @@ bool diskulator_host(unsigned char* selected_host)
   diskulator_host_screen_setup();
   diskulator_host_display_host_slots();
   diskulator_host_display_device_slots();
-
+  diskulator_host_display_common_keys();
+  
   switch(mode)
     {
     case HOSTS:
