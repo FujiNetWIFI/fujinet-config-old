@@ -339,7 +339,28 @@ void diskulator_host_mode_device_slots(unsigned char* i, HostMode* mode)
       diskulator_host_handle_drives_keys(k,*i,&mode);
     }
 }
-  
+
+/**
+ * Setup
+ */
+void diskulator_host_setup(HostMode* mode)
+{
+  diskulator_host_screen_setup();
+  diskulator_host_display_host_slots();
+  diskulator_host_display_device_slots();
+  diskulator_host_display_common_keys();
+
+  switch (mode)
+    {
+    case HOSTS:
+      diskulator_host_display_host_keys();
+      break;
+    case DEVICES:
+      diskulator_host_display_device_keys();
+      break;
+    }
+}
+
 /**
  * Diskulator hosts/deviceslots screen.
  */
@@ -349,22 +370,24 @@ bool diskulator_host(unsigned char* selected_host)
   unsigned char hosts_i=0;
   unsigned char devices_i=0;
   
-  diskulator_host_screen_setup();
-  diskulator_host_display_host_slots();
-  diskulator_host_display_device_slots();
-  diskulator_host_display_common_keys();
+  diskulator_host_setup(&mode);
   
-  switch(mode)
+  while (true)
     {
-    case HOSTS:
-      diskulator_host_mode_host_slots(&hosts_i,&mode);
-      break;
-    case DEVICES:
-      diskulator_host_mode_device_slots(&devices_i,&mode);
-      break;
-    case CONFIG:
-      break;
-    case SELECTED:
-      return ret;
-    }  
+      switch(mode)
+	{
+	case HOSTS:
+	  diskulator_host_mode_host_slots(&hosts_i,&mode);
+	  break;
+	case DEVICES:
+	  diskulator_host_mode_device_slots(&devices_i,&mode);
+	  break;
+	case CONFIG:
+	  diskulator_host_run_info(&mode);
+	  diskulator_host_setup();
+	  break;
+	case SELECTED:
+	  return ret;
+	}
+    }
 }
