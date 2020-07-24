@@ -190,11 +190,11 @@ void diskulator_host_handle_common_keys(unsigned char k, unsigned char* i, HostM
     {
     case 0x1C:
     case '-':
-      diskulator_host_cursor_up(&i);
+      diskulator_host_cursor_up(i);
       break;
     case 0x1D:
     case '=':
-      diskulator_host_cursor_down(&i);
+      diskulator_host_cursor_down(i);
       break;
     case '_':
       color_luminanceIncrease();
@@ -246,20 +246,14 @@ void diskulator_host_handle_common_keys(unsigned char k, unsigned char* i, HostM
  */
 void diskulator_host_edit_host_slot(unsigned char i, HostSlots* hostSlots)
 {
-  if (hostSlots.host[i][0] == 0x00)
+  if (hostSlots->host[i][0] == 0x00)
     screen_puts(3, i + 1, "                                    ");
-  screen_input(4, i + 1, hostSlots.host[i]);
-  if (hostSlots.host[i][0] == 0x00)
-    screen_puts(5, i + 1, "Empty");
-  fuji_sio_write_host_slots(&hostSlots);
-}
 
-/**
- * Select a host
- */
-void diskulator_host_select(unsigned char i, HostSlots* hostSlots)
-{
+  screen_input(4, i + 1, hostSlots->host[i]);
   
+  if (hostSlots->host[i][0] == 0x00)
+    screen_puts(5, i + 1, "Empty");
+  fuji_sio_write_host_slots(hostSlots);
 }
 
 /**
@@ -274,7 +268,6 @@ void diskulator_host_handle_hosts_keys(unsigned char k, unsigned char i, HostSlo
       diskulator_host_edit_host_slot(i,hostSlots);
       break;
     case 0x9B: // RETURN
-      diskulator_host_select(i,hostSlots);
       *mode = SELECTED;
       break;
     }
@@ -294,8 +287,8 @@ void diskulator_host_mode_host_slots(unsigned char* i, HostMode* mode)
     {
       diskulator_host_option_key();
       k=diskulator_host_process_key();
-      diskulator_host_handle_common_keys(k,i,&mode);
-      diskulator_host_handle_hosts_keys(k,*i,&mode);
+      diskulator_host_handle_common_keys(k,i,mode);
+      diskulator_host_handle_hosts_keys(k,*i,&hostSlots,mode);
     }
   
 }
@@ -305,12 +298,17 @@ void diskulator_host_mode_host_slots(unsigned char* i, HostMode* mode)
  */
 void diskulator_host_eject(unsigned char i)
 {
+  screen_puts(0, i + 11, " ");
+  screen_puts(3, i + 11, "  Empty                              ");
+  memset(deviceSlots.slot[i].file, 0, sizeof(deviceSlots.slot[i].file));
+  deviceSlots.slot[i].hostSlot = 0xFF;
+  fuji_sio_write_device_slots(&deviceSlots);
 }
 
 /**
  * Handle keys for device slots
  */
-void diskulator_host_handle_drives_keys(unsigned char k, unsigned char i, HostMode* mode)
+void diskulator_host_handle_drives_keys(unsigned char k, unsigned char i)
 {
   switch(k)
     {
@@ -331,19 +329,19 @@ void diskulator_host_mode_device_slots(unsigned char* i, HostMode* mode)
   bar_clear();
   bar_show(*i+13);
 
-  while (mode==DRIVES)
+  while (*mode==DEVICES)
     {
       diskulator_host_option_key();
       k=diskulator_host_process_key();
-      diskulator_host_handle_common_keys(k,i,&mode);
-      diskulator_host_handle_drives_keys(k,*i,&mode);
+      diskulator_host_handle_common_keys(k,i,mode);
+      diskulator_host_handle_drives_keys(k,*i);
     }
 }
 
 /**
  * Setup
  */
-void diskulator_host_setup(HostMode* mode)
+void diskulator_host_setup(HostMode mode)
 {
   diskulator_host_screen_setup();
   diskulator_host_display_host_slots();
@@ -353,10 +351,10 @@ void diskulator_host_setup(HostMode* mode)
   switch (mode)
     {
     case HOSTS:
-      diskulator_host_display_host_keys();
+      diskulator_host_display_hosts_keys();
       break;
     case DEVICES:
-      diskulator_host_display_device_keys();
+      diskulator_host_display_devices_keys();
       break;
     }
 }
@@ -370,7 +368,7 @@ bool diskulator_host(unsigned char* selected_host)
   unsigned char hosts_i=0;
   unsigned char devices_i=0;
   
-  diskulator_host_setup(&mode);
+  diskulator_host_setup(mode);
   
   while (true)
     {
@@ -383,11 +381,11 @@ bool diskulator_host(unsigned char* selected_host)
 	  diskulator_host_mode_device_slots(&devices_i,&mode);
 	  break;
 	case CONFIG:
-	  diskulator_host_run_info(&mode);
-	  diskulator_host_setup();
+	  info_run();
 	  break;
 	case SELECTED:
-	  return ret;
+	  *selected_host=hosts_i;
+	  return true;
 	}
     }
 }
