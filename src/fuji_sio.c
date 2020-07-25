@@ -270,3 +270,37 @@ void fuji_sio_close_directory(unsigned char hs)
     OS.dcb.daux = hs;
     siov();
 }
+
+/**
+ * Mount all Hosts
+ */
+bool fuji_sio_mount_all_hosts(DeviceSlots* deviceSlots, HostSlots* hostSlots)
+{
+  unsigned char ds;
+  
+  for (ds = 0; ds < 8; ds++)
+    {
+      if (deviceSlots->slot[ds].hostSlot != 0xFF)
+	fuji_sio_mount_host(deviceSlots->slot[ds].hostSlot, hostSlots);
+      
+      if (OS.dcb.dstats != 0x01)
+	return false; // Mount error
+    }
+}
+
+/**
+ * Mount all devices
+ */
+bool fuji_sio_mount_all_devices(DeviceSlots* deviceSlots)
+{
+    unsigned char ds;
+
+    for (ds = 0; ds < 8; ds++)
+    {
+        if (deviceSlots->slot[ds].hostSlot != 0xFF)
+            fuji_sio_mount_device(ds, deviceSlots->slot[ds].mode);
+
+        if (OS.dcb.dstats != 0x01)
+	  return false; // Mount error
+    }
+}

@@ -7,9 +7,17 @@
 
 #include <stdbool.h>
 
+typedef enum _host_mode
+  {
+   HOSTS,
+   DEVICES,
+   CONFIG,
+   SELECTED
+  } HostMode;
+
 /**
  * Diskulator hosts/deviceslots screen.
  */
-bool diskulator_host(void);
+bool diskulator_host(unsigned char* selected_host);
 
 #endif

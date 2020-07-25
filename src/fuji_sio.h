@@ -82,4 +82,14 @@ void fuji_sio_read_directory(unsigned char hs, char *e, unsigned short len);
  */
 void fuji_sio_close_directory(unsigned char hs);
 
+/**
+ * Mount all Hosts
+ */
+bool fuji_sio_mount_all_hosts(DeviceSlots* deviceSlots, HostSlots* hostSlots);
+
+/**
+ * Mount all devices
+ */
+bool fuji_sio_mount_all_devices(DeviceSlots* deviceSlots);
+
 #endif /* FUJINET_SIO_H */
