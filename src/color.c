@@ -3,7 +3,6 @@
  */
 
 #include <atari.h>
-#include <peekpoke.h>
 #include "color.h"
 
 unsigned char backgroundLum;
@@ -11,8 +10,7 @@ unsigned char backgroundHue;
 
 void updateColors(void) 
 {
-    OS.color2 = _gtia_mkcolor(backgroundHue, backgroundLum);
-    OS.color3 = _gtia_mkcolor(backgroundHue, backgroundLum);
+    OS.color4 = OS.color2 = (backgroundHue << 4) | (backgroundLum < 1);
 }
 
 void color_luminanceIncrease(void)
