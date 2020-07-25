@@ -9,6 +9,7 @@
 #include <conio.h>
 #include <string.h>
 #include "diskulator_host.h"
+#include "diskulator.h"
 #include "screen.h"
 #include "bar.h"
 #include "fuji_typedefs.h"
@@ -17,8 +18,8 @@
 #include "color.h"
 #include "info.h"
 
-static HostSlots hostSlots;
-static DeviceSlots deviceSlots;
+extern HostSlots hostSlots;
+extern DeviceSlots deviceSlots;
 
 /**
  * Display common keys
@@ -155,33 +156,6 @@ void diskulator_host_option_key(void)
 }
 
 /**
- * Cursor up for either hosts or devices
- */
-void diskulator_host_cursor_up(unsigned char* i)
-{
-  if (*i > 0)
-    *i--;
-}
-
-/**
- * Cursor down for either hosts or devices
- */
-void diskulator_host_cursor_down(unsigned char* i)
-{
-  if (*i < 7)
-    *i++;
-}
-
-/**
- * Process key for hosts or devices
- */
-char diskulator_host_process_key(void)
-{
-  if (kbhit())
-    return cgetc();
-}
-
-/**
  * Process common (e.g. direction) keys
  */
 void diskulator_host_handle_common_keys(unsigned char k, unsigned char* i, HostMode* mode)
@@ -190,11 +164,11 @@ void diskulator_host_handle_common_keys(unsigned char k, unsigned char* i, HostM
     {
     case 0x1C:
     case '-':
-      diskulator_host_cursor_up(i);
+      diskulator_cursor_up(i);
       break;
     case 0x1D:
     case '=':
-      diskulator_host_cursor_down(i);
+      diskulator_cursor_down(i,7);
       break;
     case '_':
       color_luminanceIncrease();
@@ -286,9 +260,12 @@ void diskulator_host_mode_host_slots(unsigned char* i, HostMode* mode)
   while (mode==HOSTS)
     {
       diskulator_host_option_key();
-      k=diskulator_host_process_key();
+      k=diskulator_process_key();
       diskulator_host_handle_common_keys(k,i,mode);
       diskulator_host_handle_hosts_keys(k,*i,&hostSlots,mode);
+
+      if (k>0)
+	bar_show(*i+2);
     }
   
 }
@@ -335,6 +312,9 @@ void diskulator_host_mode_device_slots(unsigned char* i, HostMode* mode)
       k=diskulator_host_process_key();
       diskulator_host_handle_common_keys(k,i,mode);
       diskulator_host_handle_drives_keys(k,*i);
+
+      if (k>0)
+	bar_show(*i+13);
     }
 }
 
@@ -347,7 +327,7 @@ void diskulator_host_setup(HostMode mode)
   diskulator_host_display_host_slots();
   diskulator_host_display_device_slots();
   diskulator_host_display_common_keys();
-
+  
   switch (mode)
     {
     case HOSTS:
