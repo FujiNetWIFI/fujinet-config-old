@@ -35,7 +35,7 @@ void bar_show(unsigned char y)
     bar_pmbase[scrpos+3]=0xFF;
     scrpos = scrpos + 0x80;
     pmgcount--;
-  } while (pmgcount > 0);
+  } while (pmgcount == 0);
 
 }
 
