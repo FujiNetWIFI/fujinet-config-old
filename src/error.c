@@ -9,8 +9,9 @@
 #include "error.h"
 #include "screen.h"
 
-char text_error_reading_config[] = "ERROR READING ADAPTER CONFIG";
+char text_error_reading_adapter_config[] = "ERROR READING ADAPTER CONFIG";
 char text_error_scanning_networks[] = "ERROR SCANNING NETWORKS";
+char text_error_reading_scan_result[] = "ERROR READING SCAN RESULT";
 
 /**
  * Display a fatal error, then die.
@@ -23,11 +24,14 @@ void error_fatal(ErrorMessage msg)
   
   switch (msg)
     {
-    case ERROR_READING_CONFIG:
-      text = text_error_reading_config;
+    case ERROR_READING_ADAPTER_CONFIG:
+      text = text_error_reading_adapter_config;
       break;
     case ERROR_SCANNING_NETWORKS:
       text = text_error_scanning_networks;
+      break;
+    case ERROR_READING_SCAN_RESULT:
+      text = text_error_reading_scan_result;
       break;
     }
   

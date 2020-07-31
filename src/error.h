@@ -9,8 +9,9 @@
 
 typedef enum _errorMessage
   {
-   ERROR_READING_CONFIG,
+   ERROR_READING_ADAPTER_CONFIG,
    ERROR_SCANNING_NETWORKS,
+   ERROR_READING_SCAN_RESULT,
   } ErrorMessage;
 
 /**
