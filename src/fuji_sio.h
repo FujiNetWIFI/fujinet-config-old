@@ -16,7 +16,7 @@ bool fuji_sio_error(void);
 /**
  * Return number of networks
  */
-unsigned char fuji_sio_do_scan(unsigned char *num_networks);
+unsigned char fuji_sio_do_scan(void);
 
 /**
  * Return Network entry from last scan
