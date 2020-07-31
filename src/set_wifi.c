@@ -85,7 +85,10 @@ void set_wifi_scan_networks(void)
 {
   unsigned char i;
   unsigned char numNetworks = fuji_sio_do_scan();
- 
+
+  if (numNetworks > 16)
+    numNetworks = 16;
+  
   if (fuji_sio_error())
     error_fatal(ERROR_SCANNING_NETWORKS);
 
