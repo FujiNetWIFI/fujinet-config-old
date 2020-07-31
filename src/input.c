@@ -8,6 +8,41 @@
 #include <conio.h>
 
 /**
+ * Handle nav up
+ */
+void input_handle_nav_up(unsigned char* i)
+{
+  if (*i>0)
+    *i--;
+}
+
+void input_handle_nav_down(unsigned char max, unsigned char* i)
+{
+  if (*i<max)
+    *i++;
+}
+
+/**
+ * Handle common nav keys
+ * k is the input ATASCII key
+ * i is the maximum down #
+ */
+void input_handle_nav_keys(char k, unsigned char max, unsigned char *i)
+{
+  switch(k)
+    {
+    case 0x1C:
+    case '-':
+      input_handle_nav_up(i);
+      break;
+    case 0x1D:
+    case '=':
+      input_handle_nav_down(max,i);
+      break;
+    }
+}
+
+/**
  * Get an input from keyboard/joystick
  * Returns an 'atascii key' regardless of input
  */

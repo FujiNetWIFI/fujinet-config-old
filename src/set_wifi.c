@@ -10,6 +10,7 @@
 #include "fuji_typedefs.h"
 #include "error.h"
 #include "input.h"
+#include "bar.h"
 
 char colon[] = ":";
 
@@ -106,6 +107,8 @@ unsigned char set_wifi_scan_networks(void)
       set_wifi_print_ssid(&s,i);
       set_wifi_print_rssi(&s,i);
     }
+
+  bar_show(4); // Start here.
   
   return numNetworks;
 }
@@ -113,11 +116,17 @@ unsigned char set_wifi_scan_networks(void)
 /**
  * Select a network
  */
-State set_wifi_select_network(void)
+State set_wifi_select_network(unsigned char numNetworks)
 {
   State new_state = CONNECT_WIFI;
-  unsigned char k = input_handle_key();
-  
+  unsigned char k;
+  unsigned char i;
+
+  while (true)
+    {
+      k=input_handle_key();
+      input_handle_nav_keys(k,numNetworks,&i);
+    }
   
   return new_state;
 }
@@ -140,7 +149,7 @@ State set_wifi(Context *context)
   set_wifi_display_mac_address(&adapterConfig);
   numNetworks = set_wifi_scan_networks();
 
-  new_state = set_wifi_select_network();
+  new_state = set_wifi_select_network(numNetworks);
   
   return new_state;
 }
