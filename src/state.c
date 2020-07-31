@@ -13,6 +13,17 @@
 #include "diskulator_slot.h"
 #include "diskulator_info.h"
 #include "adapter_config.h"
+#include "bar.h"
+#include "screen.h"
+
+/**
+ * Common code for every state
+ */
+void state_common(void)
+{
+  screen_clear();
+  bar_clear();
+}
 
 /**
  * Set next state
@@ -29,6 +40,8 @@ void state(Context *context)
 {
   while(true)
     {
+      state_common();
+      
       switch(context->state)
 	{
 	case SET_WIFI:
