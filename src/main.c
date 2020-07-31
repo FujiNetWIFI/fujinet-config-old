@@ -9,6 +9,8 @@
 #include "bar.h"
 #include "screen.h"
 #include "state.h"
+#include "fuji_typedefs.h"
+#include "fuji_sio.h"
 
 Context context;
 
@@ -62,6 +64,22 @@ void config_dlist=
   };
 
 /**
+ * Is device configured?
+ */
+State configured(void)
+{
+  NetConfig netConfig;
+
+  fuji_sio_read_config(&netConfig);
+
+  // WiFi not configured or SELECT to override.
+  if ((GTIA_READ.consol == 5) || netConfig.ssid[0] == '\0')
+    return SET_WIFI;
+  
+  return CONNECT_WIFI;
+}
+
+/**
  * Setup the config screen
  */
 void setup(void)
@@ -94,5 +112,8 @@ void setup(void)
 void main(void)
 {
   setup();
+
+  context.state = configured();
+  
   state(&context); // Never ends.
 }

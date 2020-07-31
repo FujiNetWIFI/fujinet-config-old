@@ -314,3 +314,19 @@ bool fuji_sio_mount_all_devices(DeviceSlots* deviceSlots)
 	  return false; // Mount error
     }
 }
+
+/**
+ * Read #FujiNet configuration
+ */
+void fuji_sio_read_config(NetConfig* netConfig)
+{
+  OS.dcb.ddevic = 0x70;
+  OS.dcb.dunit = 1;
+  OS.dcb.dcomnd = 0xFE; //get_ssid
+  OS.dcb.dstats = 0x40;
+  OS.dcb.dbuf = netConfig->rawData;
+  OS.dcb.dtimlo = 0x0F; // 15 second timeout
+  OS.dcb.dbyt = sizeof(netConfig->rawData);
+  OS.dcb.daux = 0;
+  siov();
+}
