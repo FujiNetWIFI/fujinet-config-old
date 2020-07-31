@@ -10,6 +10,7 @@
 #include "screen.h"
 
 char text_error_reading_config[] = "ERROR READING ADAPTER CONFIG";
+char text_error_scanning_networks[] = "ERROR SCANNING NETWORKS";
 
 /**
  * Display a fatal error, then die.
@@ -24,6 +25,9 @@ void error_fatal(ErrorMessage msg)
     {
     case ERROR_READING_CONFIG:
       text = text_error_reading_config;
+      break;
+    case ERROR_SCANNING_NETWORKS:
+      text = text_error_scanning_networks;
       break;
     }
   

@@ -19,25 +19,27 @@ bool fuji_sio_error(void)
 
 void set_sio_defaults(void)
 {
-    OS.dcb.ddevic = 0x70;
-    OS.dcb.dunit = 1;
-    OS.dcb.dtimlo = 0x0F; // 15 second timeout
+  OS.dcb.ddevic = 0x70;
+  OS.dcb.dunit = 1;
+  OS.dcb.dtimlo = 0x0F; // 15 second timeout
 }
 
 /**
  * Return number of networks
  */
-unsigned char fuji_sio_do_scan(unsigned char *num_networks)
+unsigned char fuji_sio_do_scan(void)
 {
-    set_sio_defaults();
-    OS.dcb.dcomnd = 0xFD; // do scan
-    OS.dcb.dstats = 0x40; // Peripheral->Computer
-    OS.dcb.dbuf = num_networks;
-    OS.dcb.dbyt = 4;      // 4 byte response
-    OS.dcb.daux = 0;
-    siov();
-
-    return OS.dcb.dstats;
+  unsigned char num_networks=0;
+  
+  set_sio_defaults();
+  OS.dcb.dcomnd = 0xFD; // do scan
+  OS.dcb.dstats = 0x40; // Peripheral->Computer
+  OS.dcb.dbuf = &num_networks;
+  OS.dcb.dbyt = 4;      // 4 byte response
+  OS.dcb.daux = 0;
+  siov();
+  
+  return num_networks;
 }
 
 /**

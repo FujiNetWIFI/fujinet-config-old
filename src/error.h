@@ -10,7 +10,7 @@
 typedef enum _errorMessage
   {
    ERROR_READING_CONFIG,
-   
+   ERROR_SCANNING_NETWORKS,
   } ErrorMessage;
 
 /**

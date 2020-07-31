@@ -45,6 +45,17 @@ void set_wifi_setup(void)
 }
 
 /**
+ * Scan and display networks
+ */
+void set_wifi_scan_networks(void)
+{
+  unsigned char numNetworks = fuji_sio_do_scan();
+
+  if (fuji_sio_error())
+    error_fatal(ERROR_SCANNING_NETWORKS);
+}
+
+/**
  * Set wifi State
  */
 State set_wifi(Context *context)
@@ -59,7 +70,7 @@ State set_wifi(Context *context)
     error_fatal(ERROR_READING_CONFIG);
 
   set_wifi_display_mac_address(&adapterConfig);
-  
+  set_wifi_scan_networks();
   
   return new_state;
 }
