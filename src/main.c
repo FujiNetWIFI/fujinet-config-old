@@ -8,8 +8,9 @@
 #include <peekpoke.h>
 #include "bar.h"
 #include "screen.h"
-#include "config.h"
-#include "diskulator.h"
+#include "state.h"
+
+Context context;
 
 extern unsigned char* video_ptr;
 extern unsigned char* dlist_ptr;
@@ -93,11 +94,5 @@ void setup(void)
 void main(void)
 {
   setup();
-
-  if (configured()==false)
-    config_run();
-  else
-    config_connect();
-
-  diskulator_run();  
+  state(&context); // Never ends.
 }
