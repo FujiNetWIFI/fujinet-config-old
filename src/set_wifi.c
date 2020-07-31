@@ -3,6 +3,7 @@
  * Set Wifi Network
  */
 
+#include <stdlib.h>
 #include "set_wifi.h"
 #include "screen.h"
 #include "fuji_sio.h"
@@ -14,9 +15,18 @@ char colon[] = ":";
 /**
  * Display MAC address
  */
-void set_wifi_display_mac_address(NetConfig *netConfig)
+void set_wifi_display_mac_address(AdapterConfig *adapterConfig)
 {
-  
+  char mactmp[3];
+  unsigned char i=0;
+  unsigned char x=13;
+
+  for (i=0;i<6;i++)
+    {
+      itoa(adapterConfig->macAddress[i],mactmp,16);
+      screen_puts(x,1,mactmp);
+      x+=3;
+    }
 }
 
 /**
@@ -39,14 +49,17 @@ void set_wifi_setup(void)
  */
 State set_wifi(Context *context)
 {
-  NetConfig netConfig;
+  AdapterConfig adapterConfig;
   State new_state = CONNECT_WIFI;
 
   set_wifi_setup();
-  fuji_sio_read_config(&netConfig);
+  fuji_sio_read_adapter_config(&adapterConfig);
 
   if (fuji_sio_error())
     error_fatal(ERROR_READING_CONFIG);
+
+  set_wifi_display_mac_address(&adapterConfig);
+  
   
   return new_state;
 }

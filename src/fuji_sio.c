@@ -324,9 +324,9 @@ bool fuji_sio_mount_all_devices(DeviceSlots* deviceSlots)
 }
 
 /**
- * Read #FujiNet configuration
+ * Read #FujiNet SSID configuration
  */
-void fuji_sio_read_config(NetConfig* netConfig)
+void fuji_sio_read_net_config(NetConfig* netConfig)
 {
   OS.dcb.ddevic = 0x70;
   OS.dcb.dunit = 1;
@@ -335,6 +335,22 @@ void fuji_sio_read_config(NetConfig* netConfig)
   OS.dcb.dbuf = netConfig->rawData;
   OS.dcb.dtimlo = 0x0F; // 15 second timeout
   OS.dcb.dbyt = sizeof(netConfig->rawData);
+  OS.dcb.daux = 0;
+  siov();
+}
+
+/**
+ * Read #FujiNet Adapter configuration
+ */
+void fuji_sio_read_adapter_config(AdapterConfig* adapterConfig)
+{
+  OS.dcb.ddevic = 0x70;
+  OS.dcb.dunit = 1;
+  OS.dcb.dcomnd = 0xE8;
+  OS.dcb.dstats = 0x40;
+  OS.dcb.dbuf = adapterConfig->rawData;
+  OS.dcb.dtimlo = 0x0f;
+  OS.dcb.dbyt = sizeof(adapterConfig->rawData);
   OS.dcb.daux = 0;
   siov();
 }

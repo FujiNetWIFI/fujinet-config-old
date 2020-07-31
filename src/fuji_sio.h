@@ -109,8 +109,13 @@ bool fuji_sio_mount_all_hosts(DeviceSlots* deviceSlots, HostSlots* hostSlots);
 bool fuji_sio_mount_all_devices(DeviceSlots* deviceSlots);
 
 /**
- * Read #FujiNet configuration
+ * Read #FujiNet SSID configuration
  */
-void fuji_sio_read_config(NetConfig* netConfig);
+void fuji_sio_read_net_config(NetConfig* netConfig);
+
+/**
+ * Read #FujiNet Adapter configuration
+ */
+void fuji_sio_read_adapter_config(AdapterConfig* adapterConfig);
 
 #endif /* FUJINET_SIO_H */

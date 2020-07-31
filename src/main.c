@@ -70,7 +70,7 @@ State configured(void)
 {
   NetConfig netConfig;
 
-  fuji_sio_read_config(&netConfig);
+  fuji_sio_read_net_config(&netConfig);
 
   // WiFi not configured or SELECT to override.
   if ((GTIA_READ.consol == 5) || netConfig.ssid[0] == '\0')
