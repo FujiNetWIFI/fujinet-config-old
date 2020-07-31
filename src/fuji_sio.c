@@ -9,6 +9,14 @@
 #include "sio.h"
 #include "fuji_sio.h"
 
+/**
+ * Did an error result?
+ */
+bool fuji_sio_error(void)
+{
+  return (OS.dcb.dstats>128);
+}
+
 void set_sio_defaults(void)
 {
     OS.dcb.ddevic = 0x70;

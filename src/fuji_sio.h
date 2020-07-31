@@ -9,6 +9,11 @@
 #include "fuji_typedefs.h"
 
 /**
+ * Did an error result?
+ */
+bool fuji_sio_error(void);
+
+/**
  * Return number of networks
  */
 unsigned char fuji_sio_do_scan(unsigned char *num_networks);
