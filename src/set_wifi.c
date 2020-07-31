@@ -9,6 +9,7 @@
 #include "fuji_sio.h"
 #include "fuji_typedefs.h"
 #include "error.h"
+#include "input.h"
 
 char colon[] = ":";
 
@@ -80,8 +81,9 @@ void set_wifi_print_rssi(SSIDInfo *s, unsigned char i)
 
 /**
  * Scan and display networks
+ * Return # of results.
  */
-void set_wifi_scan_networks(void)
+unsigned char set_wifi_scan_networks(void)
 {
   unsigned char i;
   unsigned char numNetworks = fuji_sio_do_scan();
@@ -104,6 +106,20 @@ void set_wifi_scan_networks(void)
       set_wifi_print_ssid(&s,i);
       set_wifi_print_rssi(&s,i);
     }
+  
+  return numNetworks;
+}
+
+/**
+ * Select a network
+ */
+State set_wifi_select_network(void)
+{
+  State new_state = CONNECT_WIFI;
+  unsigned char k = input_handle_key();
+  
+  
+  return new_state;
 }
 
 /**
@@ -113,7 +129,8 @@ State set_wifi(Context *context)
 {
   AdapterConfig adapterConfig;
   State new_state = CONNECT_WIFI;
-
+  unsigned char numNetworks;
+  
   set_wifi_setup();
   
   fuji_sio_read_adapter_config(&adapterConfig);
@@ -121,7 +138,9 @@ State set_wifi(Context *context)
     error_fatal(ERROR_READING_ADAPTER_CONFIG);
 
   set_wifi_display_mac_address(&adapterConfig);
-  set_wifi_scan_networks();
+  numNetworks = set_wifi_scan_networks();
+
+  new_state = set_wifi_select_network();
   
   return new_state;
 }
