@@ -4,6 +4,8 @@
  */
 
 #include <stdlib.h>
+#include <string.h>
+#include <atari.h>
 #include "set_wifi.h"
 #include "screen.h"
 #include "fuji_sio.h"
@@ -11,6 +13,8 @@
 #include "error.h"
 #include "input.h"
 #include "bar.h"
+
+#define MAX_NETWORKS 16 // Max visible networks on screen
 
 char colon[] = ":";
 
@@ -89,8 +93,8 @@ unsigned char set_wifi_scan_networks(void)
   unsigned char i;
   unsigned char numNetworks = fuji_sio_do_scan();
 
-  if (numNetworks > 16)
-    numNetworks = 16;
+  if (numNetworks > MAX_NETWORKS)
+    numNetworks = MAX_NETWORKS;
   
   if (fuji_sio_error())
     error_fatal(ERROR_SCANNING_NETWORKS);
@@ -108,9 +112,56 @@ unsigned char set_wifi_scan_networks(void)
       set_wifi_print_rssi(&s,i);
     }
 
+  screen_clear_line((numNetworks++)+3);
+  screen_puts(2,(numNetworks)+2,"<Enter a specific SSID>");
+
   bar_show(4); // Start here.
   
   return numNetworks;
+}
+
+/**
+ * Save selection
+ * selectedNetwork = index from wifi scan.
+ */
+State set_wifi_save_network(unsigned char selectedNetwork, unsigned char numNetworks)
+{
+  SSIDInfo s;
+  NetConfig n;
+
+  if (selectedNetwork<numNetworks-1)
+    {
+      // Get scan result for SSID
+      fuji_sio_scan_result(selectedNetwork,&s);
+
+      if (fuji_sio_error())
+	error_fatal(ERROR_READING_SCAN_RESULT);
+
+      strcpy(n.ssid,s.ssid);
+    }
+  else
+    {
+      // Get custom SSID
+      screen_puts(0,21," ENTER NETWORK NAME "
+		       "  AND PRESS return  ");
+
+      // Clear and get input.
+      screen_clear_line((numNetworks-1)+3);
+      screen_input(1,(numNetworks-1)+3,n.ssid);
+    }
+
+  screen_clear_line(21);
+  screen_puts(3,21,"ENTER PASSWORD");
+  screen_input(0,20,n.password);
+
+  screen_puts(3,21,"SAVING NETWORK");
+
+  fuji_sio_set_ssid(false, &n);
+
+  if (fuji_sio_error())
+    error_fatal(ERROR_SETTING_SSID);
+
+  return CONNECT_WIFI;  
 }
 
 /**
@@ -118,16 +169,34 @@ unsigned char set_wifi_scan_networks(void)
  */
 State set_wifi_select_network(unsigned char numNetworks)
 {
-  State new_state = CONNECT_WIFI;
+  State new_state;
   unsigned char k=0;
   unsigned char i=0;
 
-  while (true)
+  screen_puts(0,21," SELECT NETWORK, OR "
+	           "   ESC TO RE-SCAN   ");
+  
+  while (true) // Process keys
     {
       k=input_handle_key();
       input_handle_nav_keys(k,numNetworks,&i);
+
       if (k>0)
-	bar_show(i+4);
+	{
+	  bar_show(i+4);
+	  if ((k==0x9B) || (k==0x1B))
+	    break;
+	}
+    }
+
+  if (k==0x9B) // RETURN
+    {
+      new_state = set_wifi_save_network(i,numNetworks);
+    }
+  else if (k==0x1B) // ESC
+    {
+      // Loop back around again to re-scan.
+      new_state = SET_WIFI;
     }
   
   return new_state;

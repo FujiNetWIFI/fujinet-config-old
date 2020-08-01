@@ -12,6 +12,7 @@
 char text_error_reading_adapter_config[] = "ERROR READING ADAPTER CONFIG";
 char text_error_scanning_networks[] = "ERROR SCANNING NETWORKS";
 char text_error_reading_scan_result[] = "ERROR READING SCAN RESULT";
+char text_error_setting_ssid[] = "ERROR SETTING SSID";
 
 /**
  * Display a fatal error, then die.
@@ -32,6 +33,9 @@ void error_fatal(ErrorMessage msg)
       break;
     case ERROR_READING_SCAN_RESULT:
       text = text_error_reading_scan_result;
+      break;
+    case ERROR_SETTING_SSID:
+      text = text_error_setting_ssid;
       break;
     }
   

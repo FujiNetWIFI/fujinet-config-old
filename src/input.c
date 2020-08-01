@@ -20,7 +20,7 @@ void input_handle_nav_up(unsigned char* i)
 void input_handle_nav_down(unsigned char max, unsigned char* i)
 {
   if (*i<max-1)
-      (*i)++;
+    (*i)++;
 }
 
 /**
@@ -71,10 +71,8 @@ unsigned char input_handle_joystick(void)
  */
 unsigned char input_handle_key(void)
 {
-  if (kbhit())
+  if (kbhit())      
     return cgetc();
   else
     return input_handle_joystick();
-  
-  // TODO: Process joystick input.
 }
