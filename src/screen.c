@@ -107,3 +107,12 @@ int screen_input(unsigned char x, unsigned char y, char* s)
 	}
     }
 }
+
+/**
+ * Patch the dlist for the hosts screen
+ */
+void screen_dlist_diskulator_hosts(void)
+{
+  dlist_ptr[0x0F] = dlist_ptr[0x10] = 6;
+  dlist_ptr[0x1B] = dlist_ptr[0x1C] = 6;
+}

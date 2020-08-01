@@ -34,4 +34,9 @@ void screen_clear(void);
  */
 int screen_input(unsigned char x, unsigned char y, char* s);
 
+/**
+ * Patch the dlist for the hosts screen
+ */
+void screen_dlist_diskulator_hosts(void);
+
 #endif /* SCREEN_H */
