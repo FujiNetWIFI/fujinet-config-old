@@ -21,6 +21,7 @@ char text_error_wifi_connect_failed[] = "CONNECT FAILED";
 char text_error_wifi_connection_lost[] = "CONNECTION LOST";
 char text_error_wifi_disconnected[] = "WIFI DISCONNECTED";
 char text_error_reading_host_slots[] = "ERROR READING HOST SLOTS";
+char text_error_reading_device_slots[] = "ERROR READING DEVICE SLOTS";
 
 /**
  * Display error.
@@ -68,6 +69,9 @@ void error(ErrorMessage msg)
       break;
     case ERROR_READING_HOST_SLOTS:
       text = text_error_reading_host_slots;
+      break;
+    case ERROR_READING_DEVICE_SLOTS:
+      text = text_error_reading_device_slots;
       break;
     }  
   screen_puts(0,21,text);

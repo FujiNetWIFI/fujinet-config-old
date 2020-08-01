@@ -46,11 +46,45 @@ void diskulator_hosts_display_host_slots(HostSlots *hs)
 }
 
 /**
+ * Display device slots
+ */
+void diskulator_hosts_display_device_slots(DeviceSlots *ds)
+{
+  unsigned char i;
+
+  // Display device slots
+  for (i = 0; i < 8; i++)
+    {
+      unsigned char d[6];
+      
+      d[1] = 0x20;
+      d[2] = 0x31 + i;
+      d[4] = 0x20;
+      d[5] = 0x00;
+      
+      if (ds->slot[i].file[0] != 0x00)
+        {
+	  d[0] = ds->slot[i].hostSlot + 0x31;
+	  d[3] = (ds->slot[i].mode == 0x02 ? 'W' : 'R');
+        }
+      else
+        {
+	  d[0] = 0x20;
+	  d[3] = 0x20;
+        }
+      
+      screen_puts(0, i + 11, d);
+      screen_puts(5, i + 11, ds->slot[i].file[0] != 0x00 ? ds->slot[i].file : text_empty);
+    }
+}
+
+/**
  * Connect wifi State
  */
 State diskulator_hosts(Context *context)
 {
   HostSlots hs;
+  DeviceSlots ds;
   
   State new_state = DISKULATOR_HOSTS;
 
@@ -60,6 +94,13 @@ State diskulator_hosts(Context *context)
     error_fatal(ERROR_READING_HOST_SLOTS);
 
   diskulator_hosts_display_host_slots(&hs);
+
+  fuji_sio_read_device_slots(&ds);
+
+  if (fuji_sio_error())
+    error_fatal(ERROR_READING_DEVICE_SLOTS);
+
+  diskulator_hosts_display_device_slots(&ds);
   
   return new_state;
 }
