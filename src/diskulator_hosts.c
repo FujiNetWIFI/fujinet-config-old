@@ -13,16 +13,6 @@
 char text_empty[]="Empty";
 
 /**
- * Diskulator hosts setup
- */
-void diskulator_hosts_setup(void)
-{
-  screen_dlist_diskulator_hosts();
-  screen_puts(3, 0, "TNFS HOST LIST");
-  screen_puts(24, 9, "DRIVE SLOTS");
-}
-
-/**
  * Display Hosts Slots
  */
 void diskulator_hosts_display_host_slots(HostSlots *hs)
@@ -79,6 +69,31 @@ void diskulator_hosts_display_device_slots(DeviceSlots *ds)
 }
 
 /**
+ * Diskulator hosts setup
+ */
+void diskulator_hosts_setup(HostSlots *hs, DeviceSlots *ds)
+{
+  screen_dlist_diskulator_hosts();
+  
+  screen_puts(3, 0, "TNFS HOST LIST");
+  screen_puts(24, 9, "DRIVE SLOTS");
+
+  fuji_sio_read_host_slots(hs);
+  
+  if (fuji_sio_error())
+    error_fatal(ERROR_READING_HOST_SLOTS);
+  
+  diskulator_hosts_display_host_slots(hs);
+
+  fuji_sio_read_device_slots(ds);
+  
+  if (fuji_sio_error())
+    error_fatal(ERROR_READING_DEVICE_SLOTS);
+  
+  diskulator_hosts_display_device_slots(ds);
+}
+
+/**
  * Connect wifi State
  */
 State diskulator_hosts(Context *context)
@@ -88,19 +103,7 @@ State diskulator_hosts(Context *context)
   
   State new_state = DISKULATOR_HOSTS;
 
-  fuji_sio_read_host_slots(&hs);
-
-  if (fuji_sio_error())
-    error_fatal(ERROR_READING_HOST_SLOTS);
-
-  diskulator_hosts_display_host_slots(&hs);
-
-  fuji_sio_read_device_slots(&ds);
-
-  if (fuji_sio_error())
-    error_fatal(ERROR_READING_DEVICE_SLOTS);
-
-  diskulator_hosts_display_device_slots(&ds);
-  
+  diskulator_hosts_setup(&hs,&ds);
+    
   return new_state;
 }
