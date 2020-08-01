@@ -9,8 +9,19 @@
 #include "fuji_sio.h"
 #include "fuji_typedefs.h"
 #include "error.h"
+#include "die.h"
 
 char text_empty[]="Empty";
+
+static DeviceSlots ds;
+static HostSlots hs;
+
+typedef enum _substate
+  {
+   HOSTS,
+   DEVICES,
+   DONE
+  } SubState;
 
 /**
  * Display Hosts Slots
@@ -94,16 +105,42 @@ void diskulator_hosts_setup(HostSlots *hs, DeviceSlots *ds)
 }
 
 /**
+ * Diskulator interactive - hosts
+ */
+State diskulator_hosts_hosts(Context *context)
+{
+}
+
+/**
+ * Diskulator interactive - device slots
+ */
+State diskulator_hosts_devices(Context *context)
+{
+}
+
+/**
  * Connect wifi State
  */
 State diskulator_hosts(Context *context)
 {
-  HostSlots hs;
-  DeviceSlots ds;
+  SubState ss=HOSTS;
   
   State new_state = DISKULATOR_HOSTS;
-
+  
   diskulator_hosts_setup(&hs,&ds);
-    
+  
+  while (ss != DONE)
+    {
+      switch(ss)
+	{
+	case HOSTS:
+	  new_state = diskulator_hosts_hosts(context);
+	  break;
+	case DEVICES:
+	  new_state = diskulator_hosts_devices(context);
+	  break;
+	}
+    }
+  
   return new_state;
 }
