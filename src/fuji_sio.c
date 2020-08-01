@@ -82,7 +82,7 @@ unsigned char fuji_sio_get_wifi_status(unsigned char* wifiStatus)
     set_sio_defaults();
     OS.dcb.dcomnd = 0xFA; // Return wifi status
     OS.dcb.dstats = 0x40; // Peripheral->Computer
-    OS.dcb.dbuf = &wifiStatus;
+    OS.dcb.dbuf = wifiStatus;
     OS.dcb.dbyt = 1;
     OS.dcb.daux1 = 0;
     siov();
