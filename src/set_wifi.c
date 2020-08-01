@@ -119,13 +119,15 @@ unsigned char set_wifi_scan_networks(void)
 State set_wifi_select_network(unsigned char numNetworks)
 {
   State new_state = CONNECT_WIFI;
-  unsigned char k;
-  unsigned char i;
+  unsigned char k=0;
+  unsigned char i=0;
 
   while (true)
     {
       k=input_handle_key();
       input_handle_nav_keys(k,numNetworks,&i);
+      if (k>0)
+	bar_show(i+4);
     }
   
   return new_state;
