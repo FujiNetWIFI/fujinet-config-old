@@ -20,6 +20,11 @@
 void screen_puts(unsigned char x,unsigned char y,char *s);
 
 /**
+ * Clear a line
+ */
+void screen_clear_line(unsigned char y);
+
+/**
  * Clear screen
  */
 void screen_clear(void);

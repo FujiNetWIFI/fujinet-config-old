@@ -18,6 +18,11 @@ void screen_clear()
   memset(video_ptr,0,GRAPHICS_0_SCREEN_SIZE);
 }
 
+void screen_clear_line(unsigned char y)
+{
+  memset(&video_ptr[(y)*40],0,40);
+}
+
 /**
  * Print ATASCII string to display memory
  */
