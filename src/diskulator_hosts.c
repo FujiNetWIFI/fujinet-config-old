@@ -114,11 +114,10 @@ void diskulator_hosts_setup(HostSlots *hs, DeviceSlots *ds)
 /**
  * Diskulator interactive - hosts
  */
-SubState diskulator_hosts_hosts(Context *context)
+void diskulator_hosts_hosts(Context *context, SubState *new_substate)
 {
   unsigned char k=input_handle_key();
   unsigned char i=0;
-  SubState new_substate = HOSTS;
   
   input_handle_nav_keys(k,2,8,&i);
 
@@ -126,22 +125,23 @@ SubState diskulator_hosts_hosts(Context *context)
     {
     case 'D':
     case 'd':
-      new_substate = DEVICES;
+      *new_substate = DEVICES;
       bar_show(i+13);
       break;
+    case 'I':
+    case 'i':
+      context->state=DISKULATOR_INFO;
+      *new_substate=DONE;
     }
-  
-  return new_substate;
 }
 
 /**
  * Diskulator interactive - device slots
  */
-SubState diskulator_hosts_devices(Context *context)
+void diskulator_hosts_devices(Context *context, SubState *new_substate)
 {
   unsigned char k=input_handle_key();
   unsigned char i=0;
-  SubState new_substate = HOSTS;
   
   input_handle_nav_keys(k,13,8,&i);
 
@@ -149,12 +149,10 @@ SubState diskulator_hosts_devices(Context *context)
     {
     case 'H':
     case 'h':
-      new_substate = HOSTS;
+      *new_substate = HOSTS;
       bar_show(i+2);
       break;
     }
-  
-  return new_substate;  
 }
 
 /**
@@ -171,10 +169,10 @@ State diskulator_hosts(Context *context)
       switch(ss)
       	{
       	case HOSTS:
-      	  ss = diskulator_hosts_hosts(context);
+      	  diskulator_hosts_hosts(context,&ss);
       	  break;
       	case DEVICES:
-      	  ss = diskulator_hosts_devices(context);
+      	  diskulator_hosts_devices(context,&ss);
       	  break;
       	}
     }
