@@ -128,8 +128,8 @@ void diskulator_hosts_hosts(Context *context, SubState *new_substate)
       *new_substate = DEVICES;
       bar_show(i+13);
       break;
-    case 'I':
-    case 'i':
+    case 'C':
+    case 'c':
       context->state=DISKULATOR_INFO;
       *new_substate=DONE;
     }
