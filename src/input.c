@@ -70,6 +70,14 @@ unsigned char input_handle_joystick(void)
 }
 
 /**
+ * Handle global console keys.
+ */
+unsigned char input_handle_console_keys(void)
+{
+  return GTIA_READ.consol;
+}
+
+/**
  * Get an input from keyboard/joystick
  * Returns an 'atascii key' regardless of input
  */

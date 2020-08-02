@@ -139,6 +139,12 @@ void diskulator_hosts_hosts(Context *context, SubState *new_substate)
 
   while (*new_substate==HOSTS)
     {
+      if (input_handle_console_keys() == 0x03)
+	{
+	  *new_substate=DONE;
+	  context->state = MOUNT_AND_BOOT;
+	}
+
       k=input_handle_key();
       input_handle_nav_keys(k,2,8,&i);
       
@@ -172,6 +178,11 @@ void diskulator_hosts_devices(Context *context, SubState *new_substate)
 
   while (*new_substate==DEVICES)
     {
+      if (input_handle_console_keys() == 0x03)
+	{
+	  *new_substate=DONE;
+	  context->state = MOUNT_AND_BOOT;
+	}
       k=input_handle_key();
       input_handle_nav_keys(k,13,8,&i);
       

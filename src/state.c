@@ -15,6 +15,7 @@
 #include "adapter_config.h"
 #include "bar.h"
 #include "screen.h"
+#include "mount_and_boot.h"
 
 /**
  * Common code for every state
@@ -56,6 +57,9 @@ void state(Context *context)
 	  break;
 	case ADAPTER_CONFIG:
 	  context->state = adapter_config(context);
+	  break;
+	case MOUNT_AND_BOOT:
+	  context->state = mount_and_boot(context);
 	  break;
 	}
     }

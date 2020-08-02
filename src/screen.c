@@ -174,3 +174,12 @@ void screen_dlist_wifi(void)
   dlist_ptr[0x0a] = dlist_ptr[0x0b] = 2;
   dlist_ptr[0x1b] = dlist_ptr[0x1c] = 6;
 }
+
+/**
+ * Patch the dlist for mount and boot screen.
+ */
+void screen_dlist_mount_and_boot(void)
+{
+  dlist_ptr[0x0a] = dlist_ptr[0x0b] = 2;
+  dlist_ptr[0x1b] = dlist_ptr[0x1c] = 6;
+}

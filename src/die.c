@@ -14,7 +14,7 @@
 void die(void)
 {
   while (!kbhit()) { }
-  asm("jmp $E477");
+  cold_start();
 }
 
 /**

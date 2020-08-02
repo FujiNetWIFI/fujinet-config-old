@@ -22,6 +22,8 @@ char text_error_wifi_connection_lost[] = "CONNECTION LOST";
 char text_error_wifi_disconnected[] = "WIFI DISCONNECTED";
 char text_error_reading_host_slots[] = "ERROR READING HOST SLOTS";
 char text_error_reading_device_slots[] = "ERROR READING DEVICE SLOTS";
+char text_error_mounting_host_slot[] = "ERROR MOUNTING HOST SLOT";
+char text_error_mounting_device_slot[] = "ERROR MOUNTING DEVICE SLOT";
 
 /**
  * Display error.
@@ -72,6 +74,12 @@ void error(ErrorMessage msg)
       break;
     case ERROR_READING_DEVICE_SLOTS:
       text = text_error_reading_device_slots;
+      break;
+    case ERROR_MOUNTING_HOST_SLOT:
+      text = text_error_mounting_host_slot;
+      break;
+    case ERROR_MOUNTING_DEVICE_SLOT:
+      text = text_error_mounting_device_slot;
       break;
     }  
   screen_puts(0,21,text);
