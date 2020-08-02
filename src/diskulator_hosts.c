@@ -116,22 +116,27 @@ void diskulator_hosts_setup(HostSlots *hs, DeviceSlots *ds)
  */
 void diskulator_hosts_hosts(Context *context, SubState *new_substate)
 {
-  unsigned char k=input_handle_key();
+  unsigned char k;
   unsigned char i=0;
-  
-  input_handle_nav_keys(k,2,8,&i);
 
-  switch(k)
+  while (*new_substate==HOSTS)
     {
-    case 'D':
-    case 'd':
-      *new_substate = DEVICES;
-      bar_show(i+13);
-      break;
-    case 'C':
-    case 'c':
-      context->state=DISKULATOR_INFO;
-      *new_substate=DONE;
+      k=input_handle_key();
+      input_handle_nav_keys(k,2,8,&i);
+      
+      switch(k)
+	{
+	case 'D':
+	case 'd':
+	  *new_substate = DEVICES;
+	  bar_show(i+13);
+	  break;
+	case 'C':
+	case 'c':
+	  context->state=DISKULATOR_INFO;
+	  *new_substate=DONE;
+	  break;
+	}
     }
 }
 
@@ -140,18 +145,22 @@ void diskulator_hosts_hosts(Context *context, SubState *new_substate)
  */
 void diskulator_hosts_devices(Context *context, SubState *new_substate)
 {
-  unsigned char k=input_handle_key();
+  unsigned char k;
   unsigned char i=0;
-  
-  input_handle_nav_keys(k,13,8,&i);
 
-  switch(k)
+  while (*new_substate==DEVICES)
     {
-    case 'H':
-    case 'h':
-      *new_substate = HOSTS;
-      bar_show(i+2);
-      break;
+      k=input_handle_key();
+      input_handle_nav_keys(k,13,8,&i);
+      
+      switch(k)
+	{
+	case 'H':
+	case 'h':
+	  *new_substate = HOSTS;
+	  bar_show(i+2);
+	  break;
+	}
     }
 }
 
