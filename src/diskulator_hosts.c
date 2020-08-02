@@ -210,6 +210,7 @@ void diskulator_hosts_hosts(Context *context, SubState *new_substate)
 	{
 	case 'D':
 	case 'd':
+	  i=0;
 	  *new_substate = DEVICES;
 	  keys_reference_diskulator_hosts_devices();
 	  bar_show(i+ORIGIN_DEVICE_SLOTS);
@@ -250,6 +251,7 @@ void diskulator_hosts_devices(Context *context, SubState *new_substate)
 	{
 	case 'H':
 	case 'h':
+	  i=0;
 	  *new_substate = HOSTS;
 	  keys_reference_diskulator_hosts_hosts();
 	  bar_show(i+ORIGIN_HOST_SLOTS);
