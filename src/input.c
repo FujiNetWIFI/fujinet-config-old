@@ -7,6 +7,7 @@
 #include <atari.h>
 #include <conio.h>
 #include "sio.h"
+#include "bar.h"
 
 /**
  * Handle nav up
@@ -28,7 +29,7 @@ void input_handle_nav_down(unsigned char max, unsigned char* i)
  * k is the input ATASCII key
  * i is the maximum down #
  */
-void input_handle_nav_keys(char k, unsigned char max, unsigned char *i)
+void input_handle_nav_keys(char k, unsigned char pos, unsigned char max, unsigned char *i)
 {
   switch(k)
     {
@@ -41,6 +42,9 @@ void input_handle_nav_keys(char k, unsigned char max, unsigned char *i)
       input_handle_nav_down(max,i);
       break;
     }
+
+  if (k>0)
+    bar_show(pos+(*i));
 }
 
 /**

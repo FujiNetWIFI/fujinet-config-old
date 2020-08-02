@@ -10,6 +10,9 @@
 #include "fuji_typedefs.h"
 #include "error.h"
 #include "die.h"
+#include "input.h"
+#include "bar.h"
+#include "keys-reference.h"
 
 char text_empty[]="Empty";
 
@@ -102,20 +105,56 @@ void diskulator_hosts_setup(HostSlots *hs, DeviceSlots *ds)
     error_fatal(ERROR_READING_DEVICE_SLOTS);
   
   diskulator_hosts_display_device_slots(ds);
+
+  keys_reference_diskulator_hosts_hosts();
+  
+  bar_show(2);
 }
 
 /**
  * Diskulator interactive - hosts
  */
-State diskulator_hosts_hosts(Context *context)
+SubState diskulator_hosts_hosts(Context *context)
 {
+  unsigned char k=input_handle_key();
+  unsigned char i=0;
+  SubState new_substate = HOSTS;
+  
+  input_handle_nav_keys(k,2,8,&i);
+
+  switch(k)
+    {
+    case 'D':
+    case 'd':
+      new_substate = DEVICES;
+      bar_show(i+13);
+      break;
+    }
+  
+  return new_substate;
 }
 
 /**
  * Diskulator interactive - device slots
  */
-State diskulator_hosts_devices(Context *context)
+SubState diskulator_hosts_devices(Context *context)
 {
+  unsigned char k=input_handle_key();
+  unsigned char i=0;
+  SubState new_substate = HOSTS;
+  
+  input_handle_nav_keys(k,13,8,&i);
+
+  switch(k)
+    {
+    case 'H':
+    case 'h':
+      new_substate = HOSTS;
+      bar_show(i+2);
+      break;
+    }
+  
+  return new_substate;  
 }
 
 /**
@@ -124,23 +163,21 @@ State diskulator_hosts_devices(Context *context)
 State diskulator_hosts(Context *context)
 {
   SubState ss=HOSTS;
-  
-  State new_state = DISKULATOR_HOSTS;
-  
+    
   diskulator_hosts_setup(&hs,&ds);
   
   while (ss != DONE)
     {
       switch(ss)
-	{
-	case HOSTS:
-	  new_state = diskulator_hosts_hosts(context);
-	  break;
-	case DEVICES:
-	  new_state = diskulator_hosts_devices(context);
-	  break;
-	}
+      	{
+      	case HOSTS:
+      	  ss = diskulator_hosts_hosts(context);
+      	  break;
+      	case DEVICES:
+      	  ss = diskulator_hosts_devices(context);
+      	  break;
+      	}
     }
   
-  return new_state;
+  return context->state;
 }

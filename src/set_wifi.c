@@ -179,14 +179,10 @@ State set_wifi_select_network(unsigned char numNetworks)
   while (true) // Process keys
     {
       k=input_handle_key();
-      input_handle_nav_keys(k,numNetworks,&i);
+      input_handle_nav_keys(k,4,numNetworks,&i);
 
-      if (k>0)
-	{
-	  bar_show(i+4);
-	  if ((k==0x9B) || (k==0x1B))
-	    break;
-	}
+      if ((k==0x9B) || (k==0x1B))
+	break;
     }
 
   if (k==0x9B) // RETURN

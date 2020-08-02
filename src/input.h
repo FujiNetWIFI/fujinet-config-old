@@ -13,7 +13,7 @@
  * max is the maximum row
  * i is the current index
  */
-void input_handle_nav_keys(char k, unsigned char max, unsigned char *i);
+void input_handle_nav_keys(char k, unsigned char pos, unsigned char max, unsigned char *i);
 
 /**
  * Get an input from keyboard/joystick
