@@ -151,6 +151,21 @@ void diskulator_hosts_handle_jump_keys(unsigned char k,unsigned char *i, SubStat
 }
 
 /**
+ * Handle nav keys depending on sub-state (HOSTS or DEVICES)
+ */
+void diskulator_hosts_handle_nav_keys(unsigned char k, unsigned char *i, SubState *new_substate)
+{
+  unsigned char o;
+  
+  if (*new_substate==DEVICES)
+    o=13;
+  else
+    o=2;
+
+  input_handle_nav_keys(k,o,8,i);
+}
+
+/**
  * Edit a host slot
  */
 void diskulator_hosts_edit_host_slot(unsigned char i)
@@ -186,7 +201,8 @@ void diskulator_hosts_hosts(Context *context, SubState *new_substate)
 
       k=input_handle_key();
       diskulator_hosts_handle_jump_keys(k,&i,new_substate);
-      input_handle_nav_keys(k,2,8,&i);
+      diskulator_hosts_handle_nav_keys(k,&i,new_substate);
+      //      input_handle_nav_keys(k,2,8,&i);
       
       switch(k)
 	{
@@ -226,7 +242,8 @@ void diskulator_hosts_devices(Context *context, SubState *new_substate)
 	}
       k=input_handle_key();
       diskulator_hosts_handle_jump_keys(k,&i,new_substate);
-      input_handle_nav_keys(k,13,8,&i);
+      diskulator_hosts_handle_nav_keys(k,&i,new_substate);
+      //      input_handle_nav_keys(k,13,8,&i);
       
       switch(k)
 	{
