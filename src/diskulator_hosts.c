@@ -112,6 +112,24 @@ void diskulator_hosts_setup(HostSlots *hs, DeviceSlots *ds)
 }
 
 /**
+ * Edit a host slot
+ */
+void diskulator_hosts_edit_host_slot(unsigned char i)
+{
+  if (hs.host[i][0] == 0x00)
+    {
+      char tmp[2]={0,0};
+      screen_clear_line(i+1);
+      tmp[0]=i+0x31;
+      screen_puts(2,i+1,tmp);
+    }
+  screen_input(4, i+1, hs.host[i]);
+  if (hs.host[i][0] == 0x00)
+    screen_puts(5, i+1, text_empty);
+  fuji_sio_write_host_slots(&hs);
+}
+
+/**
  * Diskulator interactive - hosts
  */
 void diskulator_hosts_hosts(Context *context, SubState *new_substate)
@@ -135,6 +153,10 @@ void diskulator_hosts_hosts(Context *context, SubState *new_substate)
 	case 'c':
 	  context->state=DISKULATOR_INFO;
 	  *new_substate=DONE;
+	  break;
+	case 'E':
+	case 'e':
+	  diskulator_hosts_edit_host_slot(i);
 	  break;
 	}
     }
