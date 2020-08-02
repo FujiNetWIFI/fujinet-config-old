@@ -14,6 +14,9 @@
 #include "bar.h"
 #include "keys-reference.h"
 
+#define ORIGIN_HOST_SLOTS 2
+#define ORIGIN_DEVICE_SLOTS 13
+
 char text_empty[]="Empty";
 
 static DeviceSlots ds;
@@ -128,7 +131,7 @@ void diskulator_hosts_handle_jump_keys(unsigned char k,unsigned char *i, SubStat
     case '8':
       *i=k-'1';
       *new_substate=DEVICES;
-      bar_show((*i)+13);
+      bar_show((*i)+ORIGIN_DEVICE_SLOTS);
       keys_reference_diskulator_hosts_devices();
       break;
     case '!':
@@ -144,7 +147,7 @@ void diskulator_hosts_handle_jump_keys(unsigned char k,unsigned char *i, SubStat
       else
 	*i=k-'!';
       *new_substate=HOSTS;
-      bar_show((*i)+2);
+      bar_show((*i)+ORIGIN_HOST_SLOTS);
       keys_reference_diskulator_hosts_hosts();
       break;
     }
@@ -158,9 +161,9 @@ void diskulator_hosts_handle_nav_keys(unsigned char k, unsigned char *i, SubStat
   unsigned char o;
   
   if (*new_substate==DEVICES)
-    o=13;
+    o=ORIGIN_DEVICE_SLOTS;
   else
-    o=2;
+    o=ORIGIN_HOST_SLOTS;
 
   input_handle_nav_keys(k,o,8,i);
 }
@@ -202,7 +205,6 @@ void diskulator_hosts_hosts(Context *context, SubState *new_substate)
       k=input_handle_key();
       diskulator_hosts_handle_jump_keys(k,&i,new_substate);
       diskulator_hosts_handle_nav_keys(k,&i,new_substate);
-      //      input_handle_nav_keys(k,2,8,&i);
       
       switch(k)
 	{
@@ -210,7 +212,7 @@ void diskulator_hosts_hosts(Context *context, SubState *new_substate)
 	case 'd':
 	  *new_substate = DEVICES;
 	  keys_reference_diskulator_hosts_devices();
-	  bar_show(i+13);
+	  bar_show(i+ORIGIN_DEVICE_SLOTS);
 	  break;
 	case 'C':
 	case 'c':
@@ -243,7 +245,6 @@ void diskulator_hosts_devices(Context *context, SubState *new_substate)
       k=input_handle_key();
       diskulator_hosts_handle_jump_keys(k,&i,new_substate);
       diskulator_hosts_handle_nav_keys(k,&i,new_substate);
-      //      input_handle_nav_keys(k,13,8,&i);
       
       switch(k)
 	{
@@ -251,7 +252,7 @@ void diskulator_hosts_devices(Context *context, SubState *new_substate)
 	case 'h':
 	  *new_substate = HOSTS;
 	  keys_reference_diskulator_hosts_hosts();
-	  bar_show(i+2);
+	  bar_show(i+ORIGIN_HOST_SLOTS);
 	  break;
 	}
     }
