@@ -40,6 +40,7 @@ void set_wifi_display_mac_address(AdapterConfig *adapterConfig)
  */
 void set_wifi_setup(void)
 {
+  screen_dlist_wifi();
   screen_puts(0,  0, "WELCOME TO #FUJINET!");
   screen_puts(0, 21, "SCANNING NETWORKS...");
   screen_puts(0,  1, "MAC Address:");

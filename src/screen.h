@@ -35,8 +35,28 @@ void screen_clear(void);
 int screen_input(unsigned char x, unsigned char y, char* s);
 
 /**
+ * Print IP address at position
+ */
+void screen_print_ip(unsigned char x, unsigned char y, unsigned char *buf);
+
+/**
+ * Print MAC address at position
+ */
+void screen_print_mac(unsigned char x, unsigned char y, unsigned char *buf);
+
+/**
  * Patch the dlist for the hosts screen
  */
 void screen_dlist_diskulator_hosts(void);
+
+/**
+ * Patch the dlist for the info screen
+ */
+void screen_dlist_diskulator_info(void);
+
+/**
+ * Patch the dlist for wifi screens
+ */
+void screen_dlist_wifi(void);
 
 #endif /* SCREEN_H */

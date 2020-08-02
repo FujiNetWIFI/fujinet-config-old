@@ -19,6 +19,7 @@
  */
 void connect_wifi_setup(char* ssid)
 {
+  screen_dlist_wifi();
   screen_puts(0,0,"WELCOME TO #FUJINET! CONNECTING TO NET");
   screen_puts(2,2,ssid);
   bar_show(3);

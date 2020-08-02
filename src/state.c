@@ -26,14 +26,6 @@ void state_common(void)
 }
 
 /**
- * Set next state
- */
-void state_next(Context* context, State next_state)
-{
-  context->state = next_state;
-}
-
-/**
  * State machine. (Never exits.)
  */
 void state(Context *context)

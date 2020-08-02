@@ -4,6 +4,7 @@
  * Screen functions
  */
 
+#include <stdlib.h>
 #include <string.h>
 #include <conio.h>
 #include "screen.h"
@@ -109,10 +110,67 @@ int screen_input(unsigned char x, unsigned char y, char* s)
 }
 
 /**
+ * Print IP address at position
+ */
+void screen_print_ip(unsigned char x, unsigned char y, unsigned char *buf)
+{
+    unsigned char i = 0;
+    unsigned char o = 0;
+    unsigned char tmp[4];
+
+    for (i = 0; i < 4; i++)
+    {
+        itoa(buf[i], tmp, 10);
+        screen_puts(x + o, y, tmp);
+        o += strlen(tmp);
+        if (i < 3)
+            screen_puts(x + (o++), y, ".");
+    }
+}
+
+/**
+ * Print MAC address at position
+ */
+void screen_print_mac(unsigned char x, unsigned char y, unsigned char *buf)
+{
+    unsigned char i = 0;
+    unsigned char o = 0;
+    unsigned char tmp[3];
+
+    for (i = 0; i < 6; i++)
+    {
+        itoa(buf[i], tmp, 16);
+        screen_puts(x + o, y, tmp);
+        o += strlen(tmp);
+        if (i < 5)
+            screen_puts(x + (o++), y, ":");
+    }
+}
+
+/**
  * Patch the dlist for the hosts screen
  */
 void screen_dlist_diskulator_hosts(void)
 {
   dlist_ptr[0x0F] = dlist_ptr[0x10] = 6;
-  dlist_ptr[0x1B] = dlist_ptr[0x1C] = 2;
+  dlist_ptr[0x0A] = dlist_ptr[0x0B] = dlist_ptr[0x1B] = dlist_ptr[0x1C] = 2;
+}
+
+/**
+ * Patch the dlist for the info screen
+ */
+void screen_dlist_diskulator_info(void)
+{
+  dlist_ptr[0x0A] = 7;
+  dlist_ptr[0x0B] = 6;
+  dlist_ptr[0x0F] = dlist_ptr[0x10] = 2;
+}
+
+/**
+ * Patch the dlist for wifi screens
+ */
+void screen_dlist_wifi(void)
+{
+  dlist_ptr[0x0a] = dlist_ptr[0x0b] = 2;
+  dlist_ptr[0x1b] = dlist_ptr[0x1c] = 6;
 }

@@ -28,11 +28,6 @@ typedef struct _context
 } Context;
 
 /**
- * Set next state
- */
-void state_next(Context *context, State next_state);
-
-/**
  * State machine
  */
 void state(Context *context);
