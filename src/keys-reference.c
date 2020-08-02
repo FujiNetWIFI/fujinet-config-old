@@ -17,6 +17,10 @@ char text_mode_hosts[]=
   "Hosts\xD9\xA3\x19"
   "Config";
 
+char text_mode_devices[]=
+  "        \xD9\xA5\x19"
+  "Eject\xD9\xA8\x19Hosts\xD9\xAE\x19New          ";
+
 /**
  * Routine to display keys output
  */
@@ -31,4 +35,12 @@ void keys_display(char* text)
 void keys_reference_diskulator_hosts_hosts(void)
 {
   keys_display(text_mode_hosts);
+}
+
+/**
+ * Keys used in Diskulator_hosts devices mode
+ */
+void keys_reference_diskulator_hosts_devices(void)
+{
+  keys_display(text_mode_devices);
 }

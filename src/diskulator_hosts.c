@@ -112,6 +112,45 @@ void diskulator_hosts_setup(HostSlots *hs, DeviceSlots *ds)
 }
 
 /**
+ * Handle jump keys (1-8, shift 1-8)
+ */
+void diskulator_hosts_handle_jump_keys(unsigned char k,unsigned char *i, SubState *new_substate)
+{
+  switch(k)
+    {
+    case '1':
+    case '2':
+    case '3':
+    case '4':
+    case '5':
+    case '6':
+    case '7':
+    case '8':
+      *i=k-'1';
+      *new_substate=DEVICES;
+      bar_show((*i)+13);
+      keys_reference_diskulator_hosts_devices();
+      break;
+    case '!':
+    case '"':
+    case '#':
+    case '$':
+    case '%':
+    case '&':
+    case '\'':
+    case '@':
+      if (k=='@')
+	*i=7;
+      else
+	*i=k-'!';
+      *new_substate=HOSTS;
+      bar_show((*i)+2);
+      keys_reference_diskulator_hosts_hosts();
+      break;
+    }
+}
+
+/**
  * Edit a host slot
  */
 void diskulator_hosts_edit_host_slot(unsigned char i)
@@ -146,6 +185,7 @@ void diskulator_hosts_hosts(Context *context, SubState *new_substate)
 	}
 
       k=input_handle_key();
+      diskulator_hosts_handle_jump_keys(k,&i,new_substate);
       input_handle_nav_keys(k,2,8,&i);
       
       switch(k)
@@ -153,6 +193,7 @@ void diskulator_hosts_hosts(Context *context, SubState *new_substate)
 	case 'D':
 	case 'd':
 	  *new_substate = DEVICES;
+	  keys_reference_diskulator_hosts_devices();
 	  bar_show(i+13);
 	  break;
 	case 'C':
@@ -184,6 +225,7 @@ void diskulator_hosts_devices(Context *context, SubState *new_substate)
 	  context->state = MOUNT_AND_BOOT;
 	}
       k=input_handle_key();
+      diskulator_hosts_handle_jump_keys(k,&i,new_substate);
       input_handle_nav_keys(k,13,8,&i);
       
       switch(k)
@@ -191,6 +233,7 @@ void diskulator_hosts_devices(Context *context, SubState *new_substate)
 	case 'H':
 	case 'h':
 	  *new_substate = HOSTS;
+	  keys_reference_diskulator_hosts_hosts();
 	  bar_show(i+2);
 	  break;
 	}

@@ -12,4 +12,9 @@
  */
 void keys_reference_diskulator_hosts_hosts(void);
 
+/**
+ * Keys used in Diskulator_hosts devices mode
+ */
+void keys_reference_diskulator_hosts_devices(void);
+
 #endif /* KEYS_REFERENCE_H */
