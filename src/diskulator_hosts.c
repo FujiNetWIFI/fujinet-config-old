@@ -4,6 +4,7 @@
  */
 
 #include <stdlib.h>
+#include <string.h>
 #include "diskulator_hosts.h"
 #include "screen.h"
 #include "fuji_sio.h"
@@ -187,6 +188,25 @@ void diskulator_hosts_edit_host_slot(unsigned char i)
 }
 
 /**
+ * Eject image from device slot
+ */
+void diskulator_hosts_eject_device_slot(unsigned char i)
+{
+  char tmp[2]={0,0};
+
+  tmp[0]=i+'1'; // string denoting now ejected device slot.
+  
+  fuji_sio_umount_device(i);
+  memset(ds.slot[i].file,0,sizeof(ds.slot[i].file));
+  ds.slot[i].hostSlot=0xFF;
+  fuji_sio_write_device_slots(&ds);
+  
+  screen_clear_line(i+ORIGIN_DEVICE_SLOTS-2);
+  screen_puts(2,i+ORIGIN_DEVICE_SLOTS-2,tmp);
+  screen_puts(5,i+ORIGIN_DEVICE_SLOTS-2,text_empty);
+}
+
+/**
  * Diskulator interactive - hosts
  */
 void diskulator_hosts_hosts(Context *context, SubState *new_substate)
@@ -254,6 +274,10 @@ void diskulator_hosts_devices(Context *context, SubState *new_substate)
       
       switch(k)
 	{
+	case 'E':
+	case 'e':
+	  diskulator_hosts_eject_device_slot(i);
+	  break;
 	case 'H':
 	case 'h':
 	  i=0;
