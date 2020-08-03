@@ -224,6 +224,11 @@ void diskulator_hosts_hosts(Context *context, SubState *new_substate)
 	case 'e':
 	  diskulator_hosts_edit_host_slot(i);
 	  break;
+	case 0x9b: // RETURN
+	  context->state=DISKULATOR_SELECT;
+	  context->host_slot=i;
+	  *new_substate=DONE;
+	  break;
 	}
     }
 }
