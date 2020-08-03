@@ -20,9 +20,6 @@
 
 char text_empty[]="Empty";
 
-static DeviceSlots ds;
-static HostSlots hs;
-
 typedef enum _substate
   {
    HOSTS,
@@ -172,34 +169,34 @@ void diskulator_hosts_handle_nav_keys(unsigned char k, unsigned char *i, SubStat
 /**
  * Edit a host slot
  */
-void diskulator_hosts_edit_host_slot(unsigned char i)
+void diskulator_hosts_edit_host_slot(unsigned char i, HostSlots* hs)
 {
-  if (hs.host[i][0] == 0x00)
+  if (hs->host[i][0] == 0x00)
     {
       char tmp[2]={0,0};
       screen_clear_line(i+1);
       tmp[0]=i+0x31;
       screen_puts(2,i+1,tmp);
     }
-  screen_input(4, i+1, hs.host[i]);
-  if (hs.host[i][0] == 0x00)
+  screen_input(4, i+1, hs->host[i]);
+  if (hs->host[i][0] == 0x00)
     screen_puts(5, i+1, text_empty);
-  fuji_sio_write_host_slots(&hs);
+  fuji_sio_write_host_slots(hs);
 }
 
 /**
  * Eject image from device slot
  */
-void diskulator_hosts_eject_device_slot(unsigned char i)
+void diskulator_hosts_eject_device_slot(unsigned char i, DeviceSlots* ds)
 {
   char tmp[2]={0,0};
 
   tmp[0]=i+'1'; // string denoting now ejected device slot.
   
   fuji_sio_umount_device(i);
-  memset(ds.slot[i].file,0,sizeof(ds.slot[i].file));
-  ds.slot[i].hostSlot=0xFF;
-  fuji_sio_write_device_slots(&ds);
+  memset(ds->slot[i].file,0,sizeof(ds->slot[i].file));
+  ds->slot[i].hostSlot=0xFF;
+  fuji_sio_write_device_slots(ds);
   
   screen_clear_line(i+ORIGIN_DEVICE_SLOTS-2);
   screen_puts(2,i+ORIGIN_DEVICE_SLOTS-2,tmp);
@@ -242,7 +239,7 @@ void diskulator_hosts_hosts(Context *context, SubState *new_substate)
 	  break;
 	case 'E':
 	case 'e':
-	  diskulator_hosts_edit_host_slot(i);
+	  diskulator_hosts_edit_host_slot(i,&context->hostSlots);
 	  break;
 	case 0x9b: // RETURN
 	  context->state=DISKULATOR_SELECT;
@@ -276,7 +273,7 @@ void diskulator_hosts_devices(Context *context, SubState *new_substate)
 	{
 	case 'E':
 	case 'e':
-	  diskulator_hosts_eject_device_slot(i);
+	  diskulator_hosts_eject_device_slot(i,&context->deviceSlots);
 	  break;
 	case 'H':
 	case 'h':
@@ -296,7 +293,7 @@ State diskulator_hosts(Context *context)
 {
   SubState ss=HOSTS;
     
-  diskulator_hosts_setup(&hs,&ds);
+  diskulator_hosts_setup(&context->hostSlots,&context->deviceSlots);
   
   while (ss != DONE)
     {
