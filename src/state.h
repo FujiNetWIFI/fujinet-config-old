@@ -33,6 +33,11 @@ typedef struct _context
 } Context;
 
 /**
+ * Set up initial context
+ */
+void context_setup(Context* context);
+
+/**
  * State machine
  */
 void state(Context *context);

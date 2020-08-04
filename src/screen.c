@@ -183,3 +183,11 @@ void screen_dlist_mount_and_boot(void)
   dlist_ptr[0x0a] = dlist_ptr[0x0b] = 2;
   dlist_ptr[0x1b] = dlist_ptr[0x1c] = 6;
 }
+
+/**
+ * Patch the dlist for the diskulator select screen.
+ */
+void screen_dlist_diskulator_select(void)
+{
+  dlist_ptr[0x0f] = dlist_ptr[0x10] = 2;
+}

@@ -64,4 +64,9 @@ void screen_dlist_wifi(void);
  */
 void screen_dlist_mount_and_boot(void);
 
+/**
+ * Patch the dlist for the diskulator select screen.
+ */
+void screen_dlist_diskulator_select(void);
+
 #endif /* SCREEN_H */

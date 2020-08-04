@@ -82,7 +82,7 @@ State configured(void)
 /**
  * Setup the config screen
  */
-void setup(void)
+void setup(Context *context)
 {
   OS.color0=0x9C;
   OS.color1=0x0F;
@@ -106,12 +106,12 @@ void setup(void)
   OS.chbas=0x78; // use the charset
   bar_clear();
   bar_setup_regs();
-  
+  context_setup(context);
 }
 
 void main(void)
 {
-  setup();
+  setup(&context);
 
   context.state = configured();
   

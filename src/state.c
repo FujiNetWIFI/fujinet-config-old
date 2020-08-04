@@ -5,6 +5,7 @@
  */
 
 #include <stdbool.h>
+#include <string.h>
 #include "state.h"
 #include "set_wifi.h"
 #include "connect_wifi.h"
@@ -16,6 +17,14 @@
 #include "bar.h"
 #include "screen.h"
 #include "mount_and_boot.h"
+
+/**
+ * Set up initial context
+ */
+void context_setup(Context* context)
+{
+  strcpy(context->directory,"/");
+}
 
 /**
  * Common code for every state
