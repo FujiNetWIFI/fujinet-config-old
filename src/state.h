@@ -28,6 +28,8 @@ typedef struct _context
   char filename[256];                // Current filename
   unsigned char host_slot;           // Current Host slot (0-7)
   unsigned char device_slot;         // Current Device slot (0-7)
+  unsigned short page;               // Current Directory page
+  unsigned short dir_pos;            // current directory position
   DeviceSlots deviceSlots;           // Current device slots
   HostSlots hostSlots;               // Current host slots.
 } Context;
