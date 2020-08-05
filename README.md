@@ -57,7 +57,7 @@ Some example TNFS Hosts
 While it is easy [to set up a TNFS server](http://spectrum.alioth.net/doc/index.php/TNFS_server). You can use these publically available TNFS servers, as well:
 
 * fujinet.online
-* tnfs.atari8bit.net
+* fujinet.atari8bit.net
 * irata.online
 
 Device Slots
