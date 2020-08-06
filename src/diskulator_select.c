@@ -3,33 +3,109 @@
  * Diskulator Select Disk image screen
  */
 
+#include <atari.h>
+#include <stdbool.h>
+#include <string.h>
+#include <stdlib.h>
 #include "diskulator_select.h"
 #include "screen.h"
+#include "fuji_sio.h"
+#include "die.h"
+#include "bar.h"
+#include "input.h"
 
 typedef enum _substate
   {
    SELECT_FILE,
+   PREV_PAGE,
+   NEXT_PAGE,
    DONE
   } SubState;
 
 typedef unsigned short Page;
 typedef unsigned char PageOffset;
 
+#define DIRECTORY_LIST_Y_OFFSET 2
+#define DIRECTORY_LIST_SCREEN_WIDTH 36
+#define DIRECTORY_LIST_ENTRIES_PER_PAGE 16
+
 /**
- * Convert directory position to page and offset
+ * Display directory entry
  */
-void diskulator_select_pos_to_page(DirectoryPosition pos, Page* page, PageOffset* offset)
+bool diskulator_select_display_directory_entry(unsigned char i, char* entry)
 {
-  *page=pos>>4;
-  *offset=pos&0x0F;
+  if (entry[0]==0x7F)
+    return false; // End of directory
+
+  // Display folder icon if directory.
+  if (entry[strlen(entry)-1]=='/')
+    screen_puts(0,DIRECTORY_LIST_Y_OFFSET+i,"\x04");
+
+  // Display filename
+  screen_clear_line(DIRECTORY_LIST_Y_OFFSET+i);
+  screen_puts(2,DIRECTORY_LIST_Y_OFFSET+i,entry);
+  return true;
 }
 
 /**
- * Convert page/offset to directory position
+ * Clear directory page area
  */
-void diskulator_select_page_to_pos(Page page, PageOffset offset, DirectoryPosition* pos)
+void diskulator_select_display_clear_page(void)
 {
-  *pos=(page<<4)+offset;
+  unsigned char i;
+
+  for (i=0;i<DIRECTORY_LIST_ENTRIES_PER_PAGE+2;i++)
+    screen_clear_line(DIRECTORY_LIST_Y_OFFSET+i);
+}
+
+/**
+ * Display directory page
+ */
+unsigned char diskulator_select_display_directory_page(Context* context)
+{
+  char displayed_entry[DIRECTORY_LIST_SCREEN_WIDTH];
+  unsigned char i=0;
+
+  diskulator_select_display_clear_page();
+
+  fuji_sio_open_directory(context->host_slot,context->directory);
+  fuji_sio_set_directory_position(context->dir_pos);
+  
+  if (context->dir_pos > 0)
+    {
+      screen_puts(0,i+DIRECTORY_LIST_Y_OFFSET,"\x1C");
+      screen_puts(2,i+DIRECTORY_LIST_Y_OFFSET,"<PREV PAGE>");
+      i++;
+    }
+  
+  for (i=i;i<DIRECTORY_LIST_ENTRIES_PER_PAGE;i++)
+    {
+      fuji_sio_read_directory(displayed_entry,DIRECTORY_LIST_SCREEN_WIDTH);
+      if (!diskulator_select_display_directory_entry(i,displayed_entry))
+	break;
+    }
+
+  // This does not display if EOF happens exactly on the last entry on screen.
+  if (i==DIRECTORY_LIST_ENTRIES_PER_PAGE)
+    {
+      screen_puts(0,i+DIRECTORY_LIST_Y_OFFSET,"\x1D");
+      screen_puts(2,i+DIRECTORY_LIST_Y_OFFSET,"<NEXT PAGE>");
+      i++;
+    }
+    
+  fuji_sio_close_directory(context->host_slot);
+  return i; // Number of entries displayed
+}
+
+/**
+ * Handle RETURN key - Select item.
+ */
+void diskulator_select_handle_return(unsigned char i, Context* context, SubState *ss)
+{
+  if ((i==0) && (context->dir_pos > 0))
+    *ss = PREV_PAGE;
+  else if (i==16)
+    *ss = NEXT_PAGE;
 }
 
 /**
@@ -37,7 +113,30 @@ void diskulator_select_page_to_pos(Page page, PageOffset offset, DirectoryPositi
  */
 void diskulator_select_select_file(Context* context, SubState* ss)
 {
+  unsigned char mi=diskulator_select_display_directory_page(context);
+  unsigned char k=0;
+  unsigned char i=0;
+
+  bar_show(DIRECTORY_LIST_Y_OFFSET+1);
   
+  while (*ss==SELECT_FILE)
+    {
+      k=input_handle_key();
+      input_handle_nav_keys(k,DIRECTORY_LIST_Y_OFFSET+1,mi,&i);
+
+      switch(k)
+	{
+	case 0x9B:
+	  diskulator_select_handle_return(i,context,ss);
+	  break;
+	case '<':
+	  *ss=PREV_PAGE;
+	  break;
+	case '>':
+	  *ss=NEXT_PAGE;
+	  break;
+	}
+    }
 }
   
 /**
@@ -71,6 +170,14 @@ State diskulator_select(Context *context)
 	{
 	case SELECT_FILE:
 	  diskulator_select_select_file(context,&ss);
+	  break;
+	case PREV_PAGE:
+	  context->dir_pos -= 16;
+	  ss=SELECT_FILE;
+	  break;
+	case NEXT_PAGE:
+	  context->dir_pos += 16;
+	  ss=SELECT_FILE;
 	  break;
 	}
     }

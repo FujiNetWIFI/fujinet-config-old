@@ -244,6 +244,9 @@ void diskulator_hosts_hosts(Context *context, SubState *new_substate)
 	case 0x9b: // RETURN
 	  context->state=DISKULATOR_SELECT;
 	  context->host_slot=i;
+	  fuji_sio_mount_host(context->host_slot,&context->hostSlots);
+	  if (fuji_sio_error())
+	    error_fatal(ERROR_MOUNTING_HOST_SLOT);
 	  *new_substate=DONE;
 	  break;
 	}
