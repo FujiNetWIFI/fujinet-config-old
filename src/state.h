@@ -7,6 +7,7 @@
 #ifndef STATE_H
 #define STATE_H
 
+#include <stdbool.h>
 #include "fuji_typedefs.h"
 
 typedef enum _state
@@ -29,6 +30,7 @@ typedef struct _context
   unsigned char host_slot;           // Current Host slot (0-7)
   unsigned char device_slot;         // Current Device slot (0-7)
   unsigned short dir_pos;            // current directory position
+  bool dir_eof;                      // End of current directory?
   DeviceSlots deviceSlots;           // Current device slots
   HostSlots hostSlots;               // Current host slots.
 } Context;

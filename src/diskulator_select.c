@@ -69,6 +69,7 @@ unsigned char diskulator_select_display_directory_page(Context* context)
   diskulator_select_display_clear_page();
 
   fuji_sio_open_directory(context->host_slot,context->directory);
+  context->dir_eof=false;
   fuji_sio_set_directory_position(context->dir_pos);
   
   if (context->dir_pos > 0)
@@ -82,15 +83,22 @@ unsigned char diskulator_select_display_directory_page(Context* context)
     {
       fuji_sio_read_directory(displayed_entry,DIRECTORY_LIST_SCREEN_WIDTH);
       if (!diskulator_select_display_directory_entry(i,displayed_entry))
-	break;
+	{
+	  context->dir_eof=true;
+	  break;
+	}
     }
 
   // This does not display if EOF happens exactly on the last entry on screen.
   if (i==DIRECTORY_LIST_ENTRIES_PER_PAGE)
     {
-      screen_puts(0,i+DIRECTORY_LIST_Y_OFFSET,"\x1D");
-      screen_puts(2,i+DIRECTORY_LIST_Y_OFFSET,"<NEXT PAGE>");
-      i++;
+      fuji_sio_read_directory(displayed_entry,DIRECTORY_LIST_SCREEN_WIDTH);
+      if (displayed_entry[0]!=0x7F)
+	{
+	  screen_puts(0,i+DIRECTORY_LIST_Y_OFFSET,"\x1D");
+	  screen_puts(2,i+DIRECTORY_LIST_Y_OFFSET,"<NEXT PAGE>);
+	  i++;
+	}
     }
     
   fuji_sio_close_directory(context->host_slot);
@@ -130,10 +138,12 @@ void diskulator_select_select_file(Context* context, SubState* ss)
 	  diskulator_select_handle_return(i,context,ss);
 	  break;
 	case '<':
-	  *ss=PREV_PAGE;
+	  if (context->dir_pos>0)
+	    *ss=PREV_PAGE;
 	  break;
 	case '>':
-	  *ss=NEXT_PAGE;
+	  if (!context->dir_eof)
+	    *ss=NEXT_PAGE;
 	  break;
 	}
     }
