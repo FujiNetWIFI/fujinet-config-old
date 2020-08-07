@@ -96,7 +96,7 @@ unsigned char diskulator_select_display_directory_page(Context* context)
       if (displayed_entry[0]!=0x7F)
 	{
 	  screen_puts(0,i+DIRECTORY_LIST_Y_OFFSET,"\x1D");
-	  screen_puts(2,i+DIRECTORY_LIST_Y_OFFSET,"<NEXT PAGE>);
+	  screen_puts(2,i+DIRECTORY_LIST_Y_OFFSET,"<NEXT PAGE>");
 	  i++;
 	}
     }
