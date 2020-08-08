@@ -67,6 +67,7 @@ unsigned char diskulator_select_display_directory_page(Context* context)
   unsigned char i=0;
 
   diskulator_select_display_clear_page();
+  context->dir_entries_displayed=0;
 
   fuji_sio_open_directory(context->host_slot,context->directory);
   context->dir_eof=false;
@@ -81,6 +82,7 @@ unsigned char diskulator_select_display_directory_page(Context* context)
   
   for (i=i;i<DIRECTORY_LIST_ENTRIES_PER_PAGE;i++)
     {
+      context->dir_entries_displayed++;
       fuji_sio_read_directory(displayed_entry,DIRECTORY_LIST_SCREEN_WIDTH);
       if (!diskulator_select_display_directory_entry(i,displayed_entry))
 	{
@@ -182,11 +184,13 @@ State diskulator_select(Context *context)
 	  diskulator_select_select_file(context,&ss);
 	  break;
 	case PREV_PAGE:
-	  context->dir_pos -= 16;
+	  context->dir_pos -= context->dir_entries_displayed;
+	  if (context->dir_pos < 16)
+	    context->dir_pos = 0; // Deal with pagination drift.
 	  ss=SELECT_FILE;
 	  break;
 	case NEXT_PAGE:
-	  context->dir_pos += 16;
+	  context->dir_pos += context->dir_entries_displayed;
 	  ss=SELECT_FILE;
 	  break;
 	}
