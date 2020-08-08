@@ -356,3 +356,20 @@ void fuji_sio_read_adapter_config(AdapterConfig* adapterConfig)
   OS.dcb.daux = 0;
   siov();
 }
+
+/**
+ * Set filename for device slot
+ */
+void fuji_sio_set_filename_for_device_slot(unsigned char slot, const char* filename)
+{
+  OS.dcb.ddevic=0x70;
+  OS.dcb.dunit=1;
+  OS.dcb.dcomnd=0xE2;
+  OS.dcb.dstats=0x80;
+  OS.dcb.dbuf=filename;
+  OS.dcb.dtimlo=0x0F;
+  OS.dcb.dbyt=256;
+  OS.dcb.daux1=slot;
+  OS.dcb.daux2=0;
+  siov();
+}

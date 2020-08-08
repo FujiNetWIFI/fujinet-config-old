@@ -118,4 +118,9 @@ void fuji_sio_read_net_config(NetConfig* netConfig);
  */
 void fuji_sio_read_adapter_config(AdapterConfig* adapterConfig);
 
+/**
+ * Set filename for device slot
+ */
+void fuji_sio_set_filename_for_device_slot(unsigned char slot, const char* filename);
+
 #endif /* FUJINET_SIO_H */
