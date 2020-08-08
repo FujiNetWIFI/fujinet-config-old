@@ -68,7 +68,7 @@ void diskulator_select_display_clear_page(void)
  */
 void diskulator_select_display_prev_page(void)
 {
-  screen_puts(0,DIRECTORY_LIST_Y_OFFSET-1,"\x1C");
+  screen_puts(0,DIRECTORY_LIST_Y_OFFSET-1,"\x9C");
   screen_puts(2,DIRECTORY_LIST_Y_OFFSET-1,"<PREV PAGE>");
 }
 
@@ -77,7 +77,7 @@ void diskulator_select_display_prev_page(void)
  */
 void diskulator_select_display_next_page(void)
 {
-  screen_puts(0,DIRECTORY_LIST_Y_OFFSET+DIRECTORY_LIST_ENTRIES_PER_PAGE,"\x1D");
+  screen_puts(0,DIRECTORY_LIST_Y_OFFSET+DIRECTORY_LIST_ENTRIES_PER_PAGE,"\x9E");
   screen_puts(2,DIRECTORY_LIST_Y_OFFSET+DIRECTORY_LIST_ENTRIES_PER_PAGE,"<NEXT PAGE>");
 }
 
@@ -89,6 +89,8 @@ void diskulator_select_display_directory_page(Context* context)
   char displayed_entry[DIRECTORY_LIST_SCREEN_WIDTH];
   unsigned char i;
 
+  bar_clear();
+  
   diskulator_select_display_clear_page();
 
   fuji_sio_open_directory(context->host_slot,context->directory);
