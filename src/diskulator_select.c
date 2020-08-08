@@ -25,25 +25,30 @@ typedef enum _substate
 typedef unsigned short Page;
 typedef unsigned char PageOffset;
 
-#define DIRECTORY_LIST_Y_OFFSET 2
+#define DIRECTORY_LIST_Y_OFFSET 3
 #define DIRECTORY_LIST_SCREEN_WIDTH 36
-#define DIRECTORY_LIST_ENTRIES_PER_PAGE 16
+#define DIRECTORY_LIST_ENTRIES_PER_PAGE 14
 
 /**
  * Display directory entry
  */
-bool diskulator_select_display_directory_entry(unsigned char i, char* entry)
+bool diskulator_select_display_directory_entry(unsigned char i, char* entry, Context *context)
 {
   if (entry[0]==0x7F)
-    return false; // End of directory
+    {
+      context->dir_eof=true;
+      return false; // End of directory
+    }
+
+  context->dir_eof=false;
+  
+  // Display filename
+  screen_puts(2,DIRECTORY_LIST_Y_OFFSET+i,entry);
 
   // Display folder icon if directory.
   if (entry[strlen(entry)-1]=='/')
     screen_puts(0,DIRECTORY_LIST_Y_OFFSET+i,"\x04");
 
-  // Display filename
-  screen_clear_line(DIRECTORY_LIST_Y_OFFSET+i);
-  screen_puts(2,DIRECTORY_LIST_Y_OFFSET+i,entry);
   return true;
 }
 
@@ -54,57 +59,56 @@ void diskulator_select_display_clear_page(void)
 {
   unsigned char i;
 
-  for (i=0;i<DIRECTORY_LIST_ENTRIES_PER_PAGE+2;i++)
-    screen_clear_line(DIRECTORY_LIST_Y_OFFSET+i);
+  for (i=2;i<19;i++)
+    screen_clear_line(i);
+}
+
+/**
+ * Display previous page
+ */
+void diskulator_select_display_prev_page(void)
+{
+  screen_puts(0,DIRECTORY_LIST_Y_OFFSET-1,"\x1C");
+  screen_puts(2,DIRECTORY_LIST_Y_OFFSET-1,"<PREV PAGE>");
+}
+
+/**
+ * Display previous page
+ */
+void diskulator_select_display_next_page(void)
+{
+  screen_puts(0,DIRECTORY_LIST_Y_OFFSET+DIRECTORY_LIST_ENTRIES_PER_PAGE,"\x1D");
+  screen_puts(2,DIRECTORY_LIST_Y_OFFSET+DIRECTORY_LIST_ENTRIES_PER_PAGE,"<NEXT PAGE>");
 }
 
 /**
  * Display directory page
  */
-unsigned char diskulator_select_display_directory_page(Context* context)
+void diskulator_select_display_directory_page(Context* context)
 {
   char displayed_entry[DIRECTORY_LIST_SCREEN_WIDTH];
-  unsigned char i=0;
+  unsigned char i;
 
   diskulator_select_display_clear_page();
-  context->dir_entries_displayed=0;
 
   fuji_sio_open_directory(context->host_slot,context->directory);
-  context->dir_eof=false;
-  fuji_sio_set_directory_position(context->dir_pos);
+  fuji_sio_set_directory_position(context->dir_page*DIRECTORY_LIST_ENTRIES_PER_PAGE);
   
-  if (context->dir_pos > 0)
-    {
-      screen_puts(0,i+DIRECTORY_LIST_Y_OFFSET,"\x1C");
-      screen_puts(2,i+DIRECTORY_LIST_Y_OFFSET,"<PREV PAGE>");
-      i++;
-    }
-  
-  for (i=i;i<DIRECTORY_LIST_ENTRIES_PER_PAGE;i++)
-    {
-      context->dir_entries_displayed++;
-      fuji_sio_read_directory(displayed_entry,DIRECTORY_LIST_SCREEN_WIDTH);
-      if (!diskulator_select_display_directory_entry(i,displayed_entry))
-	{
-	  context->dir_eof=true;
-	  break;
-	}
-    }
-
-  // This does not display if EOF happens exactly on the last entry on screen.
-  if (i==DIRECTORY_LIST_ENTRIES_PER_PAGE)
+  for (i=0;i<DIRECTORY_LIST_ENTRIES_PER_PAGE;i++)
     {
       fuji_sio_read_directory(displayed_entry,DIRECTORY_LIST_SCREEN_WIDTH);
-      if (displayed_entry[0]!=0x7F)
-	{
-	  screen_puts(0,i+DIRECTORY_LIST_Y_OFFSET,"\x1D");
-	  screen_puts(2,i+DIRECTORY_LIST_Y_OFFSET,"<NEXT PAGE>");
-	  i++;
-	}
+      if (!diskulator_select_display_directory_entry(i,displayed_entry,context))
+	break;
     }
     
   fuji_sio_close_directory(context->host_slot);
-  return i; // Number of entries displayed
+  context->entries_displayed=i;
+
+  if (context->dir_page > 0)
+    diskulator_select_display_prev_page();
+
+  if (context->dir_eof == false)
+    diskulator_select_display_next_page();
 }
 
 /**
@@ -114,8 +118,28 @@ void diskulator_select_handle_return(unsigned char i, Context* context, SubState
 {
   if ((i==0) && (context->dir_pos > 0))
     *ss = PREV_PAGE;
-  else if (i==16)
+  else if (i==DIRECTORY_LIST_ENTRIES_PER_PAGE)
     *ss = NEXT_PAGE;
+}
+
+/**
+ * Handle page nav
+ */
+void diskulator_select_handle_page_nav(unsigned char k, unsigned char i, Context *context, SubState *ss)
+{
+  switch(k)
+    {
+    case '-':
+    case 0x1C:
+      if (i==0 && context->dir_page > 0)
+	*ss=PREV_PAGE;
+      break;
+    case '=':
+    case 0x1D:
+      if (i==DIRECTORY_LIST_ENTRIES_PER_PAGE-1 && context->dir_eof == false)
+	*ss=NEXT_PAGE;
+      break;
+    }
 }
 
 /**
@@ -123,24 +147,26 @@ void diskulator_select_handle_return(unsigned char i, Context* context, SubState
  */
 void diskulator_select_select_file(Context* context, SubState* ss)
 {
-  unsigned char mi=diskulator_select_display_directory_page(context);
-  unsigned char k=0;
-  unsigned char i=0;
+  unsigned char k=0;  // Key to process
+  unsigned char i=0;  // cursor on page
+
+  diskulator_select_display_directory_page(context);
 
   bar_show(DIRECTORY_LIST_Y_OFFSET+1);
   
   while (*ss==SELECT_FILE)
     {
-      k=input_handle_key();
-      input_handle_nav_keys(k,DIRECTORY_LIST_Y_OFFSET+1,mi,&i);
-
+      k=input_handle_key(); 
+      diskulator_select_handle_page_nav(k,i,context,ss);     
+      input_handle_nav_keys(k,DIRECTORY_LIST_Y_OFFSET+1,context->entries_displayed,&i);
+      
       switch(k)
 	{
 	case 0x9B:
 	  diskulator_select_handle_return(i,context,ss);
 	  break;
 	case '<':
-	  if (context->dir_pos>0)
+	  if (context->dir_page > 0)
 	    *ss=PREV_PAGE;
 	  break;
 	case '>':
@@ -184,13 +210,11 @@ State diskulator_select(Context *context)
 	  diskulator_select_select_file(context,&ss);
 	  break;
 	case PREV_PAGE:
-	  context->dir_pos -= context->dir_entries_displayed;
-	  if (context->dir_pos < 16)
-	    context->dir_pos = 0; // Deal with pagination drift.
+	  context->dir_page--;
 	  ss=SELECT_FILE;
 	  break;
 	case NEXT_PAGE:
-	  context->dir_pos += context->dir_entries_displayed;
+	  context->dir_page++;
 	  ss=SELECT_FILE;
 	  break;
 	}
