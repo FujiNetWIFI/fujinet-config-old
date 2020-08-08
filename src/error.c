@@ -24,6 +24,9 @@ char text_error_reading_host_slots[] = "ERROR READING HOST SLOTS";
 char text_error_reading_device_slots[] = "ERROR READING DEVICE SLOTS";
 char text_error_mounting_host_slot[] = "ERROR MOUNTING HOST SLOT";
 char text_error_mounting_device_slot[] = "ERROR MOUNTING DEVICE SLOT";
+char text_error_setting_directory_position[] = "ERROR SETTING DIRECTORY POS";
+char text_error_opening_directory[] = "ERROR OPENING DIRECTORY";
+char text_error_reading_directory[] = "ERROR READING DIRECTORY";
 
 /**
  * Display error.
@@ -80,6 +83,15 @@ void error(ErrorMessage msg)
       break;
     case ERROR_MOUNTING_DEVICE_SLOT:
       text = text_error_mounting_device_slot;
+      break;
+    case ERROR_SETTING_DIRECTORY_POSITION:
+      text = text_error_setting_directory_position;
+      break;
+    case ERROR_OPENING_DIRECTORY:
+      text = text_error_opening_directory;
+      break;
+    case ERROR_READING_DIRECTORY:
+      text = text_error_reading_directory;
       break;
     }  
   screen_puts(0,21,text);

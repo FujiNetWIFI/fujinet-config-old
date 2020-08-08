@@ -13,6 +13,7 @@
 #include "die.h"
 #include "bar.h"
 #include "input.h"
+#include "error.h"
 
 typedef enum _substate
   {
@@ -27,6 +28,7 @@ typedef unsigned char PageOffset;
 
 #define DIRECTORY_LIST_Y_OFFSET 3
 #define DIRECTORY_LIST_SCREEN_WIDTH 36
+#define DIRECTORY_LIST_FULL_WIDTH 128
 #define DIRECTORY_LIST_ENTRIES_PER_PAGE 14
 
 /**
@@ -94,11 +96,18 @@ void diskulator_select_display_directory_page(Context* context)
   diskulator_select_display_clear_page();
 
   fuji_sio_open_directory(context->host_slot,context->directory);
+  if (fuji_sio_error())
+    error_fatal(ERROR_OPENING_DIRECTORY);
+  
   fuji_sio_set_directory_position(context->dir_page*DIRECTORY_LIST_ENTRIES_PER_PAGE);
+  if (fuji_sio_error())
+    error_fatal(ERROR_SETTING_DIRECTORY_POSITION);
   
   for (i=0;i<DIRECTORY_LIST_ENTRIES_PER_PAGE;i++)
     {
       fuji_sio_read_directory(displayed_entry,DIRECTORY_LIST_SCREEN_WIDTH);
+      if (fuji_sio_error())
+	error_fatal(ERROR_READING_DIRECTORY);
       if (!diskulator_select_display_directory_entry(i,displayed_entry,context))
 	break;
     }
@@ -117,11 +126,31 @@ void diskulator_select_display_directory_page(Context* context)
  * Handle RETURN key - Select item.
  */
 void diskulator_select_handle_return(unsigned char i, Context* context, SubState *ss)
-{
-  if ((i==0) && (context->dir_pos > 0))
-    *ss = PREV_PAGE;
-  else if (i==DIRECTORY_LIST_ENTRIES_PER_PAGE)
-    *ss = NEXT_PAGE;
+{  
+  fuji_sio_open_directory(context->host_slot,context->directory);
+  if (fuji_sio_error())
+    error_fatal(ERROR_OPENING_DIRECTORY);
+  
+  fuji_sio_set_directory_position((context->dir_page*DIRECTORY_LIST_ENTRIES_PER_PAGE)+i);
+  if (fuji_sio_error())
+    error_fatal(ERROR_SETTING_DIRECTORY_POSITION);
+
+  fuji_sio_read_directory(context->filename,DIRECTORY_LIST_FULL_WIDTH);
+  if (fuji_sio_error())
+    error_fatal(ERROR_READING_DIRECTORY);
+
+  // Handle if this is a directory
+  if (context->filename[strlen(context->filename)-1]=='/')
+    {
+      strcat(context->directory,context->filename);
+      memset(context->filename,0,sizeof(context->filename));
+      *ss=SELECT_FILE; // Stay here, go to the new directory.
+    }
+  else
+    {
+      *ss=DONE; // We are done with the select screen.
+      context->state=DISKULATOR_SLOT;
+    }
 }
 
 /**

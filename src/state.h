@@ -25,8 +25,8 @@ typedef enum _state
 typedef struct _context
 {
   State state;                       // Current program state (state.h)
-  char directory[256];               // Current directory
-  char filename[256];                // Current filename
+  char directory[128];               // Current directory
+  char filename[128];                // Current filename
   unsigned char host_slot;           // Current Host slot (0-7)
   unsigned char device_slot;         // Current Device slot (0-7)
   unsigned short dir_pos;            // current directory position
