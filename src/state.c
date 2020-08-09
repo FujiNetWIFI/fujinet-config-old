@@ -23,7 +23,6 @@
  */
 void context_setup(Context* context)
 {
-  strcpy(context->directory,"/");
 }
 
 /**

@@ -20,6 +20,8 @@ typedef enum _substate
    SELECT_FILE,
    PREV_PAGE,
    NEXT_PAGE,
+   ADVANCE_DIR,
+   DEVANCE_DIR,
    DONE
   } SubState;
 
@@ -30,6 +32,15 @@ typedef unsigned char PageOffset;
 #define DIRECTORY_LIST_SCREEN_WIDTH 36
 #define DIRECTORY_LIST_FULL_WIDTH 128
 #define DIRECTORY_LIST_ENTRIES_PER_PAGE 14
+
+/**
+ * Display directory path
+ */
+void diskulator_select_display_directory_path(Context* context)
+{
+  screen_clear_line(1);
+  screen_puts(0,1,context->directory);
+}
 
 /**
  * Display directory entry
@@ -144,7 +155,8 @@ void diskulator_select_handle_return(unsigned char i, Context* context, SubState
     {
       strcat(context->directory,context->filename);
       memset(context->filename,0,sizeof(context->filename));
-      *ss=SELECT_FILE; // Stay here, go to the new directory.
+      diskulator_select_display_directory_path(context);
+      *ss=ADVANCE_DIR; // Stay here, go to the new directory.
     }
   else
     {
@@ -174,6 +186,23 @@ void diskulator_select_handle_page_nav(unsigned char k, unsigned char i, Context
 }
 
 /**
+ * Devance (move up) directory
+ */
+void diskulator_select_devance_directory(Context* context)
+{
+  unsigned char i=strlen(context->directory)-2; // skip over the last '/'
+
+  while (context->directory[i--]!='/')
+    {
+      // Skip over it.
+    }
+
+  // i is now at next /, truncate it.
+  i++;
+  context->directory[++i]=0;
+}
+
+/**
  * Select file
  */
 void diskulator_select_select_file(Context* context, SubState* ss)
@@ -196,6 +225,7 @@ void diskulator_select_select_file(Context* context, SubState* ss)
 	case 0x9B:
 	  diskulator_select_handle_return(i,context,ss);
 	  break;
+
 	case '<':
 	  if (context->dir_page > 0)
 	    *ss=PREV_PAGE;
@@ -203,6 +233,13 @@ void diskulator_select_select_file(Context* context, SubState* ss)
 	case '>':
 	  if (!context->dir_eof)
 	    *ss=NEXT_PAGE;
+	  break;
+	case 0x1B:
+	  *ss=DONE;
+	  context->state=DISKULATOR_HOSTS;
+	  break;
+	case 0x7E:
+	  *ss=DEVANCE_DIR;
 	  break;
 	}
     }
@@ -214,13 +251,18 @@ void diskulator_select_select_file(Context* context, SubState* ss)
 void diskulator_select_setup(Context *context)
 {
   screen_dlist_diskulator_select();
+
+  memset(context->filename,0,sizeof(context->filename));
+  memset(context->directory,0,sizeof(context->directory));
+  strcpy(context->directory,"/");
+  
   screen_puts(4, 0, "DISK IMAGES");
   
   screen_puts(0, 21, "\xD9\xB2\xA5\xB4\xB5\xB2\xAE\x19"
 	      "PICK \xD9\xA5\xB3\xA3\x19"
 	      "ABORT");
-  
-  screen_puts(0, 1, context->directory);
+
+  diskulator_select_display_directory_path(context);
 }
 
 /**
@@ -246,6 +288,18 @@ State diskulator_select(Context *context)
 	  break;
 	case NEXT_PAGE:
 	  context->dir_page++;
+	  ss=SELECT_FILE;
+	  break;
+	case ADVANCE_DIR:
+	  context->dir_page=0;
+	  context->dir_eof=false;
+	  ss=SELECT_FILE;
+	  break;
+	case DEVANCE_DIR:
+	  diskulator_select_devance_directory(context);
+	  diskulator_select_display_directory_path(context);
+	  context->dir_page=0;
+	  context->dir_eof=false;
 	  ss=SELECT_FILE;
 	  break;
 	}
