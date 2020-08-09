@@ -9,6 +9,11 @@
 #include "state.h"
 
 /**
+ * Display device slots
+ */
+void diskulator_hosts_display_device_slots(unsigned char y, DeviceSlots *ds);
+
+/**
  * Set wifi State
  */
 State diskulator_hosts(Context *context);

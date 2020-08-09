@@ -53,7 +53,7 @@ void diskulator_hosts_display_host_slots(HostSlots *hs)
 /**
  * Display device slots
  */
-void diskulator_hosts_display_device_slots(DeviceSlots *ds)
+void diskulator_hosts_display_device_slots(unsigned char y, DeviceSlots *ds)
 {
   unsigned char i;
 
@@ -78,8 +78,8 @@ void diskulator_hosts_display_device_slots(DeviceSlots *ds)
 	  d[3] = 0x20;
         }
       
-      screen_puts(0, i + 11, d);
-      screen_puts(5, i + 11, ds->slot[i].file[0] != 0x00 ? ds->slot[i].file : text_empty);
+      screen_puts(0, i + y, d);
+      screen_puts(5, i + y, ds->slot[i].file[0] != 0x00 ? ds->slot[i].file : text_empty);
     }
 }
 
@@ -105,7 +105,7 @@ void diskulator_hosts_setup(HostSlots *hs, DeviceSlots *ds)
   if (fuji_sio_error())
     error_fatal(ERROR_READING_DEVICE_SLOTS);
   
-  diskulator_hosts_display_device_slots(ds);
+  diskulator_hosts_display_device_slots(11,ds);
 
   keys_reference_diskulator_hosts_hosts();
   

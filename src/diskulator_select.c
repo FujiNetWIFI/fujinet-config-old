@@ -225,7 +225,6 @@ void diskulator_select_select_file(Context* context, SubState* ss)
 	case 0x9B:
 	  diskulator_select_handle_return(i,context,ss);
 	  break;
-
 	case '<':
 	  if (context->dir_page > 0)
 	    *ss=PREV_PAGE;
@@ -270,7 +269,6 @@ void diskulator_select_setup(Context *context)
  */
 State diskulator_select(Context *context)
 {
-  State new_state = DISKULATOR_HOSTS;
   SubState ss=SELECT_FILE;
 
   diskulator_select_setup(context);
@@ -305,5 +303,5 @@ State diskulator_select(Context *context)
 	}
     }
   
-  return new_state;
+  return context->state;
 }

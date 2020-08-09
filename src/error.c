@@ -27,7 +27,10 @@ char text_error_mounting_device_slot[] = "ERROR MOUNTING DEVICE SLOT";
 char text_error_setting_directory_position[] = "ERROR SETTING DIRECTORY POS";
 char text_error_opening_directory[] = "ERROR OPENING DIRECTORY";
 char text_error_reading_directory[] = "ERROR READING DIRECTORY";
+char text_error_setting_full_path[] = "ERROR SETTING FULL PATH";
+char text_error_writing_device_slots[] = "ERROR WRITING DEVICE SLOTS";
 char text_error_intentional_stop[] = "INTENTIONAL STOP";
+
 /**
  * Display error.
  * 
@@ -92,6 +95,12 @@ void error(ErrorMessage msg)
       break;
     case ERROR_READING_DIRECTORY:
       text = text_error_reading_directory;
+      break;
+    case ERROR_SETTING_FULL_PATH:
+      text = text_error_setting_full_path;
+      break;
+    case ERROR_WRITING_DEVICE_SLOTS:
+      text = text_error_writing_device_slots;
       break;
     case ERROR_INTENTIONAL_STOP:
       text = text_error_intentional_stop;

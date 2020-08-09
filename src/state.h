@@ -27,8 +27,10 @@ typedef struct _context
   State state;                       // Current program state (state.h)
   char directory[128];               // Current directory
   char filename[128];                // Current filename
+  char full_path[256];               // Full path.
   unsigned char host_slot;           // Current Host slot (0-7)
   unsigned char device_slot;         // Current Device slot (0-7)
+  unsigned char mode;                // mode for device slot (1 or 2)
   unsigned short dir_pos;            // current directory position
   unsigned short dir_page;           // directory page
   bool dir_eof;                      // End of current directory?
