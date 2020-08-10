@@ -203,6 +203,97 @@ void diskulator_select_devance_directory(Context* context)
 }
 
 /**
+ * New Disk
+ */
+void diskulator_select_new_disk(Context* context, SubState* ss)
+{
+  char tmp_str[8];
+  
+  screen_clear_line(20);
+  screen_clear_line(21);
+
+  screen_puts(1,20,"ENTER NAME OF NEW DISK IMAGE FILE");
+  screen_input(0,21,context->filename);
+
+  if (context->filename[0]==0x00)
+    {
+      *ss=ADVANCE_DIR;
+      return;
+    }
+
+  screen_clear_line(20);
+  screen_clear_line(21);
+  
+  screen_puts(0, 20, "Size?\xD9\x91\x19"
+	      "90K  \xD9\x92\x19"
+	      "130K  \xD9\x93\x19"
+	      "180K  \xD9\x94\x19"
+	      "360K  ");
+  screen_puts(0, 21, "     \xD9\x95\x19"
+	      "720K \xD9\x96\x19"
+	      "1440K \xD9\x97\x19"
+	      "Custom");
+
+  memset(tmp_str,0,sizeof(tmp_str));
+  screen_input(32,21,tmp_str);
+
+  switch(tmp_str[0])
+    {
+    case '1':
+      context->newDisk_ns=720;
+      context->newDisk_sz=128;
+      break;
+    case '2':
+      context->newDisk_ns=1040;
+      context->newDisk_sz=128;
+      break;
+    case '3':
+      context->newDisk_ns=720;
+      context->newDisk_sz=256;
+      break;
+    case '4':
+      context->newDisk_ns=1440;
+      context->newDisk_sz=256;
+      break;
+    case '5':
+      context->newDisk_ns=2880;
+      context->newDisk_sz=256;
+      break;
+    case '6':
+      context->newDisk_ns=5760;
+      context->newDisk_sz=256;
+      break;
+    case '7':
+      screen_clear_line(20);
+      screen_clear_line(21);
+      
+      memset(tmp_str,0,sizeof(tmp_str));
+      screen_puts(0,20,"# Sectors?");
+      screen_input(12,20,tmp_str);
+      context->newDisk_ns=atoi(tmp_str);
+
+      memset(tmp_str,0,sizeof(tmp_str));
+      screen_puts(0,21,"Sector Size (128/256)?");
+      screen_input(24,21,tmp_str);
+      context->newDisk_sz=atoi(tmp_str);
+      break;
+    }
+
+  memset(tmp_str,0,sizeof(tmp_str));
+  screen_clear_line(20);
+  screen_clear_line(21);
+  screen_puts(0,20,"Are you sure (Y/N)?");
+  screen_input(21,20,tmp_str);
+
+  if (tmp_str[0]=='Y' || tmp_str[0]=='y')
+    {
+      *ss=DONE;
+      context->state=DISKULATOR_SLOT;
+      context->newDisk=true;
+    }
+}
+
+/**
  * Select file
  */
 void diskulator_select_select_file(Context* context, SubState* ss)
@@ -240,6 +331,10 @@ void diskulator_select_select_file(Context* context, SubState* ss)
 	case 0x7E:
 	  *ss=DEVANCE_DIR;
 	  break;
+	case 'N':
+	case 'n':
+	  diskulator_select_new_disk(context,ss);
+	  break;
 	}
     }
 }
@@ -254,12 +349,14 @@ void diskulator_select_setup(Context *context)
   memset(context->filename,0,sizeof(context->filename));
   memset(context->directory,0,sizeof(context->directory));
   strcpy(context->directory,"/");
+
+  context->newDisk = false;
   
   screen_puts(4, 0, "DISK IMAGES");
   
   screen_puts(0, 21, "\xD9\xB2\xA5\xB4\xB5\xB2\xAE\x19"
 	      "PICK \xD9\xA5\xB3\xA3\x19"
-	      "ABORT");
+	      "ABORT" "\xD9\xA4\xA5\xAC\xA5\xB4\xA5\x19" "UP DIR");
 
   diskulator_select_display_directory_path(context);
 }

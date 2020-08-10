@@ -30,6 +30,7 @@ char text_error_reading_directory[] = "ERROR READING DIRECTORY";
 char text_error_setting_full_path[] = "ERROR SETTING FULL PATH";
 char text_error_writing_device_slots[] = "ERROR WRITING DEVICE SLOTS";
 char text_error_intentional_stop[] = "INTENTIONAL STOP";
+char text_error_creating_new_disk[] = "ERROR CREATING NEW DISK";
 
 /**
  * Display error.
@@ -101,6 +102,9 @@ void error(ErrorMessage msg)
       break;
     case ERROR_WRITING_DEVICE_SLOTS:
       text = text_error_writing_device_slots;
+      break;
+    case ERROR_CREATING_NEW_DISK:
+      text = text_error_creating_new_disk;
       break;
     case ERROR_INTENTIONAL_STOP:
       text = text_error_intentional_stop;

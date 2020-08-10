@@ -35,6 +35,9 @@ typedef struct _context
   unsigned short dir_page;           // directory page
   bool dir_eof;                      // End of current directory?
   unsigned char entries_displayed;   // # of entries displayed on current page.
+  bool newDisk;                      // Are we making a new disk?
+  unsigned short newDisk_ns;         // New disk # of sectors
+  unsigned short newDisk_sz;         // New disk sector size
   DeviceSlots deviceSlots;           // Current device slots
   HostSlots hostSlots;               // Current host slots.
 } Context;

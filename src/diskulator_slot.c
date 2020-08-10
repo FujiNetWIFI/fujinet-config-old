@@ -20,6 +20,7 @@ typedef enum _substate
    SELECT_SLOT,
    SELECT_MODE,
    COMMIT_SLOT,
+   CREATE_DISK,
    DONE
   } SubState;
 
@@ -66,7 +67,7 @@ void diskulator_slot_select(Context *context, SubState *ss)
 	  bar_show(i+3);
 	case 0x9B:
 	  context->device_slot=i;
-	  *ss=SELECT_MODE;
+	  *ss=(context->newDisk==true ? CREATE_DISK : SELECT_MODE);
 	  break;
 	default:
 	  break;
@@ -81,7 +82,7 @@ void diskulator_slot_select_mode(Context *context, SubState *ss)
 {
   screen_clear_line(21);
   screen_puts(0, 21, "\xD9\xB2\xA5\xB4\xB5\xB2\xAE\x19R/O     \xD9\xB7\x19R/W     \xD9\xA5\xB3\xA3\x19"
-                               "ABORT             ");
+	      "ABORT");
 
   switch (cgetc())
     {
@@ -96,6 +97,28 @@ void diskulator_slot_select_mode(Context *context, SubState *ss)
       context->mode = 1;
       break;
     }
+
+  *ss=COMMIT_SLOT;
+}
+
+/**
+ * Create new disk
+ */
+void diskulator_slot_create_disk(Context *context, SubState *ss)
+{
+  screen_clear_line(20);
+  screen_clear_line(21);
+
+  screen_puts(0,21,"CREATING NEW DISK");
+
+  context->deviceSlots.slot[context->device_slot].hostSlot = context->host_slot;
+  strcpy(context->deviceSlots.slot[context->device_slot].file, context->directory);
+  strcat(context->deviceSlots.slot[context->device_slot].file, context->filename);
+  fuji_sio_new_disk(context->device_slot,context->newDisk_ns,context->newDisk_sz,&context->deviceSlots);
+  if (fuji_sio_error())
+    error_fatal(ERROR_CREATING_NEW_DISK);
+
+  context->mode = 0x02; // R/W
 
   *ss=COMMIT_SLOT;
 }
@@ -150,6 +173,9 @@ State diskulator_slot(Context *context)
 	  break;
 	case COMMIT_SLOT:
 	  diskulator_slot_commit(context,&ss);
+	  break;
+	case CREATE_DISK:
+	  diskulator_slot_create_disk(context,&ss);
 	  break;
 	case DONE:
 	  context->state = DISKULATOR_HOSTS;
