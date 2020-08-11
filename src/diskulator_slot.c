@@ -4,7 +4,6 @@
  */
 
 #include <atari.h>
-#include <conio.h>
 #include <string.h>
 #include "diskulator_hosts.h"
 #include "diskulator_slot.h"
@@ -80,11 +79,15 @@ void diskulator_slot_select(Context *context, SubState *ss)
  */
 void diskulator_slot_select_mode(Context *context, SubState *ss)
 {
+  unsigned char k=0;
   screen_clear_line(21);
   screen_puts(0, 21, "\xD9\xB2\xA5\xB4\xB5\xB2\xAE\x19R/O     \xD9\xB7\x19R/W     \xD9\xA5\xB3\xA3\x19"
 	      "ABORT");
 
-  switch (cgetc())
+  while (k==0)
+    k=input_handle_key();
+  
+  switch (k)
     {
     case 0x1B:
       *ss=DONE;

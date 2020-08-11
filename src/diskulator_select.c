@@ -212,7 +212,7 @@ void diskulator_select_new_disk(Context* context, SubState* ss)
   screen_clear_line(20);
   screen_clear_line(21);
 
-  screen_puts(1,20,"ENTER NAME OF NEW DISK IMAGE FILE");
+  screen_puts(1,20,"Enter name of new disk image file");
   screen_input(0,21,context->filename);
 
   if (context->filename[0]==0x00)
@@ -326,6 +326,7 @@ void diskulator_select_select_file(Context* context, SubState* ss)
 	  break;
 	case 0x1B:
 	  *ss=DONE;
+	  context->dir_page=0;
 	  context->state=DISKULATOR_HOSTS;
 	  break;
 	case 0x7E:
@@ -354,10 +355,10 @@ void diskulator_select_setup(Context *context)
   
   screen_puts(4, 0, "DISK IMAGES");
   
-  screen_puts(0, 21, "\xD9\xB2\xA5\xB4\xB5\xB2\xAE\x19"
-	      "PICK \xD9\xA5\xB3\xA3\x19"
-	      "ABORT" "\xD9\xA4\xA5\xAC\xA5\xB4\xA5\x19" "UP DIR");
-
+  screen_puts(0, 20, "\xD9\xB2\xA5\xB4\xB5\xB2\xAE\x19"
+	      "Pick \xD9\xA5\xB3\xA3\x19"
+	      "Abort" "\xD9\xA4\xA5\xAC\xA5\xB4\xA5\x19" "Up DIR");
+  screen_puts(0,21, "\xD9\xAE\x19New");
   diskulator_select_display_directory_path(context);
 }
 

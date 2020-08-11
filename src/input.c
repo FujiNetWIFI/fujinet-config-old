@@ -63,6 +63,9 @@ unsigned char input_handle_joystick(void)
 	  return 0x1D;
 	}
     }
+  else
+    return 0;
+  
   if (OS.strig0 == 0)
     return 0x9B;
 

@@ -3,12 +3,12 @@
  * Diskulator Info/Devices
  */
 
-#include <conio.h>
 #include "diskulator_info.h"
 #include "fuji_typedefs.h"
 #include "fuji_sio.h"
 #include "screen.h"
 #include "error.h"
+#include "input.h"
 
 /**
  * Connect wifi State
@@ -17,7 +17,7 @@ State diskulator_info(Context *context)
 {
   State new_state = DISKULATOR_HOSTS;
   AdapterConfig ac;
-  char k;
+  char k=0;
   
   screen_dlist_diskulator_info();
 
@@ -47,9 +47,8 @@ State diskulator_info(Context *context)
   screen_print_mac(17, 11, ac.macAddress);
   screen_print_mac(17, 12, ac.bssid);
 
-  while (!kbhit()) { } // wait for key
-
-  k=cgetc();
+  while (k==0)
+    k=input_handle_key();
 
   switch(k)
     {
