@@ -393,7 +393,7 @@ void diskulator_select_setup(Context *context)
   screen_puts(0, 20, "\xD9\xB2\xA5\xB4\xB5\xB2\xAE\x19"
 	      "Pick \xD9\xA5\xB3\xA3\x19"
 	      "Abort" "\xD9\xA4\xA5\xAC\xA5\xB4\xA5\x19" "Up DIR");
-  screen_puts(3,21, "\xD9\xAE\x19New\xD9\xA6\x19" "Filter" "\xd9\xAD\x19MkDIR\xd9\xB2\x19RmDIR");
+  screen_puts(11,21, "\xD9\xAE\x19New\xD9\xA6\x19" "Filter");
   diskulator_select_display_directory_path(context);
 }
 
