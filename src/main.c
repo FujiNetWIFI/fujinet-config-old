@@ -8,8 +8,11 @@
 #include <peekpoke.h>
 #include "bar.h"
 #include "screen.h"
-#include "config.h"
-#include "diskulator.h"
+#include "state.h"
+#include "fuji_typedefs.h"
+#include "fuji_sio.h"
+
+Context context;
 
 extern unsigned char* video_ptr;
 extern unsigned char* dlist_ptr;
@@ -61,9 +64,25 @@ void config_dlist=
   };
 
 /**
+ * Is device configured?
+ */
+State configured(void)
+{
+  NetConfig netConfig;
+
+  fuji_sio_read_net_config(&netConfig);
+
+  // WiFi not configured or SELECT to override.
+  if ((GTIA_READ.consol == 5) || netConfig.ssid[0] == '\0')
+    return SET_WIFI;
+  
+  return CONNECT_WIFI;
+}
+
+/**
  * Setup the config screen
  */
-void setup(void)
+void setup(Context *context)
 {
   OS.color0=0x9C;
   OS.color1=0x0F;
@@ -87,17 +106,14 @@ void setup(void)
   OS.chbas=0x78; // use the charset
   bar_clear();
   bar_setup_regs();
-  
+  context_setup(context);
 }
 
 void main(void)
 {
-  setup();
+  setup(&context);
 
-  if (configured()==false)
-    config_run();
-  else
-    config_connect();
-
-  diskulator_run();  
+  context.state = configured();
+  
+  state(&context); // Never ends.
 }

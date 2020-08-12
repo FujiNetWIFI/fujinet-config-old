@@ -20,6 +20,11 @@
 void screen_puts(unsigned char x,unsigned char y,char *s);
 
 /**
+ * Clear a line
+ */
+void screen_clear_line(unsigned char y);
+
+/**
  * Clear screen
  */
 void screen_clear(void);
@@ -28,5 +33,40 @@ void screen_clear(void);
  * Input a string at x,y
  */
 int screen_input(unsigned char x, unsigned char y, char* s);
+
+/**
+ * Print IP address at position
+ */
+void screen_print_ip(unsigned char x, unsigned char y, unsigned char *buf);
+
+/**
+ * Print MAC address at position
+ */
+void screen_print_mac(unsigned char x, unsigned char y, unsigned char *buf);
+
+/**
+ * Patch the dlist for the hosts screen
+ */
+void screen_dlist_diskulator_hosts(void);
+
+/**
+ * Patch the dlist for the info screen
+ */
+void screen_dlist_diskulator_info(void);
+
+/**
+ * Patch the dlist for wifi screens
+ */
+void screen_dlist_wifi(void);
+
+/**
+ * Patch the dlist for mount and boot screen.
+ */
+void screen_dlist_mount_and_boot(void);
+
+/**
+ * Patch the dlist for the diskulator select screen.
+ */
+void screen_dlist_diskulator_select(void);
 
 #endif /* SCREEN_H */

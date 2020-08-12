@@ -12,4 +12,9 @@
  */
 void die(void);
 
+/**
+ * Wait a moment.
+ */
+void wait_a_moment(void);
+
 #endif /* DIE_H */
