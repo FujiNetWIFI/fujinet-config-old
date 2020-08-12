@@ -362,6 +362,7 @@ void diskulator_select_select_file(Context* context, SubState* ss)
 	  break;
 	case 0x7E:
 	  *ss=DEVANCE_DIR;
+	  context->dir_page=0;
 	  break;
 	case 'N':
 	case 'n':
