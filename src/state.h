@@ -25,7 +25,9 @@ typedef enum _state
 typedef struct _context
 {
   State state;                       // Current program state (state.h)
+  char filter[32];                   // filter (wildcard)
   char directory[128];               // Current directory
+  char directory_plus_filter[128]; 
   char filename[128];                // Current filename
   char full_path[256];               // Full path.
   unsigned char host_slot;           // Current Host slot (0-7)

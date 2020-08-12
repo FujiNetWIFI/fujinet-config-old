@@ -95,6 +95,17 @@ void diskulator_select_display_next_page(void)
 }
 
 /**
+ * Display current filter
+ */
+void diskulator_select_display_filter(Context *context)
+{
+  char filter_str[40]="Filter: ";
+
+  strcat(filter_str,context->filter);
+  screen_puts(14,DIRECTORY_LIST_Y_OFFSET-1,filter_str);
+}
+
+/**
  * Display directory page
  */
 void diskulator_select_display_directory_page(Context* context)
@@ -103,10 +114,20 @@ void diskulator_select_display_directory_page(Context* context)
   unsigned char i;
 
   bar_clear();
-  
+
   diskulator_select_display_clear_page();
 
-  fuji_sio_open_directory(context->host_slot,context->directory);
+  if (context->filter[0]!=0x00)
+    {
+      diskulator_select_display_filter(context);
+      memset(context->directory_plus_filter,0,sizeof(context->directory_plus_filter));
+      strcpy(context->directory_plus_filter,context->directory);
+      strcpy(&context->directory_plus_filter[strlen(context->directory_plus_filter)+1],context->filter);
+      fuji_sio_open_directory(context->host_slot,context->directory_plus_filter);
+    }
+  else
+    fuji_sio_open_directory(context->host_slot,context->directory);
+  
   if (fuji_sio_error())
     error_fatal(ERROR_OPENING_DIRECTORY);
   
@@ -294,6 +315,16 @@ void diskulator_select_new_disk(Context* context, SubState* ss)
 }
 
 /**
+ * Set filter
+ */
+void diskulator_select_set_filter(Context *context, SubState *ss)
+{
+  diskulator_select_display_filter(context);
+  screen_input(21,DIRECTORY_LIST_Y_OFFSET-1,context->filter);
+  *ss=ADVANCE_DIR;
+}
+
+/**
  * Select file
  */
 void diskulator_select_select_file(Context* context, SubState* ss)
@@ -336,6 +367,10 @@ void diskulator_select_select_file(Context* context, SubState* ss)
 	case 'n':
 	  diskulator_select_new_disk(context,ss);
 	  break;
+	case 'F':
+	case 'f':
+	  diskulator_select_set_filter(context,ss);
+	  break;
 	}
     }
 }
@@ -358,7 +393,7 @@ void diskulator_select_setup(Context *context)
   screen_puts(0, 20, "\xD9\xB2\xA5\xB4\xB5\xB2\xAE\x19"
 	      "Pick \xD9\xA5\xB3\xA3\x19"
 	      "Abort" "\xD9\xA4\xA5\xAC\xA5\xB4\xA5\x19" "Up DIR");
-  screen_puts(0,21, "\xD9\xAE\x19New");
+  screen_puts(0,21, "\xD9\xAE\x19New\xD9\xA6\x19" "Filter");
   diskulator_select_display_directory_path(context);
 }
 
