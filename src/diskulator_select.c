@@ -158,8 +158,12 @@ void diskulator_select_display_directory_page(Context* context)
  * Handle RETURN key - Select item.
  */
 void diskulator_select_handle_return(unsigned char i, Context* context, SubState *ss)
-{  
-  fuji_sio_open_directory(context->host_slot,context->directory);
+{
+  if (context->filter[0]==0x00)
+    fuji_sio_open_directory(context->host_slot,context->directory);
+  else
+    fuji_sio_open_directory(context->host_slot,context->directory_plus_filter);
+  
   if (fuji_sio_error())
     error_fatal(ERROR_OPENING_DIRECTORY);
   
