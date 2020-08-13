@@ -388,7 +388,6 @@ void diskulator_select_setup(Context *context)
   memset(context->filename,0,sizeof(context->filename));
   memset(context->directory,0,sizeof(context->directory));
   strcpy(context->directory,"/");
-  memset(context->filter,0,sizeof(context->filter));
 
   context->newDisk = false;
   
