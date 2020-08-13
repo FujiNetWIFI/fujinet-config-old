@@ -386,6 +386,7 @@ void diskulator_select_setup(Context *context)
   memset(context->filename,0,sizeof(context->filename));
   memset(context->directory,0,sizeof(context->directory));
   strcpy(context->directory,"/");
+  memset(context->filter,0,sizeof(context->filter));
 
   context->newDisk = false;
   
@@ -425,6 +426,7 @@ State diskulator_select(Context *context)
 	case ADVANCE_DIR:
 	  context->dir_page=0;
 	  context->dir_eof=false;
+	  memset(context->filter,0,sizeof(context->filter));
 	  ss=SELECT_FILE;
 	  break;
 	case DEVANCE_DIR:
@@ -432,6 +434,7 @@ State diskulator_select(Context *context)
 	  diskulator_select_display_directory_path(context);
 	  context->dir_page=0;
 	  context->dir_eof=false;
+	  memset(context->filter,0,sizeof(context->filter));
 	  ss=SELECT_FILE;
 	  break;
 	}
