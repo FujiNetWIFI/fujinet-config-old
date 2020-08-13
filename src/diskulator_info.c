@@ -3,6 +3,8 @@
  * Diskulator Info/Devices
  */
 
+#define VERSION "2.0.2020-08-12"
+
 #include "diskulator_info.h"
 #include "fuji_typedefs.h"
 #include "fuji_sio.h"
@@ -36,7 +38,7 @@ State diskulator_info(Context *context)
   screen_puts(5, 10, "   Netmask:");
   screen_puts(5, 11, "       MAC:");
   screen_puts(5, 12, "     BSSID:");
-  screen_puts(5, 13, "   Version:");
+  screen_puts(5, 13, "   Version:" VERSION);
 
   screen_puts(17, 5, ac.ssid);
   screen_puts(17, 6, ac.hostname);
