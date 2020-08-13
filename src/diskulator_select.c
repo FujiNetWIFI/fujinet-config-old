@@ -220,7 +220,9 @@ void diskulator_select_devance_directory(Context* context)
 
   // i is now at next /, truncate it.
   i++;
-  context->directory[++i]=0;
+
+  while (i<255)
+    context->directory[++i]=0;
 }
 
 /**
