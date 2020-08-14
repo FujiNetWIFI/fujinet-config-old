@@ -354,10 +354,12 @@ void diskulator_select_select_file(Context* context, SubState* ss)
 	  diskulator_select_handle_return(i,context,ss);
 	  break;
 	case '<':
+	case 0x43: // PgUp
 	  if (context->dir_page > 0)
 	    *ss=PREV_PAGE;
 	  break;
-	case '>':
+	case '>': 
+	case 0x44: // PgDn
 	  if (!context->dir_eof)
 	    *ss=NEXT_PAGE;
 	  break;
