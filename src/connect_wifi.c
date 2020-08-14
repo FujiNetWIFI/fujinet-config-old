@@ -28,7 +28,7 @@ void connect_wifi_setup(char* ssid)
 /**
  * Wait for network connection
  */
-State connect_wifi_wait_for_network(NetConfig* n)
+State connect_wifi_wait_for_network(NetConfig* n, Context *context)
 {
   State new_state = SET_WIFI;
   unsigned char wifiStatus=0;
@@ -45,7 +45,9 @@ State connect_wifi_wait_for_network(NetConfig* n)
       if (fuji_sio_error())
 	error_fatal(ERROR_READING_WIFI_STATUS);
 
-      if (wifiStatus > 0)
+      if (wifiStatus==6) // DISCONNECTED
+	continue;
+      else if (wifiStatus > 0)
 	break;
     }
 
@@ -96,5 +98,5 @@ State connect_wifi(Context *context)
   if (fuji_sio_error())
     error_fatal(ERROR_SETTING_SSID);
 
-  return connect_wifi_wait_for_network(&n);
+  return connect_wifi_wait_for_network(&n,context);
 }

@@ -125,7 +125,7 @@ unsigned char set_wifi_scan_networks(void)
  * Save selection
  * selectedNetwork = index from wifi scan.
  */
-State set_wifi_save_network(unsigned char selectedNetwork, unsigned char numNetworks)
+State set_wifi_save_network(unsigned char selectedNetwork, unsigned char numNetworks, Context *context)
 {
   SSIDInfo s;
   NetConfig n;
@@ -160,10 +160,12 @@ State set_wifi_save_network(unsigned char selectedNetwork, unsigned char numNetw
 
   screen_puts(3,21,"SAVING NETWORK");
 
-  fuji_sio_set_ssid(false, &n);
+  fuji_sio_set_ssid(true, &n);
 
   if (fuji_sio_error())
     error_fatal(ERROR_SETTING_SSID);
+
+  context->state=CONNECT_WIFI;
 
   return CONNECT_WIFI;  
 }
@@ -171,7 +173,7 @@ State set_wifi_save_network(unsigned char selectedNetwork, unsigned char numNetw
 /**
  * Select a network
  */
-State set_wifi_select_network(unsigned char numNetworks)
+State set_wifi_select_network(unsigned char numNetworks, Context *context)
 {
   State new_state;
   unsigned char k=0;
@@ -191,7 +193,7 @@ State set_wifi_select_network(unsigned char numNetworks)
 
   if (k==0x9B) // RETURN
     {
-      new_state = set_wifi_save_network(i,numNetworks);
+      new_state = set_wifi_save_network(i,numNetworks,context);
     }
   else if (k==0x1B) // ESC
     {
@@ -220,7 +222,7 @@ State set_wifi(Context *context)
   set_wifi_display_mac_address(&adapterConfig);
   numNetworks = set_wifi_scan_networks();
 
-  new_state = set_wifi_select_network(numNetworks);
-  
+  new_state = set_wifi_select_network(numNetworks, context);
+
   return new_state;
 }
