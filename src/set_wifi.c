@@ -130,8 +130,8 @@ State set_wifi_save_network(unsigned char selectedNetwork, unsigned char numNetw
   SSIDInfo s;
   NetConfig n;
 
-  memset(s,0,sizeof(s));
-  memset(n,0,sizeof(n));
+  memset(&s,0,sizeof(s));
+  memset(&n,0,sizeof(n));
   
   if (selectedNetwork<numNetworks-1)
     {
