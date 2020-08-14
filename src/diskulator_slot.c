@@ -34,7 +34,9 @@ void diskulator_slot_setup(Context* context)
 	      "ABORT  \xD9\xA5\x19"
 	      "EJECT ");
   fuji_sio_read_device_slots(&context->deviceSlots);
-
+  if (fuji_sio_error())
+    error_fatal(ERROR_READING_DEVICE_SLOTS);
+  
   diskulator_hosts_display_device_slots(2,&context->deviceSlots);
   bar_show(3);
 }
@@ -152,7 +154,7 @@ void diskulator_slot_commit(Context *context, SubState *ss)
 
   // And go back to the hosts/slots screen
   *ss=DONE;
-  context->state=DISKULATOR_HOSTS;
+  context->state=DISKULATOR_SELECT;
 }
 
 /**
