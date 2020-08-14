@@ -33,10 +33,12 @@ void input_handle_nav_keys(char k, unsigned char pos, unsigned char max, unsigne
 {
   switch(k)
     {
+    case 0x43:
     case 0x1C:
     case '-':
       input_handle_nav_up(i);
       break;
+    case 0x44:
     case 0x1D:
     case '=':
       input_handle_nav_down(max,i);
