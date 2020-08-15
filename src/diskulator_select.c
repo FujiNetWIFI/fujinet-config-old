@@ -347,6 +347,12 @@ void diskulator_select_select_file(Context* context, SubState* ss)
       k=input_handle_key(); 
       diskulator_select_handle_page_nav(k,i,context,ss);     
       input_handle_nav_keys(k,DIRECTORY_LIST_Y_OFFSET+1,context->entries_displayed,&i);
+
+      if (input_handle_console_keys() == 0x03)
+	{
+	  *ss=DONE;
+	  context->state = MOUNT_AND_BOOT;
+	}
       
       switch(k)
 	{
@@ -402,7 +408,7 @@ void diskulator_select_setup(Context *context)
   screen_puts(0, 20, "\xD9\xB2\xA5\xB4\xB5\xB2\xAE\x19"
 	      "Pick \xD9\xA5\xB3\xA3\x19"
 	      "Abort" "\xD9\xA4\xA5\xAC\xA5\xB4\xA5\x19" "Up DIR");
-  screen_puts(11,21, "\xD9\xAE\x19New\xD9\xA6\x19" "Filter");
+  screen_puts(6,21, "\xD9\xAE\x19New\xD9\xA6\x19" "Filter" "\xD9\xAF\xB0\xB4\xA9\xAF\xAE\x19" "Boot");
   diskulator_select_display_directory_path(context);
 }
 
@@ -416,7 +422,7 @@ State diskulator_select(Context *context)
   diskulator_select_setup(context);
 
   while (ss != DONE)
-    {
+    {      
       switch(ss)
 	{
 	case SELECT_FILE:
