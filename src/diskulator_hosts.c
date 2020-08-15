@@ -92,7 +92,7 @@ void diskulator_hosts_setup(HostSlots *hs, DeviceSlots *ds)
   
   screen_puts(3, 0, "TNFS HOST LIST");
   screen_puts(24, 9, "DRIVE SLOTS");
-
+  
   fuji_sio_read_host_slots(hs);
   
   if (fuji_sio_error())
@@ -290,6 +290,16 @@ void diskulator_hosts_devices(Context *context, SubState *new_substate)
 }
 
 /**
+ * Clear file context
+ */
+void diskulator_hosts_clear_file_context(Context *context)
+{
+  memset(context->directory,0,sizeof(context->directory));
+  memset(context->filter,0,sizeof(context->filter));
+  context->dir_page=0;
+}
+
+/**
  * Connect wifi State
  */
 State diskulator_hosts(Context *context)
@@ -297,6 +307,7 @@ State diskulator_hosts(Context *context)
   SubState ss=HOSTS;
     
   diskulator_hosts_setup(&context->hostSlots,&context->deviceSlots);
+  diskulator_hosts_clear_file_context(context);
   
   while (ss != DONE)
     {

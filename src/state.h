@@ -34,7 +34,6 @@ typedef struct _context
   unsigned char host_slot;           // Current Host slot (0-7)
   unsigned char device_slot;         // Current Device slot (0-7)
   unsigned char mode;                // mode for device slot (1 or 2)
-  unsigned short dir_pos;            // current directory position
   unsigned short dir_page;           // directory page
   bool dir_eof;                      // End of current directory?
   unsigned char entries_displayed;   // # of entries displayed on current page.
