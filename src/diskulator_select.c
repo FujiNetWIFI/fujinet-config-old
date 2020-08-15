@@ -435,8 +435,9 @@ void diskulator_select_setup(Context *context)
   screen_dlist_diskulator_select();
 
   memset(context->filename,0,sizeof(context->filename));
-  memset(context->directory,0,sizeof(context->directory));
-  strcpy(context->directory,"/");
+
+  if (context->directory[0]==0x00)
+    strcpy(context->directory,"/");
 
   context->newDisk = false;
   
