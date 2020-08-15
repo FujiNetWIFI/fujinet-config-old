@@ -160,7 +160,7 @@ State set_wifi_save_network(unsigned char selectedNetwork, unsigned char numNetw
 
   screen_puts(3,21,"SAVING NETWORK");
 
-  fuji_sio_set_ssid(true, &n);
+  fuji_sio_set_ssid(true, &n); // turns out we have to save the setting here anyway.
 
   if (fuji_sio_error())
     error_fatal(ERROR_SETTING_SSID);

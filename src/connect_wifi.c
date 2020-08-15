@@ -32,6 +32,7 @@ State connect_wifi_wait_for_network(NetConfig* n, Context *context)
 {
   State new_state = SET_WIFI;
   unsigned char wifiStatus=0;
+  unsigned char retries=0;
   
   rtclr();
 
@@ -40,12 +41,18 @@ State connect_wifi_wait_for_network(NetConfig* n, Context *context)
       if ((OS.rtclok[2] & 0x3f) != 0)
 	  continue;
 
+      retries++;
       fuji_sio_get_wifi_status(&wifiStatus);
       
       if (fuji_sio_error())
 	error_fatal(ERROR_READING_WIFI_STATUS);
 
-      if (wifiStatus==6) // DISCONNECTED
+      if (retries>40)
+	{
+	  wifiStatus=4;
+	  break;
+	}
+      else if (wifiStatus==6) // DISCONNECTED
 	continue;
       else if (wifiStatus > 0)
 	break;
@@ -65,14 +72,20 @@ State connect_wifi_wait_for_network(NetConfig* n, Context *context)
     case 5:
       error(ERROR_WIFI_CONNECTION_LOST);
       break;
+    case 6:
+      error(ERROR_WIFI_DISCONNECTED);
+      break;
     }
 
   if (wifiStatus != 3)
-    bar_set_color(COLOR_SETTING_FAILED);
+    {
+      bar_set_color(COLOR_SETTING_FAILED);
+      wait_a_moment();
+    }
   else
     {
       bar_set_color(COLOR_SETTING_SUCCESSFUL);
-      fuji_sio_set_ssid(true,n);
+      fuji_sio_set_ssid(true,n); // and here.
       wait_a_moment();
       new_state = DISKULATOR_HOSTS;
     }
