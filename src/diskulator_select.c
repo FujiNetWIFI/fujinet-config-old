@@ -28,6 +28,8 @@ typedef enum _substate
 typedef unsigned short Page;
 typedef unsigned char PageOffset;
 
+extern char text_empty[];
+
 #define DIRECTORY_LIST_Y_OFFSET 3
 #define DIRECTORY_LIST_SCREEN_WIDTH 36
 #define DIRECTORY_LIST_FULL_WIDTH 128
@@ -155,6 +157,11 @@ void diskulator_select_display_directory_page(Context* context)
 
   if (context->dir_eof == false)
     diskulator_select_display_next_page();
+
+  if (i==0)
+    {
+      diskulator_select_display_directory_entry(i,text_empty,context);
+    }
 }
 
 /**
@@ -162,6 +169,9 @@ void diskulator_select_display_directory_page(Context* context)
  */
 void diskulator_select_handle_return(unsigned char i, Context* context, SubState *ss)
 {
+  if (context->entries_displayed==0)
+    return;
+  
   if (context->filter[0]==0x00)
     fuji_sio_open_directory(context->host_slot,context->directory);
   else
@@ -200,6 +210,9 @@ void diskulator_select_handle_return(unsigned char i, Context* context, SubState
  */
 void diskulator_select_handle_page_nav(unsigned char k, unsigned char i, Context *context, SubState *ss)
 {
+  if (context->entries_displayed==0)
+    return;
+  
   switch(k)
     {
     case '-':
@@ -374,8 +387,10 @@ void diskulator_select_select_file(Context* context, SubState* ss)
   while (*ss==SELECT_FILE)
     {
       k=input_handle_key(); 
-      diskulator_select_handle_page_nav(k,i,context,ss);     
-      input_handle_nav_keys(k,DIRECTORY_LIST_Y_OFFSET+1,context->entries_displayed,&i);
+      diskulator_select_handle_page_nav(k,i,context,ss);
+      
+      if (context->entries_displayed>0)
+	input_handle_nav_keys(k,DIRECTORY_LIST_Y_OFFSET+1,context->entries_displayed,&i);
 
       if (input_handle_console_keys() == 0x03)
 	{
