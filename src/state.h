@@ -30,6 +30,7 @@ typedef struct _context
   char directory_plus_filter[128]; 
   char filename[128];                // Current filename
   char full_path[256];               // Full path.
+  char entry_widths[14];             // Widths of each entry for expansion.
   unsigned char host_slot;           // Current Host slot (0-7)
   unsigned char device_slot;         // Current Device slot (0-7)
   unsigned char mode;                // mode for device slot (1 or 2)

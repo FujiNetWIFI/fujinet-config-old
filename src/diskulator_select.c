@@ -72,7 +72,7 @@ void diskulator_select_display_clear_page(void)
 {
   unsigned char i;
 
-  for (i=2;i<19;i++)
+  for (i=2;i<20;i++)
     screen_clear_line(i);
 }
 
@@ -140,6 +140,9 @@ void diskulator_select_display_directory_page(Context* context)
       fuji_sio_read_directory(displayed_entry,DIRECTORY_LIST_SCREEN_WIDTH);
       if (fuji_sio_error())
 	error_fatal(ERROR_READING_DIRECTORY);
+
+      context->entry_widths[i]=strlen(displayed_entry);
+
       if (!diskulator_select_display_directory_entry(i,displayed_entry,context))
 	break;
     }
@@ -175,6 +178,8 @@ void diskulator_select_handle_return(unsigned char i, Context* context, SubState
   if (fuji_sio_error())
     error_fatal(ERROR_READING_DIRECTORY);
 
+  fuji_sio_close_directory(context->host_slot);
+  
   // Handle if this is a directory
   if (context->filename[strlen(context->filename)-1]=='/')
     {
@@ -331,6 +336,30 @@ void diskulator_select_set_filter(Context *context, SubState *ss)
 }
 
 /**
+ * Show full filename
+ */
+void diskulator_select_show_full_filename(Context *context, unsigned char i)
+{
+  fuji_sio_open_directory(context->host_slot,context->directory);
+  if (fuji_sio_error())
+    error_fatal(ERROR_OPENING_DIRECTORY);
+
+  fuji_sio_set_directory_position((context->dir_page*DIRECTORY_LIST_ENTRIES_PER_PAGE)+i);
+  if (fuji_sio_error())
+    error_fatal(ERROR_SETTING_DIRECTORY_POSITION);
+
+  fuji_sio_read_directory(context->filename,DIRECTORY_LIST_FULL_WIDTH);
+  if (fuji_sio_error())
+    error_fatal(ERROR_READING_DIRECTORY);
+
+  fuji_sio_close_directory(context->host_slot);
+
+  screen_clear_line(18);
+  screen_clear_line(19);
+  screen_puts(0,18,context->filename);
+}
+
+/**
  * Select file
  */
 void diskulator_select_select_file(Context* context, SubState* ss)
@@ -352,6 +381,14 @@ void diskulator_select_select_file(Context* context, SubState* ss)
 	{
 	  *ss=DONE;
 	  context->state = MOUNT_AND_BOOT;
+	}
+
+      if ((context->entry_widths[i]>DIRECTORY_LIST_SCREEN_WIDTH) && (k>0))
+	diskulator_select_show_full_filename(context,i);
+      else if (k>0)
+	{
+	  screen_clear_line(18);
+	  screen_clear_line(19);
 	}
       
       switch(k)
