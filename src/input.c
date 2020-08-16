@@ -91,8 +91,11 @@ unsigned char input_handle_console_keys(void)
  */
 unsigned char input_handle_key(void)
 {
-  if (kbhit())      
-    return cgetc();
+  if (kbhit())
+    {
+      rtclr();
+      return cgetc();
+    }
   else
     return input_handle_joystick();
 }

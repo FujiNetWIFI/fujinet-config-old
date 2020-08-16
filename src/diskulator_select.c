@@ -34,6 +34,17 @@ extern char text_empty[];
 #define DIRECTORY_LIST_SCREEN_WIDTH 36
 #define DIRECTORY_LIST_FULL_WIDTH 128
 #define DIRECTORY_LIST_ENTRIES_PER_PAGE 14
+#define DIRECTORY_LIST_SHOW_FULL_FILENAME_DELAY 24
+
+/**
+ * Clear full filename area
+ */
+void diskulator_select_clear_file_area(void)
+{
+  screen_clear_line(18);
+  screen_clear_line(19);
+  screen_clear_line(20);
+}
 
 /**
  * Display directory path
@@ -85,8 +96,8 @@ void diskulator_select_display_clear_page(void)
  */
 void diskulator_select_display_prev_page(void)
 {
-  screen_puts(0,DIRECTORY_LIST_Y_OFFSET-1,"\x9C");
-  screen_puts(2,DIRECTORY_LIST_Y_OFFSET-1,"<PREV PAGE>");
+  screen_puts(0,DIRECTORY_LIST_Y_OFFSET-1,"\xd9\x9C\x19");
+  screen_puts(3,DIRECTORY_LIST_Y_OFFSET-1,"Previous Page");
 }
 
 /**
@@ -94,8 +105,8 @@ void diskulator_select_display_prev_page(void)
  */
 void diskulator_select_display_next_page(void)
 {
-  screen_puts(0,DIRECTORY_LIST_Y_OFFSET+DIRECTORY_LIST_ENTRIES_PER_PAGE,"\x9E");
-  screen_puts(2,DIRECTORY_LIST_Y_OFFSET+DIRECTORY_LIST_ENTRIES_PER_PAGE,"<NEXT PAGE>");
+  screen_puts(0,DIRECTORY_LIST_Y_OFFSET+DIRECTORY_LIST_ENTRIES_PER_PAGE,"\xd9\x9E\x19");
+  screen_puts(3,DIRECTORY_LIST_Y_OFFSET+DIRECTORY_LIST_ENTRIES_PER_PAGE,"Next Page");
 }
 
 /**
@@ -372,9 +383,11 @@ void diskulator_select_show_full_filename(Context *context, unsigned char i)
 
   fuji_sio_close_directory(context->host_slot);
 
-  screen_clear_line(18);
   screen_clear_line(19);
-  screen_puts(0,18,context->filename);
+  screen_clear_line(20);
+  screen_clear_line(21);
+  
+  screen_puts(0,19,context->filename);
 }
 
 /**
@@ -384,7 +397,8 @@ void diskulator_select_select_file(Context* context, SubState* ss)
 {
   unsigned char k=0;  // Key to process
   unsigned char i=0;  // cursor on page
-
+  bool long_filename_displayed=false;
+  
   diskulator_select_display_directory_page(context);
 
   bar_show(DIRECTORY_LIST_Y_OFFSET+1);
@@ -403,16 +417,28 @@ void diskulator_select_select_file(Context* context, SubState* ss)
 	  context->state = MOUNT_AND_BOOT;
 	}
 
-      if ((context->entry_widths[i]>DIRECTORY_LIST_SCREEN_WIDTH) && (k>0))
-	diskulator_select_show_full_filename(context,i);
-      else if (k>0)
+      // Clear file area if we move cursor
+      if (k>0)
+	diskulator_select_clear_file_area();
+      
+      // See if we need to display a long filename
+      if ((context->entry_widths[i]>DIRECTORY_LIST_SCREEN_WIDTH) &&
+	  (OS.rtclok[2]>DIRECTORY_LIST_SHOW_FULL_FILENAME_DELAY) &&
+	  (long_filename_displayed==false))
 	{
-	  screen_clear_line(18);
-	  screen_clear_line(19);
+	  diskulator_select_clear_file_area();
+	  diskulator_select_show_full_filename(context,i);
+	  long_filename_displayed=true;
 	}
       
       switch(k)
 	{
+	case '=':
+	case '-':
+	case 0x1C:
+	case 0x1D:
+	  long_filename_displayed=false;
+	  break;
 	case 0x9B:
 	  diskulator_select_handle_return(i,context,ss);
 	  break;
@@ -462,8 +488,8 @@ void diskulator_select_setup(Context *context)
   context->newDisk = false;
   
   screen_puts(4, 0, "DISK IMAGES");
-  
-  screen_puts(0,21,"nEW  fILTER  bksp UPesc MAIN option BOOT");
+
+  screen_puts(0,22,"" "\xd9" "\xAE" "\x19" "ew" "\xd9" "\xA6" "\x19" "ilter" "\xd9" "\xA4\xA5\xAC\xA5\xB4\xA5" "\x19" "Up Dir" "\xd9" "\xAF\xB0\xB4\xA9\xAF\xAE" "\x19" "Boot");
   diskulator_select_display_directory_path(context);
 }
 

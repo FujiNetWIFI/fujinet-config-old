@@ -30,7 +30,10 @@ void diskulator_slot_setup(Context* context)
 {  
   screen_dlist_diskulator_slot();
 
-  screen_puts(0,21,"\x11-\x18 SLOT return PICK  eJECT esc ABORT  ");
+  screen_puts(0,22,"" "\xd9" "\x91\x8d\x98" "\x19" "Slot" "\xd9" "\xB2\xA5\xB4\xB5\xB2\xAE" "\x19" "Select" "\xd9" "\xA5" "\x19" "ject" "\xd9" "\xA5\xB3\xA3" "\x19" "Abort");
+
+  screen_puts(0,19,context->filename);
+
   screen_puts(0,0,"MOUNT TO DRIVE SLOT");
   
   fuji_sio_read_device_slots(&context->deviceSlots);
@@ -56,6 +59,18 @@ void diskulator_slot_select(Context *context, SubState *ss)
 
       switch(k)
 	{
+	case 'E':
+	case 'e':
+	  diskulator_hosts_eject_device_slot(i,4,&context->deviceSlots);
+	  break;
+	case 0x1B:
+	  *ss=DONE;
+	  context->state=DISKULATOR_SELECT;
+	  break;
+	case 0x9B:
+	  context->device_slot=i;
+	  *ss=(context->newDisk==true ? CREATE_DISK : SELECT_MODE);
+	  break;
 	case '1':
 	case '2':
 	case '3':
@@ -66,10 +81,6 @@ void diskulator_slot_select(Context *context, SubState *ss)
 	case '8':
 	  i=k-=0x31;
 	  bar_show(i+3);
-	case 0x9B:
-	  context->device_slot=i;
-	  *ss=(context->newDisk==true ? CREATE_DISK : SELECT_MODE);
-	  break;
 	default:
 	  break;
 	}
@@ -84,7 +95,7 @@ void diskulator_slot_select_mode(Context *context, SubState *ss)
   unsigned char k=0;
   screen_clear_line(21);
 
-  screen_puts(0,21,"  return R/O w R/W       esc ABORT     ");
+  screen_puts(0,22,"" "\xD9" "\xB2\xA5\xB4\xB5\xB2\xAE" "\x19" "Read Only" "\xD9" "\xB7" "\x19" "Read/Write" "\xD9" "\xA5\xB3\xA3" "\x19" "Abort");
   
   while (k==0)
     k=input_handle_key();

@@ -14,9 +14,6 @@
 #include "input.h"
 #include "bar.h"
 
-#define ORIGIN_HOST_SLOTS 2
-#define ORIGIN_DEVICE_SLOTS 13
-
 char text_empty[]="Empty";
 
 typedef enum _substate
@@ -90,7 +87,7 @@ void diskulator_hosts_keys_hosts(void)
   screen_clear_line(20);
   screen_clear_line(21);
   screen_puts(0,20,"\xD9" "\x91\x8d\x98\x19Slot\xD9" "\xA5" "\x19" "dit Slot\xD9\xB2\xA5\xB4\xB5\xB2\xAE\x19Select Files");
-  screen_puts(4,21,"\xD9" "\xA3" "\x19" "onfiguration" "\xD9" "\xB4\xA1\xA2" "\x19" "Drive Slots");
+  screen_puts(2,21,"\xD9" "\xA3" "\x19" "onfig" "\xD9" "\xB4\xA1\xA2" "\x19" "Drive Slots" "\xD9" "\xAF\xB0\xB4\xA9\xAF\xAE" "\x19" "Boot");
 }
 
 /**
@@ -190,7 +187,7 @@ void diskulator_hosts_edit_host_slot(unsigned char i, HostSlots* hs)
 /**
  * Eject image from device slot
  */
-void diskulator_hosts_eject_device_slot(unsigned char i, DeviceSlots* ds)
+void diskulator_hosts_eject_device_slot(unsigned char i, unsigned char pos, DeviceSlots* ds)
 {
   char tmp[2]={0,0};
 
@@ -201,9 +198,9 @@ void diskulator_hosts_eject_device_slot(unsigned char i, DeviceSlots* ds)
   ds->slot[i].hostSlot=0xFF;
   fuji_sio_write_device_slots(ds);
   
-  screen_clear_line(i+ORIGIN_DEVICE_SLOTS-2);
-  screen_puts(2,i+ORIGIN_DEVICE_SLOTS-2,tmp);
-  screen_puts(5,i+ORIGIN_DEVICE_SLOTS-2,text_empty);
+  screen_clear_line((i+pos-2));
+  screen_puts(2,(i+pos-2),tmp);
+  screen_puts(5,(i+pos-2),text_empty);
 }
 
 /**
@@ -283,7 +280,7 @@ void diskulator_hosts_devices(Context *context, SubState *new_substate)
 	  break;
 	case 'E':
 	case 'e':
-	  diskulator_hosts_eject_device_slot(i,&context->deviceSlots);
+	  diskulator_hosts_eject_device_slot(i,ORIGIN_DEVICE_SLOTS,&context->deviceSlots);
 	  break;
 	case 0x7F:
 	  i=0;

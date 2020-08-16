@@ -153,8 +153,7 @@ void screen_print_mac(unsigned char x, unsigned char y, unsigned char *buf)
 void screen_dlist_diskulator_hosts(void)
 {
   dlist_ptr[0x0F] = dlist_ptr[0x10] = 6;
-  dlist_ptr[0x0A] = dlist_ptr[0x0B] = 2;
-  dlist_ptr[0x1B] = dlist_ptr[0x1C] = 6;
+  dlist_ptr[0x0A] = dlist_ptr[0x0B] = dlist_ptr[0x1B] = dlist_ptr[0x1C] = 2;
 }
 
 /**
@@ -191,7 +190,7 @@ void screen_dlist_mount_and_boot(void)
 void screen_dlist_diskulator_select(void)
 {
   dlist_ptr[0x0f] = dlist_ptr[0x10] = 2;
-  dlist_ptr[0x1B] = dlist_ptr[0x1C] = 6;
+  dlist_ptr[0x1B] = dlist_ptr[0x1C] = 2;
 }
 
 /**
@@ -208,6 +207,5 @@ void screen_dlist_diskulator_select_aux(void)
  */
 void screen_dlist_diskulator_slot(void)
 {
-  dlist_ptr[0x0f] = dlist_ptr[0x10] = 2;
-  dlist_ptr[0x1B] = dlist_ptr[0x1C] = 6;
+  dlist_ptr[0x0f] = dlist_ptr[0x10] = dlist_ptr[0x1B] = dlist_ptr[0x1C] = 2;
 }
