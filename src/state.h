@@ -18,7 +18,6 @@ typedef enum _state
    DISKULATOR_SELECT,
    DISKULATOR_SLOT,
    DISKULATOR_INFO,
-   ADAPTER_CONFIG,
    MOUNT_AND_BOOT
   } State;
 

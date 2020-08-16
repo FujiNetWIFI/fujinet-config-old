@@ -63,9 +63,6 @@ void state(Context *context)
 	case DISKULATOR_INFO:
 	  context->state = diskulator_info(context);
 	  break;
-	case ADAPTER_CONFIG:
-	  context->state = adapter_config(context);
-	  break;
 	case MOUNT_AND_BOOT:
 	  context->state = mount_and_boot(context);
 	  break;
