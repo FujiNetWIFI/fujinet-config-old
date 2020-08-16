@@ -87,7 +87,10 @@ void diskulator_hosts_display_device_slots(unsigned char y, DeviceSlots *ds)
  */
 void diskulator_hosts_keys_hosts(void)
 {
-  screen_puts(0,20,"\x11-\x18 SLOT cONFIG eDITreturn PICK tab DRVS");
+  screen_clear_line(20);
+  screen_clear_line(21);
+  screen_puts(0,20,"\xD9" "\x91\x8d\x98\x19Slot\xD9" "\xA5" "\x19" "dit Slot\xD9\xB2\xA5\xB4\xB5\xB2\xAE\x19Select Files");
+  screen_puts(4,21,"\xD9" "\xA3" "\x19" "onfiguration" "\xD9" "\xB4\xA1\xA2" "\x19" "Drive Slots");
 }
 
 /**
@@ -95,7 +98,10 @@ void diskulator_hosts_keys_hosts(void)
  */
 void diskulator_hosts_keys_devices(void)
 {
-  screen_puts(0,20,"  \x11-\x18 SLOT  cONFIG    eJECT  tab HOSTS  ");
+  screen_clear_line(20);
+  screen_clear_line(21);
+  screen_puts(0,20,"\xD9""\x91\x8d\x98\x19Slot\xD9""\xA5\x19ject slot\xD9""\xA3\x19onfiguration");
+  screen_puts(8,21,"\xD9\xB4\xA1\xA2\x19Host Slots");
 }
 
 /**
