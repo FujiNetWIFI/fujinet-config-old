@@ -85,10 +85,10 @@ State configured(void)
 void setup(Context *context)
 {
   OS.shflok=0;
-  OS.color0=0x9C;
-  OS.color1=0x0F;
-  OS.color2=0x92;
-  OS.color4=0x92;
+  OS.color0=0x9A;
+  OS.color1=0x0f;
+  OS.color2=0x90;
+  OS.color4=0x90;
   OS.coldst=1;
   OS.sdmctl=0; // Turn off screen
   memcpy((void *)DISPLAY_LIST,&config_dlist,sizeof(config_dlist)); // copy display list to $0600

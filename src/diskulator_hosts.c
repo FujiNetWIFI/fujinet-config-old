@@ -13,7 +13,6 @@
 #include "die.h"
 #include "input.h"
 #include "bar.h"
-#include "keys-reference.h"
 
 #define ORIGIN_HOST_SLOTS 2
 #define ORIGIN_DEVICE_SLOTS 13
@@ -84,6 +83,22 @@ void diskulator_hosts_display_device_slots(unsigned char y, DeviceSlots *ds)
 }
 
 /**
+ * Keys for Hosts mode
+ */
+void diskulator_hosts_keys_hosts(void)
+{
+  screen_puts(0,20,"\x11-\x18 SLOT cONFIG eDITreturn PICK tab DRVS");
+}
+
+/**
+ * Keys for Devices mode
+ */
+void diskulator_hosts_keys_devices(void)
+{
+  screen_puts(0,20,"  \x11-\x18 SLOT  cONFIG    eJECT  tab HOSTS  ");
+}
+
+/**
  * Diskulator hosts setup
  */
 void diskulator_hosts_setup(HostSlots *hs, DeviceSlots *ds)
@@ -107,7 +122,7 @@ void diskulator_hosts_setup(HostSlots *hs, DeviceSlots *ds)
   
   diskulator_hosts_display_device_slots(11,ds);
 
-  keys_reference_diskulator_hosts_hosts();
+  diskulator_hosts_keys_hosts();
   
   bar_show(2);
 }
@@ -115,7 +130,7 @@ void diskulator_hosts_setup(HostSlots *hs, DeviceSlots *ds)
 /**
  * Handle jump keys (1-8, shift 1-8)
  */
-void diskulator_hosts_handle_jump_keys(unsigned char k,unsigned char *i, SubState *new_substate)
+void diskulator_hosts_handle_jump_keys(unsigned char k,unsigned char *i, SubState *ss)
 {
   switch(k)
     {
@@ -128,25 +143,7 @@ void diskulator_hosts_handle_jump_keys(unsigned char k,unsigned char *i, SubStat
     case '7':
     case '8':
       *i=k-'1';
-      *new_substate=DEVICES;
-      bar_show((*i)+ORIGIN_DEVICE_SLOTS);
-      keys_reference_diskulator_hosts_devices();
-      break;
-    case '!':
-    case '"':
-    case '#':
-    case '$':
-    case '%':
-    case '&':
-    case '\'':
-    case '@':
-      if (k=='@')
-	*i=7;
-      else
-	*i=k-'!';
-      *new_substate=HOSTS;
-      bar_show((*i)+ORIGIN_HOST_SLOTS);
-      keys_reference_diskulator_hosts_hosts();
+      bar_show((*i)+(*ss==DEVICES ? ORIGIN_DEVICE_SLOTS : ORIGIN_HOST_SLOTS));
       break;
     }
 }
@@ -225,11 +222,10 @@ void diskulator_hosts_hosts(Context *context, SubState *new_substate)
       
       switch(k)
 	{
-	case 'D':
-	case 'd':
+	case 0x7F:
 	  i=0;
 	  *new_substate = DEVICES;
-	  keys_reference_diskulator_hosts_devices();
+	  diskulator_hosts_keys_devices();
 	  bar_show(i+ORIGIN_DEVICE_SLOTS);
 	  break;
 	case 'C':
@@ -274,15 +270,19 @@ void diskulator_hosts_devices(Context *context, SubState *new_substate)
       
       switch(k)
 	{
+	case 'C':
+	case 'c':
+	  context->state=DISKULATOR_INFO;
+	  *new_substate=DONE;
+	  break;
 	case 'E':
 	case 'e':
 	  diskulator_hosts_eject_device_slot(i,&context->deviceSlots);
 	  break;
-	case 'H':
-	case 'h':
+	case 0x7F:
 	  i=0;
 	  *new_substate = HOSTS;
-	  keys_reference_diskulator_hosts_hosts();
+	  diskulator_hosts_keys_hosts();
 	  bar_show(i+ORIGIN_HOST_SLOTS);
 	  break;
 	}

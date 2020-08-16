@@ -28,11 +28,11 @@ typedef enum _substate
  */
 void diskulator_slot_setup(Context* context)
 {  
+  screen_dlist_diskulator_slot();
+
+  screen_puts(0,21,"\x11-\x18 SLOT return PICK  eJECT esc ABORT  ");
   screen_puts(0,0,"MOUNT TO DRIVE SLOT");
-  screen_puts(0, 21, "\xD9\x91\x8D\x98\x80\xAF\xB2\x80\xB2\xA5\xB4\xB5\xB2\xAE\x19PICK");
-  screen_puts(20, 21, "\xD9\xA5\xB3\xA3\x19"
-	      "ABORT  \xD9\xA5\x19"
-	      "EJECT ");
+  
   fuji_sio_read_device_slots(&context->deviceSlots);
   if (fuji_sio_error())
     error_fatal(ERROR_READING_DEVICE_SLOTS);
@@ -83,9 +83,9 @@ void diskulator_slot_select_mode(Context *context, SubState *ss)
 {
   unsigned char k=0;
   screen_clear_line(21);
-  screen_puts(0, 21, "\xD9\xB2\xA5\xB4\xB5\xB2\xAE\x19R/O     \xD9\xB7\x19R/W     \xD9\xA5\xB3\xA3\x19"
-	      "ABORT");
 
+  screen_puts(0,21,"  return R/O w R/W       esc ABORT     ");
+  
   while (k==0)
     k=input_handle_key();
   

@@ -9,6 +9,11 @@
 #include "state.h"
 
 /**
+ * Setup Diskulator Disk Images screen
+ */
+void diskulator_select_setup(Context *context);
+
+/**
  * Select Disk Image screen
  */
 State diskulator_select(Context *context);

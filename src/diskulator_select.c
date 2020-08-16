@@ -74,6 +74,8 @@ void diskulator_select_display_clear_page(void)
 {
   unsigned char i;
 
+  screen_dlist_diskulator_select();
+  
   for (i=2;i<20;i++)
     screen_clear_line(i);
 }
@@ -256,13 +258,16 @@ void diskulator_select_new_disk(Context* context, SubState* ss)
   
   screen_clear_line(20);
   screen_clear_line(21);
-
+  screen_dlist_diskulator_select_aux();
+  
   screen_puts(1,20,"Enter name of new disk image file");
   screen_input(0,21,context->filename);
 
   if (context->filename[0]==0x00)
     {
       *ss=ADVANCE_DIR;
+      diskulator_select_setup(context); // Reset screen.
+      screen_clear_line(20);
       return;
     }
 
@@ -458,10 +463,7 @@ void diskulator_select_setup(Context *context)
   
   screen_puts(4, 0, "DISK IMAGES");
   
-  screen_puts(0, 20, "\xD9\xB2\xA5\xB4\xB5\xB2\xAE\x19"
-	      "Pick \xD9\xA5\xB3\xA3\x19"
-	      "Abort" "\xD9\xA4\xA5\xAC\xA5\xB4\xA5\x19" "Up DIR");
-  screen_puts(6,21, "\xD9\xAE\x19New\xD9\xA6\x19" "Filter" "\xD9\xAF\xB0\xB4\xA9\xAF\xAE\x19" "Boot");
+  screen_puts(0,21,"nEW  fILTER  bksp UPesc MAIN option BOOT");
   diskulator_select_display_directory_path(context);
 }
 

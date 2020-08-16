@@ -69,4 +69,14 @@ void screen_dlist_mount_and_boot(void);
  */
 void screen_dlist_diskulator_select(void);
 
+/**
+ * Patch the dlist for the diskulator select screen.
+ */
+void screen_dlist_diskulator_select_aux(void);
+
+/**
+ * Patch the dlist for the diskulator slot screen.
+ */
+void screen_dlist_diskulator_slot(void);
+
 #endif /* SCREEN_H */
