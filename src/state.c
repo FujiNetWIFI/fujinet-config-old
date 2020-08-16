@@ -13,7 +13,6 @@
 #include "diskulator_select.h"
 #include "diskulator_slot.h"
 #include "diskulator_info.h"
-#include "adapter_config.h"
 #include "bar.h"
 #include "screen.h"
 #include "mount_and_boot.h"
