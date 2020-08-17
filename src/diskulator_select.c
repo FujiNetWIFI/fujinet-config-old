@@ -422,7 +422,7 @@ void diskulator_select_select_file(Context* context, SubState* ss)
 	diskulator_select_clear_file_area();
       
       // See if we need to display a long filename
-      if ((context->entry_widths[i]>DIRECTORY_LIST_SCREEN_WIDTH) &&
+      if ((context->entry_widths[i]>DIRECTORY_LIST_SCREEN_WIDTH-2) &&
 	  (OS.rtclok[2]>DIRECTORY_LIST_SHOW_FULL_FILENAME_DELAY) &&
 	  (long_filename_displayed==false))
 	{
