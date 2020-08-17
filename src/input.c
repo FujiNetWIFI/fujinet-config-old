@@ -52,29 +52,21 @@ void input_handle_nav_keys(char k, unsigned char pos, unsigned char max, unsigne
  */
 unsigned char input_handle_joystick(void)
 {
-  if (OS.stick0!=0x0F)
+  if ((OS.stick0!=0x0F) && (OS.rtclok[2]>6))
     {
-      if ((OS.rtclok[2]>6))
+      rtclr();
+      switch(OS.stick0)
 	{
-	  rtclr();
-	  switch(OS.stick0)
-	    {
-	    case 14:
-	      return 0x1C;
-	    case 13:
-	      return 0x1D;
-	    }
+	case 14:
+	  return 0x1C;
+	case 13:
+	  return 0x1D;
 	}
-      else
-	return 0;
     }
+  else if (OS.strig0 == 0)
+    return 0x9B;
   else
     return 0;
-  
-  if (OS.strig0 == 0)
-    return 0x9B;
-
-  return 0;
 }
 
 /**
