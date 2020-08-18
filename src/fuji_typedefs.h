@@ -75,9 +75,9 @@ typedef union {
         unsigned short sectorSize;
         unsigned char hostSlot;
         unsigned char deviceSlot;
-        char filename[FILE_MAXLEN];
+        char filename[256];
     };
-    unsigned char rawData[42];
+    unsigned char rawData[262];
 } NewDisk;
 
 #endif /* FUJI_TYPEDEFS_H */
