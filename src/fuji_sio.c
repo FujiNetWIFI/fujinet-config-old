@@ -9,6 +9,8 @@
 #include "sio.h"
 #include "fuji_sio.h"
 
+NewDisk newDisk;
+
 /**
  * Did an error result?
  */
@@ -199,7 +201,6 @@ void fuji_sio_umount_device(unsigned char c)
  */
 void fuji_sio_new_disk(unsigned char c, unsigned short ns, unsigned short ss, DeviceSlots* deviceSlots)
 {
-  NewDisk newDisk;
   newDisk.numSectors = ns;
   newDisk.sectorSize = ss;
   newDisk.hostSlot = deviceSlots->slot[c].hostSlot;
@@ -367,6 +368,23 @@ void fuji_sio_set_filename_for_device_slot(unsigned char slot, const char* filen
   OS.dcb.dcomnd=0xE2;
   OS.dcb.dstats=0x80;
   OS.dcb.dbuf=filename;
+  OS.dcb.dtimlo=0x0F;
+  OS.dcb.dbyt=256;
+  OS.dcb.daux1=slot;
+  OS.dcb.daux2=0;
+  siov();
+}
+
+/**
+ * Set host slot prefix
+ */
+void fuji_sio_set_prefix_for_Device_slot(unsigned char slot, const char *prefix)
+{
+  OS.dcb.ddevic=0x70;
+  OS.dcb.dunit=1;
+  OS.dcb.dcomnd=0xE1;
+  OS.dcb.dstats=0x80;
+  OS.dcb.dbuf=prefix;
   OS.dcb.dtimlo=0x0F;
   OS.dcb.dbyt=256;
   OS.dcb.daux1=slot;
