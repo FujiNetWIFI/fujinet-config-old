@@ -369,7 +369,11 @@ void diskulator_select_set_filter(Context *context, SubState *ss)
  */
 void diskulator_select_show_full_filename(Context *context, unsigned char i)
 {
-  fuji_sio_open_directory(context->host_slot,context->directory);
+  if (context->filter[0]!=0x00)
+    fuji_sio_open_directory(context->host_slot,context->directory_plus_filter);
+  else
+    fuji_sio_open_directory(context->host_slot,context->directory);
+
   if (fuji_sio_error())
     error_fatal(ERROR_OPENING_DIRECTORY);
 

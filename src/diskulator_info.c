@@ -3,7 +3,7 @@
  * Diskulator Info/Devices
  */
 
-#define VERSION "2.3.2020-08-16"
+#define VERSION "2.4.2020-08-24"
 
 #include "diskulator_info.h"
 #include "fuji_typedefs.h"
