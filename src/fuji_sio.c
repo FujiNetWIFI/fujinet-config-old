@@ -177,6 +177,7 @@ void fuji_sio_mount_device(unsigned char c, unsigned char o)
     OS.dcb.dstats = 0x00;
     OS.dcb.dbuf = NULL;
     OS.dcb.dbyt = 0;
+    OS.dcb.dtimlo = 0xFE; // Due to ATX support.
     OS.dcb.daux1 = c;
     OS.dcb.daux2 = o;
     siov();
