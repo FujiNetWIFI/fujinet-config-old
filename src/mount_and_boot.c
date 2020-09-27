@@ -48,7 +48,7 @@ void mount_and_boot_mount_all_devices(Context *context)
     {
       if (context->deviceSlots.slot[i].hostSlot != 0xFF)
 	{
-	  text_mounting_device_slot_X[19]=i+0x31; // update status msg
+	  text_mounting_device_slot_X[18]=i+0x31; // update status msg
 	  screen_puts(0,21,text_mounting_device_slot_X);
 	  fuji_sio_mount_device(i,context->deviceSlots.slot[i].mode);
 	  if (fuji_sio_error())
