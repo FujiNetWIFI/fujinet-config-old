@@ -270,7 +270,8 @@ void diskulator_select_new_disk(Context* context, SubState* ss)
   screen_clear_line(20);
   screen_clear_line(21);
   screen_dlist_diskulator_select_aux();
-  
+
+  memset(context->filename,0,sizeof(context->filename));
   screen_puts(1,20,"Enter name of new disk image file");
   screen_input(0,21,context->filename);
 
