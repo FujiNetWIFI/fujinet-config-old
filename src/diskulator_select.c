@@ -127,6 +127,7 @@ void diskulator_select_display_directory_page(Context* context)
 {
   char displayed_entry[DIRECTORY_LIST_SCREEN_WIDTH];
   unsigned char i;
+  unsigned short pos;
 
   bar_clear();
 
@@ -145,9 +146,11 @@ void diskulator_select_display_directory_page(Context* context)
   
   if (fuji_sio_error())
     error_fatal(ERROR_OPENING_DIRECTORY);
+
+  pos=context->dir_page*DIRECTORY_LIST_ENTRIES_PER_PAGE;
   
-  fuji_sio_set_directory_position(context->dir_page*DIRECTORY_LIST_ENTRIES_PER_PAGE);
-  if (fuji_sio_error())
+  fuji_sio_set_directory_position(pos);
+  if (fuji_sio_error() && pos!=0)
     error_fatal(ERROR_SETTING_DIRECTORY_POSITION);
   
   for (i=0;i<DIRECTORY_LIST_ENTRIES_PER_PAGE;i++)
@@ -182,6 +185,8 @@ void diskulator_select_display_directory_page(Context* context)
  */
 void diskulator_select_handle_return(unsigned char i, Context* context, SubState *ss)
 {
+  unsigned short pos;
+  
   if (context->entries_displayed==0)
     return;
   
@@ -192,9 +197,11 @@ void diskulator_select_handle_return(unsigned char i, Context* context, SubState
   
   if (fuji_sio_error())
     error_fatal(ERROR_OPENING_DIRECTORY);
+
+  pos = context->dir_page*DIRECTORY_LIST_ENTRIES_PER_PAGE+i;
+  fuji_sio_set_directory_position(pos);
   
-  fuji_sio_set_directory_position((context->dir_page*DIRECTORY_LIST_ENTRIES_PER_PAGE)+i);
-  if (fuji_sio_error())
+  if (fuji_sio_error() && pos != 0)
     error_fatal(ERROR_SETTING_DIRECTORY_POSITION);
 
   fuji_sio_read_directory(context->filename,DIRECTORY_LIST_FULL_WIDTH);
