@@ -128,36 +128,82 @@ void diskulator_select_display_directory_page(Context* context)
   char displayed_entry[DIRECTORY_LIST_SCREEN_WIDTH];
   unsigned char i;
   unsigned short pos;
+  unsigned char retry=5;
 
   bar_clear();
 
   diskulator_select_display_clear_page();
 
-  if (context->filter[0]!=0x00)
+  while (retry>0)
     {
-      diskulator_select_display_filter(context);
-      memset(context->directory_plus_filter,0,sizeof(context->directory_plus_filter));
-      strcpy(context->directory_plus_filter,context->directory);
-      strcpy(&context->directory_plus_filter[strlen(context->directory_plus_filter)+1],context->filter);
-      fuji_sio_open_directory(context->host_slot,context->directory_plus_filter);
+      if (context->filter[0]!=0x00)
+	{
+	  diskulator_select_display_filter(context);
+	  memset(context->directory_plus_filter,0,sizeof(context->directory_plus_filter));
+	  strcpy(context->directory_plus_filter,context->directory);
+	  strcpy(&context->directory_plus_filter[strlen(context->directory_plus_filter)+1],context->filter);
+	  fuji_sio_open_directory(context->host_slot,context->directory_plus_filter);
+	}
+      else
+	fuji_sio_open_directory(context->host_slot,context->directory);
+
+      if (fuji_sio_error())
+	retry--;
+      else
+	break;
     }
-  else
-    fuji_sio_open_directory(context->host_slot,context->directory);
   
   if (fuji_sio_error())
-    error_fatal(ERROR_OPENING_DIRECTORY);
+    {
+      error(ERROR_OPENING_DIRECTORY);
+      wait_a_moment();
+      context->state=CONNECT_WIFI;
+      return;
+    }
 
   pos=context->dir_page*DIRECTORY_LIST_ENTRIES_PER_PAGE;
+
+  retry=5;
+
+  while (retry>0)
+    {
+      fuji_sio_set_directory_position(pos);
+
+      if (fuji_sio_error())
+	retry--;
+      else
+	break;
+    }
   
-  fuji_sio_set_directory_position(pos);
   if (fuji_sio_error() && pos!=0)
-    error_fatal(ERROR_SETTING_DIRECTORY_POSITION);
+    {
+      error(ERROR_SETTING_DIRECTORY_POSITION);
+      wait_a_moment();
+      context->state=DISKULATOR_HOSTS;
+      return;
+    }
   
   for (i=0;i<DIRECTORY_LIST_ENTRIES_PER_PAGE;i++)
     {
-      fuji_sio_read_directory(displayed_entry,DIRECTORY_LIST_SCREEN_WIDTH);
+      retry=5;
+
+      while (retry>0)
+	{
+	  fuji_sio_read_directory(displayed_entry,DIRECTORY_LIST_SCREEN_WIDTH);
+
+	  if (fuji_sio_error())
+	    retry--;
+	  else
+	    break;
+	}
+      
       if (fuji_sio_error())
-	error_fatal(ERROR_READING_DIRECTORY);
+	{
+	  error(ERROR_READING_DIRECTORY);
+	  wait_a_moment();
+	  context->state=DISKULATOR_HOSTS;
+	  return;
+	}
 
       context->entry_widths[i]=strlen(displayed_entry);
 
@@ -186,27 +232,71 @@ void diskulator_select_display_directory_page(Context* context)
 void diskulator_select_handle_return(unsigned char i, Context* context, SubState *ss)
 {
   unsigned short pos;
+  unsigned char retry=5;
   
   if (context->entries_displayed==0)
     return;
-  
-  if (context->filter[0]==0x00)
-    fuji_sio_open_directory(context->host_slot,context->directory);
-  else
-    fuji_sio_open_directory(context->host_slot,context->directory_plus_filter);
+
+  while (retry>0)
+    {
+      if (context->filter[0]==0x00)
+	fuji_sio_open_directory(context->host_slot,context->directory);
+      else
+	fuji_sio_open_directory(context->host_slot,context->directory_plus_filter);
+
+      if (fuji_sio_error())
+	retry--;
+      else
+	break;
+    }
   
   if (fuji_sio_error())
-    error_fatal(ERROR_OPENING_DIRECTORY);
+    {
+      error(ERROR_OPENING_DIRECTORY);
+      wait_a_moment();
+      context->state=DISKULATOR_HOSTS;
+      return;
+    }
 
   pos = context->dir_page*DIRECTORY_LIST_ENTRIES_PER_PAGE+i;
-  fuji_sio_set_directory_position(pos);
+
+  retry = 5;
+
+  while (retry>0)
+    {
+      fuji_sio_set_directory_position(pos);
+      if (fuji_sio_error())
+	retry--;
+      else
+	break;
+    }
   
   if (fuji_sio_error() && pos != 0)
-    error_fatal(ERROR_SETTING_DIRECTORY_POSITION);
+    {
+      error(ERROR_SETTING_DIRECTORY_POSITION);
+      wait_a_moment();
+      context->state=DISKULATOR_HOSTS;
+      return;
+    }
 
-  fuji_sio_read_directory(context->filename,DIRECTORY_LIST_FULL_WIDTH);
+  retry = 5;
+
+  while (retry>0)
+    {
+      fuji_sio_read_directory(context->filename,DIRECTORY_LIST_FULL_WIDTH);
+      if (fuji_sio_error())
+	retry--;
+      else
+	break;
+    }
+  
   if (fuji_sio_error())
-    error_fatal(ERROR_READING_DIRECTORY);
+    {
+      error(ERROR_READING_DIRECTORY);
+      wait_a_moment();
+      context->state=DISKULATOR_HOSTS;
+      return;
+    }
 
   fuji_sio_close_directory(context->host_slot);
   
@@ -377,21 +467,68 @@ void diskulator_select_set_filter(Context *context, SubState *ss)
  */
 void diskulator_select_show_full_filename(Context *context, unsigned char i)
 {
-  if (context->filter[0]!=0x00)
-    fuji_sio_open_directory(context->host_slot,context->directory_plus_filter);
-  else
-    fuji_sio_open_directory(context->host_slot,context->directory);
+  unsigned char retry=5;
 
-  if (fuji_sio_error())
-    error_fatal(ERROR_OPENING_DIRECTORY);
+  while (retry>0)
+    {
+      if (context->filter[0]!=0x00)
+	fuji_sio_open_directory(context->host_slot,context->directory_plus_filter);
+      else
+	fuji_sio_open_directory(context->host_slot,context->directory);
 
-  fuji_sio_set_directory_position((context->dir_page*DIRECTORY_LIST_ENTRIES_PER_PAGE)+i);
+      if (fuji_sio_error())
+	retry--;
+      else
+	break;
+    }
+  
   if (fuji_sio_error())
-    error_fatal(ERROR_SETTING_DIRECTORY_POSITION);
+    {
+      error(ERROR_OPENING_DIRECTORY);
+      wait_a_moment();
+      context->state=DISKULATOR_HOSTS;
+      return;
+    }
 
-  fuji_sio_read_directory(context->filename,DIRECTORY_LIST_FULL_WIDTH);
+  retry=5;
+
+  while (retry>0)
+    {
+      fuji_sio_set_directory_position((context->dir_page*DIRECTORY_LIST_ENTRIES_PER_PAGE)+i);
+
+      if (fuji_sio_error())
+	retry--;
+      else
+	break;
+    }
+  
   if (fuji_sio_error())
-    error_fatal(ERROR_READING_DIRECTORY);
+    {
+      error(ERROR_SETTING_DIRECTORY_POSITION);
+      wait_a_moment();
+      context->state=DISKULATOR_HOSTS;
+      return;
+    }
+
+  retry=5;
+
+  while (retry>0)
+    {
+      fuji_sio_read_directory(context->filename,DIRECTORY_LIST_FULL_WIDTH);
+
+      if (fuji_sio_error())
+	retry--;
+      else
+	break;
+    }
+  
+  if (fuji_sio_error())
+    {
+      error(ERROR_READING_DIRECTORY);
+      wait_a_moment();
+      context->state=DISKULATOR_HOSTS;
+      return;
+    }
 
   fuji_sio_close_directory(context->host_slot);
 

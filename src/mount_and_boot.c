@@ -10,6 +10,7 @@
 #include "fuji_typedefs.h"
 #include "error.h"
 #include "sio.h"
+#include "die.h"
 
 char text_mounting_host_slot_X[]="MOUNTING HOST SLOT X";
 char text_mounting_device_slot_X[]="MOUNTING DEV SLOT X";
@@ -21,6 +22,7 @@ char text_booting[]="SUCCESSFUL! BOOTING ";
 void mount_and_boot_mount_all_hosts(Context *context)
 {
   unsigned char i;
+  unsigned char retry=5;
   
   fuji_sio_read_device_slots(&context->deviceSlots);
   
@@ -30,9 +32,22 @@ void mount_and_boot_mount_all_hosts(Context *context)
 	{
 	  text_mounting_host_slot_X[19]=i+0x31; // update status msg.
 	  screen_puts(0,21,text_mounting_host_slot_X);
-	  fuji_sio_mount_host(context->deviceSlots.slot[i].hostSlot,&context->hostSlots);
+	  while (retry>0)
+	    {
+	      fuji_sio_mount_host(context->deviceSlots.slot[i].hostSlot,&context->hostSlots);
+	      if (fuji_sio_error())
+		retry--;
+	      else
+		break;
+	    }
+	  
 	  if (fuji_sio_error())
-	    error_fatal(ERROR_MOUNTING_HOST_SLOT);
+	    {
+	      error(ERROR_MOUNTING_HOST_SLOT);
+	      wait_a_moment();
+	      context->state=DISKULATOR_HOSTS;
+	      return;
+	    }
 	}
     }
 }
@@ -43,6 +58,7 @@ void mount_and_boot_mount_all_hosts(Context *context)
 void mount_and_boot_mount_all_devices(Context *context)
 {
   unsigned char i;
+  unsigned char retry=5;
   
   for (i=0;i<8;i++)
     {
@@ -50,9 +66,24 @@ void mount_and_boot_mount_all_devices(Context *context)
 	{
 	  text_mounting_device_slot_X[18]=i+0x31; // update status msg
 	  screen_puts(0,21,text_mounting_device_slot_X);
-	  fuji_sio_mount_device(i,context->deviceSlots.slot[i].mode);
+
+	  while (retry>0)
+	    {
+	      fuji_sio_mount_device(i,context->deviceSlots.slot[i].mode);
+
+	      if (fuji_sio_error())
+		retry--;
+	      else
+		break;
+	    }
+	  
 	  if (fuji_sio_error())
-	    error_fatal(ERROR_MOUNTING_DEVICE_SLOT);
+	    {
+	      error(ERROR_MOUNTING_DEVICE_SLOT);
+	      wait_a_moment();
+	      context->state=DISKULATOR_HOSTS;
+	      return;
+	    }
 	}
     }
 

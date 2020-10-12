@@ -13,6 +13,7 @@
 #include "error.h"
 #include "bar.h"
 #include "input.h"
+#include "die.h"
 
 typedef enum _substate
   {
@@ -131,9 +132,15 @@ void diskulator_slot_create_disk(Context *context, SubState *ss)
   strcpy(context->deviceSlots.slot[context->device_slot].file, context->directory);
   strcat(context->deviceSlots.slot[context->device_slot].file, context->filename);
   fuji_sio_new_disk(context->device_slot,context->newDisk_ns,context->newDisk_sz,&context->deviceSlots);
+  
   if (fuji_sio_error())
-    error_fatal(ERROR_CREATING_NEW_DISK);
-
+    {
+      error(ERROR_CREATING_NEW_DISK);
+      wait_a_moment();
+      context->state=DISKULATOR_SELECT;
+      return;
+    }
+  
   context->mode = 0x02; // R/W
 
   *ss=COMMIT_SLOT;
@@ -156,12 +163,22 @@ void diskulator_slot_commit(Context *context, SubState *ss)
   // Write the device slots.
   fuji_sio_write_device_slots(&context->deviceSlots);
   if (fuji_sio_error())
-    error_fatal(ERROR_WRITING_DEVICE_SLOTS);
+    {
+      error(ERROR_WRITING_DEVICE_SLOTS);
+      wait_a_moment();
+      context->state=DISKULATOR_HOSTS;
+      return;
+    }
 
   // Write full filename
   fuji_sio_set_filename_for_device_slot(context->device_slot,context->full_path);
   if (fuji_sio_error())
-    error_fatal(ERROR_SETTING_FULL_PATH);
+    {
+      error(ERROR_SETTING_FULL_PATH);
+      wait_a_moment();
+      context->state=DISKULATOR_HOSTS;
+      return;
+    }
 
   // And go back to the hosts/slots screen
   *ss=DONE;

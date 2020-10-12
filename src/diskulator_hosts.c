@@ -106,19 +106,39 @@ void diskulator_hosts_keys_devices(void)
  */
 void diskulator_hosts_setup(HostSlots *hs, DeviceSlots *ds)
 {
+  unsigned char retry=5;
+  
   screen_dlist_diskulator_hosts();
   
   screen_puts(3, 0, "TNFS HOST LIST");
   screen_puts(24, 9, "DRIVE SLOTS");
-  
-  fuji_sio_read_host_slots(hs);
-  
+
+  while (retry>0)
+    {
+      fuji_sio_read_host_slots(hs);
+      
+      if (fuji_sio_error())
+	retry--;
+      else
+	break;
+    }
+
   if (fuji_sio_error())
     error_fatal(ERROR_READING_HOST_SLOTS);
+
+  retry=5;
   
   diskulator_hosts_display_host_slots(hs);
 
-  fuji_sio_read_device_slots(ds);
+  while (retry>0)
+    {
+      fuji_sio_read_device_slots(ds);
+
+      if (fuji_sio_error())
+	retry--;
+      else
+	break;
+    }
   
   if (fuji_sio_error())
     error_fatal(ERROR_READING_DEVICE_SLOTS);
@@ -244,9 +264,16 @@ void diskulator_hosts_hosts(Context *context, SubState *new_substate)
 	  context->state=DISKULATOR_SELECT;
 	  context->host_slot=i;
 	  fuji_sio_mount_host(context->host_slot,&context->hostSlots);
+	  
 	  if (fuji_sio_error())
-	    error_fatal(ERROR_MOUNTING_HOST_SLOT);
-	  *new_substate=DONE;
+	    {
+	      error(ERROR_MOUNTING_HOST_SLOT);
+	      wait_a_moment();
+	      context->state=CONNECT_WIFI;
+	    }
+	  else
+	    *new_substate=DONE;
+
 	  break;
 	}
     }
