@@ -270,6 +270,8 @@ void diskulator_hosts_hosts(Context *context, SubState *new_substate)
 	      error(ERROR_MOUNTING_HOST_SLOT);
 	      wait_a_moment();
 	      context->state=CONNECT_WIFI;
+	      *new_substate=DONE;
+	      return;
 	    }
 	  else
 	    *new_substate=DONE;
