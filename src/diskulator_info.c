@@ -38,7 +38,7 @@ State diskulator_info(Context *context)
   screen_puts(5, 10, "   Netmask:");
   screen_puts(5, 11, "       MAC:");
   screen_puts(5, 12, "     BSSID:");
-  screen_puts(5, 13, "   Version:" VERSION);
+  screen_puts(5, 13, "   Version:");
 
   screen_puts(17, 5, ac.ssid);
   screen_puts(17, 6, ac.hostname);
@@ -48,6 +48,7 @@ State diskulator_info(Context *context)
   screen_print_ip(17, 10, ac.netmask);
   screen_print_mac(17, 11, ac.macAddress);
   screen_print_mac(17, 12, ac.bssid);
+  screen_puts(17,13, ac.fn_version);
 
   while (k==0)
     k=input_handle_key();
