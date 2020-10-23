@@ -61,6 +61,10 @@ unsigned char input_handle_joystick(void)
 	  return 0x1C;
 	case 13:
 	  return 0x1D;
+	case 11:
+	  return '<';
+	case 7:
+	  return '>';
 	}
     }
   else if (OS.strig0 == 0)
