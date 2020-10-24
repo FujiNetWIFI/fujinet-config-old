@@ -75,7 +75,11 @@ void diskulator_hosts_display_device_slots(unsigned char y, DeviceSlots *ds)
         }
       
       screen_puts(0, i + y, d);
-      screen_puts(5, i + y, ds->slot[i].file[0] != 0x00 ? ds->slot[i].file : text_empty);
+      
+      if (ds->slot[i].file[0] != 0x00)
+	screen_puts(5,i+y,ds->slot[i].file);
+      else
+	screen_puts(5,i+y,text_empty);
     }
 }
 
