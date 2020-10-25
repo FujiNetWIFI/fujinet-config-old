@@ -322,8 +322,6 @@ dist: $(PROGRAM)
 	cp ../fujinet-config-tools/dist/*.com dist/
 	cp $(PROGRAM) dist/
 	dir2atr -m -S -B picoboot.bin autorun.atr dist/
-	mv autorun.atr ../fujinet-platformio/data/
-	rm -rf dist
 
 clean:
 	$(call RMFILES,$(OBJECTS))
@@ -331,7 +329,8 @@ clean:
 	$(call RMFILES,$(REMOVES))
 	$(call RMFILES,$(PROGRAM))
 	$(call RMFILES,*.map)
- 
+	rm -rf dist/
+
 else # $(words $(TARGETLIST)),1
  
 all test clean:
