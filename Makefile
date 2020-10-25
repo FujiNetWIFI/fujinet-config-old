@@ -315,6 +315,11 @@ test: $(PROGRAM)
 	$(EMUCMD) $<
 	$(POSTEMUCMD)
  
+
+dist: $(PROGRAM)
+	cp $(PROGRAM) dist/
+	dir2atr -m -S -B picoboot.bin autorun.atr dist/
+
 clean:
 	$(call RMFILES,$(OBJECTS))
 	$(call RMFILES,$(DEPENDS))
