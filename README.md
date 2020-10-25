@@ -118,7 +118,7 @@ Note to Maintainers
 
 To build:
 
-* run make
-* run ./make_disk.sh
-* Copy autorun.atr to SPIFFS so it can be dumped to flash.
+* run make clean && make dist
+
+this will clean the build tree, and make a new disk image called autorun.atr which can be copied to the data/ directory in fujinet-platformio for firmware updating.
 
