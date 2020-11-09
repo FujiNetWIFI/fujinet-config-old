@@ -315,6 +315,9 @@ void diskulator_hosts_hosts(Context *context, SubState *new_substate)
 	  diskulator_hosts_edit_host_slot(i,&context->hostSlots);
 	  break;
 	case 0x9b: // RETURN
+	  if (context->hostSlots.host[i][0]==0x00) // empty host slot?
+	    break; // do nothing
+	  
 	  context->state=DISKULATOR_SELECT;
 	  context->host_slot=i;
 	  fuji_sio_mount_host(context->host_slot,&context->hostSlots);
