@@ -7,6 +7,9 @@
 
 #define FILE_MAXLEN 36
 
+#define MODE_READ 1
+#define MODE_WRITE 2
+
 typedef unsigned short DirectoryPosition;
 
 /**

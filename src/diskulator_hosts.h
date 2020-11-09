@@ -22,6 +22,11 @@ void diskulator_hosts_display_device_slots(unsigned char y, DeviceSlots *ds);
 void diskulator_hosts_eject_device_slot(unsigned char i, unsigned char pos, DeviceSlots* ds);
 
 /**
+ * Set device slot to read or write
+ */
+void diskulator_hosts_set_device_slot_mode(unsigned char i, unsigned char mode, DeviceSlots* ds);
+
+/**
  * Hosts/Devices screen
  */
 State diskulator_hosts(Context *context);

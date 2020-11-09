@@ -377,6 +377,23 @@ void fuji_sio_set_filename_for_device_slot(unsigned char slot, const char* filen
 }
 
 /**
+ * Get filename for device slot
+ */
+void fuji_sio_get_filename_for_device_slot(unsigned char slot, const char* filename)
+{
+  OS.dcb.ddevic=0x70;
+  OS.dcb.dunit=1;
+  OS.dcb.dcomnd=0xDA;
+  OS.dcb.dstats=0x40;
+  OS.dcb.dbuf=filename;
+  OS.dcb.dtimlo=0x0F;
+  OS.dcb.dbyt=256;
+  OS.dcb.daux1=slot;
+  OS.dcb.daux2=0;
+  siov();
+}
+
+/**
  * Set host slot prefix
  */
 void fuji_sio_set_prefix_for_Device_slot(unsigned char slot, const char *prefix)

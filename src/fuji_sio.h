@@ -124,6 +124,11 @@ void fuji_sio_read_adapter_config(AdapterConfig* adapterConfig);
 void fuji_sio_set_filename_for_device_slot(unsigned char slot, const char* filename);
 
 /**
+ * Set filename for device slot
+ */
+void fuji_sio_get_filename_for_device_slot(unsigned char slot, const char* filename);
+
+/**
  * Set host slot prefix
  */
 void fuji_sio_set_prefix_for_Device_slot(unsigned char slot, const char *prefix);

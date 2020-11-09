@@ -102,7 +102,7 @@ void diskulator_hosts_keys_devices(void)
   screen_clear_line(20);
   screen_clear_line(21);
   screen_puts(0,20,"\xD9""\x91\x8d\x98\x19Slot\xD9""\xA5\x19ject slot\xD9""\xA3\x19onfiguration");
-  screen_puts(8,21,"\xD9\xB4\xA1\xA2\x19Host Slots");
+  screen_puts(3,21,"\xD9\xB4\xA1\xA2\x19Host Slots \xD9\xB2\x19""ead \xD9\xB7\x19rite");
 }
 
 /**
@@ -228,6 +228,56 @@ void diskulator_hosts_eject_device_slot(unsigned char i, unsigned char pos, Devi
 }
 
 /**
+ * Set device slot to read or write
+ */
+void diskulator_hosts_set_device_slot_mode(unsigned char i, unsigned char mode, DeviceSlots* ds)
+{
+  unsigned char tmp_hostSlot;
+  unsigned char tmp_file[FILE_MAXLEN];
+  unsigned char *full_path;
+
+  full_path=(unsigned char *)malloc(256);
+  
+  // temporarily stash current values.
+  tmp_hostSlot=ds->slot[i].hostSlot;
+  memcpy(tmp_file,ds->slot[i].file,FILE_MAXLEN);
+  fuji_sio_get_filename_for_device_slot(i,full_path);
+
+  // Unmount slot
+  fuji_sio_umount_device(i);
+
+  // Slot is now wiped, need to re-populate from stash.
+  ds->slot[i].hostSlot=tmp_hostSlot;
+  ds->slot[i].mode=mode;
+  memcpy(ds->slot[i].file,tmp_file,FILE_MAXLEN);
+  fuji_sio_set_filename_for_device_slot(i,full_path);
+  
+  fuji_sio_write_device_slots(ds);
+  fuji_sio_mount_device(i,mode);
+
+  // If we couldn't mount read/write, then re-mount again as read-only.
+  if (fuji_sio_error())
+    {
+      fuji_sio_umount_device(i);
+
+      // Slot is now wiped, need to re-populate from stash.
+      ds->slot[i].hostSlot=tmp_hostSlot;
+      ds->slot[i].mode=mode;
+      memcpy(ds->slot[i].file,tmp_file,FILE_MAXLEN);
+      fuji_sio_set_filename_for_device_slot(i,full_path);
+
+      // Try again.
+      fuji_sio_write_device_slots(ds);
+      fuji_sio_mount_device(i,mode);
+    }
+
+  // And update device slot display.
+  diskulator_hosts_display_device_slots(11,ds);
+
+  free(full_path);
+}
+
+/**
  * Diskulator interactive - hosts
  */
 void diskulator_hosts_hosts(Context *context, SubState *new_substate)
@@ -320,6 +370,14 @@ void diskulator_hosts_devices(Context *context, SubState *new_substate)
 	  *new_substate = HOSTS;
 	  diskulator_hosts_keys_hosts();
 	  bar_show(i+ORIGIN_HOST_SLOTS);
+	  break;
+	case 'R':
+	case 'r':
+	  diskulator_hosts_set_device_slot_mode(i,MODE_READ,&context->deviceSlots);
+	  break;
+	case 'W':
+	case 'w':
+	  diskulator_hosts_set_device_slot_mode(i,MODE_WRITE,&context->deviceSlots);
 	  break;
 	}
     }
