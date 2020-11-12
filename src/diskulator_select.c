@@ -610,6 +610,11 @@ void diskulator_select_select_file(Context* context, SubState* ss)
 	  *ss=DEVANCE_DIR;
 	  context->dir_page=0;
 	  break;
+	case 'b':
+	case 'B':
+	  *ss=DONE;
+	  context->state = MOUNT_AND_BOOT;
+	  break;
 	case 'N':
 	case 'n':
 	  diskulator_select_new_disk(context,ss);

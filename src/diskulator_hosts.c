@@ -305,6 +305,11 @@ void diskulator_hosts_hosts(Context *context, SubState *new_substate)
 	  diskulator_hosts_keys_devices();
 	  bar_show(i+ORIGIN_DEVICE_SLOTS);
 	  break;
+	case 'B':
+	case 'b':
+	  *new_substate=DONE;
+	  context->state = MOUNT_AND_BOOT;
+	  break;
 	case 'C':
 	case 'c':
 	  context->state=DISKULATOR_INFO;
