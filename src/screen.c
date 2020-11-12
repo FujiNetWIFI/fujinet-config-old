@@ -129,6 +129,17 @@ void screen_print_ip(unsigned char x, unsigned char y, unsigned char *buf)
 }
 
 /**
+ * Special hex output of numbers under 16, e.g. 9 -> 09, 10 -> 0A
+ */
+void itoa_hex(int val, char *buf)
+{
+  if (val < 16) {
+    *(buf++) = '0';
+  }
+  itoa(val, buf, 16);
+}
+
+/**
  * Print MAC address at position
  */
 void screen_print_mac(unsigned char x, unsigned char y, unsigned char *buf)
@@ -139,7 +150,7 @@ void screen_print_mac(unsigned char x, unsigned char y, unsigned char *buf)
 
     for (i = 0; i < 6; i++)
     {
-        itoa(buf[i], tmp, 16);
+        itoa_hex(buf[i], tmp);
         screen_puts(x + o, y, tmp);
         o += strlen(tmp);
         if (i < 5)
