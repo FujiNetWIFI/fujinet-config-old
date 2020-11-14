@@ -409,3 +409,17 @@ void fuji_sio_set_prefix_for_Device_slot(unsigned char slot, const char *prefix)
   OS.dcb.daux2=0;
   siov();
 }
+
+/**
+ * Set config boot flag
+ */
+void fuji_sio_set_config_boot(unsigned char b)
+{
+  OS.dcb.dcomnd = 0xD9;
+  OS.dcb.dstats = 0x00;
+  OS.dcb.dbuf = NULL;
+  OS.dcb.dtimlo = 0x0f;
+  OS.dcb.dbyt = 0;
+  OS.dcb.daux1 = b;
+  siov();
+}

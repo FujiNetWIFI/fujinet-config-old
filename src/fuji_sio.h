@@ -133,4 +133,9 @@ void fuji_sio_get_filename_for_device_slot(unsigned char slot, const char* filen
  */
 void fuji_sio_set_prefix_for_Device_slot(unsigned char slot, const char *prefix);
 
+/**
+ * Set config boot flag
+ */
+void fuji_sio_set_config_boot(unsigned char b);
+
 #endif /* FUJINET_SIO_H */

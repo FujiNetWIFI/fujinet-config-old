@@ -110,6 +110,8 @@ State mount_and_boot(Context *context)
   mount_and_boot_mount_all_hosts(context);
   mount_and_boot_mount_all_devices(context);
 
+  fuji_sio_set_config_boot(0); // disable ROM disk.
+  
   cold_start(); // reboot
   
   return DISKULATOR_HOSTS; // Never gets here, but we set anyway.
