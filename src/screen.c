@@ -97,7 +97,7 @@ int screen_input(unsigned char x, unsigned char y, char* s)
 	  SetChar(c+1,y,GetChar(c+1,y)&0x7F);
 	  // exit while.
 	}
-      else if (((k>0x20) && (k<0x7b) || (k==0x20))) // printable ascii
+      else if ((k>0x1F) && (k<0x7c)) // printable ascii
 	{
 	  SetChar(c+1,y,GetChar(c+1,y)&0x7F);
 	  outc[0]=k;
