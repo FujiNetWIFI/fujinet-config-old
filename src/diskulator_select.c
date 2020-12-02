@@ -30,10 +30,14 @@ typedef unsigned char PageOffset;
 
 extern char text_empty[];
 
-#define DIRECTORY_LIST_Y_OFFSET 3
+#define DIRECTORY_LIST_HOSTNAME_Y 1
+#define DIRECTORY_LIST_DIRPATH_Y 2
+#define DIRECTORY_LIST_Y_OFFSET 4 /* N.B., "Previous" pagination entry will appear 1 line above the list */
+#define DIRECTORY_LIST_ENTRIES_PER_PAGE 13 /* N.B. "Next" pagination entry will appear 1 line below the list */
+#define DIRECTORY_LIST_FULLFILENAME_Y 18
+#define DIRECTORY_LIST_FULLFILENAME_HEIGHT 3
 #define DIRECTORY_LIST_SCREEN_WIDTH 36
 #define DIRECTORY_LIST_FULL_WIDTH 128
-#define DIRECTORY_LIST_ENTRIES_PER_PAGE 14
 #define DIRECTORY_LIST_SHOW_FULL_FILENAME_DELAY 24
 
 /**
@@ -41,18 +45,22 @@ extern char text_empty[];
  */
 void diskulator_select_clear_file_area(void)
 {
-  screen_clear_line(18);
-  screen_clear_line(19);
-  screen_clear_line(20);
+  int i;
+  for (i = DIRECTORY_LIST_FULLFILENAME_Y; i < DIRECTORY_LIST_FULLFILENAME_Y + DIRECTORY_LIST_FULLFILENAME_HEIGHT; i++) {
+    screen_clear_line(i);
+  }
 }
 
 /**
- * Display directory path
+ * Display directory path (and "SD" or TNFS server name)
  */
 void diskulator_select_display_directory_path(Context* context)
 {
-  screen_clear_line(1);
-  screen_puts(0,1,context->directory);
+  screen_clear_line(DIRECTORY_LIST_HOSTNAME_Y);
+  screen_puts(0,DIRECTORY_LIST_HOSTNAME_Y,context->hostSlots.host[context->host_slot]);
+
+  screen_clear_line(DIRECTORY_LIST_DIRPATH_Y);
+  screen_puts(0,DIRECTORY_LIST_DIRPATH_Y,context->directory);
 }
 
 /**
@@ -86,9 +94,12 @@ void diskulator_select_display_clear_page(void)
   unsigned char i;
 
   screen_dlist_diskulator_select();
-  
-  for (i=2;i<20;i++)
+
+  for (i = DIRECTORY_LIST_Y_OFFSET; i < DIRECTORY_LIST_Y_OFFSET + DIRECTORY_LIST_ENTRIES_PER_PAGE; i++) {
     screen_clear_line(i);
+  }
+
+  diskulator_select_clear_file_area();
 }
 
 /**
@@ -112,11 +123,14 @@ void diskulator_select_display_next_page(void)
 /**
  * Display current filter
  */
+#define FILTER_LABEL "Filter: "
 void diskulator_select_display_filter(Context *context)
 {
-  char filter_str[40]="Filter: ";
+  char filter_str[sizeof(FILTER_LABEL) + sizeof(context->filter) + 1] = FILTER_LABEL;
 
   strcat(filter_str,context->filter);
+  /* TODO: 14 to make sure it doesn't overlap "Previous" pagination;
+     should probably be on its own line, to fit all 32 allowed characters */
   screen_puts(14,DIRECTORY_LIST_Y_OFFSET-1,filter_str);
 }
 
