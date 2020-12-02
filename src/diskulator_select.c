@@ -75,13 +75,13 @@ bool diskulator_select_display_directory_entry(unsigned char i, char* entry, Con
     }
 
   context->dir_eof=false;
-  
+
   // Display filename
   screen_puts(2,DIRECTORY_LIST_Y_OFFSET+i,entry);
 
   // Display folder icon if directory.
   if (entry[strlen(entry)-1]=='/')
-    screen_puts(0,DIRECTORY_LIST_Y_OFFSET+i,"\x04");
+    screen_puts(0,DIRECTORY_LIST_Y_OFFSET+i,CH_FOLDER);
 
   return true;
 }
@@ -107,7 +107,7 @@ void diskulator_select_display_clear_page(void)
  */
 void diskulator_select_display_prev_page(void)
 {
-  screen_puts(0,DIRECTORY_LIST_Y_OFFSET-1,"\xd9\x9C\x19");
+  screen_puts(0,DIRECTORY_LIST_Y_OFFSET-1,CH_KEY_LABEL_L CH_INV_LT CH_KEY_LABEL_R);
   screen_puts(3,DIRECTORY_LIST_Y_OFFSET-1,"Previous Page");
 }
 
@@ -116,7 +116,7 @@ void diskulator_select_display_prev_page(void)
  */
 void diskulator_select_display_next_page(void)
 {
-  screen_puts(0,DIRECTORY_LIST_Y_OFFSET+DIRECTORY_LIST_ENTRIES_PER_PAGE,"\xd9\x9E\x19");
+  screen_puts(0,DIRECTORY_LIST_Y_OFFSET+DIRECTORY_LIST_ENTRIES_PER_PAGE,CH_KEY_LABEL_L CH_INV_GT CH_KEY_LABEL_R);
   screen_puts(3,DIRECTORY_LIST_Y_OFFSET+DIRECTORY_LIST_ENTRIES_PER_PAGE,"Next Page");
 }
 
@@ -151,22 +151,22 @@ void diskulator_select_display_directory_page(Context* context)
   while (retry>0)
     {
       if (context->filter[0]!=0x00)
-	{
-	  diskulator_select_display_filter(context);
-	  memset(context->directory_plus_filter,0,sizeof(context->directory_plus_filter));
-	  strcpy(context->directory_plus_filter,context->directory);
-	  strcpy(&context->directory_plus_filter[strlen(context->directory_plus_filter)+1],context->filter);
-	  fuji_sio_open_directory(context->host_slot,context->directory_plus_filter);
-	}
+        {
+          diskulator_select_display_filter(context);
+          memset(context->directory_plus_filter,0,sizeof(context->directory_plus_filter));
+          strcpy(context->directory_plus_filter,context->directory);
+          strcpy(&context->directory_plus_filter[strlen(context->directory_plus_filter)+1],context->filter);
+          fuji_sio_open_directory(context->host_slot,context->directory_plus_filter);
+        }
       else
-	fuji_sio_open_directory(context->host_slot,context->directory);
+        fuji_sio_open_directory(context->host_slot,context->directory);
 
       if (fuji_sio_error())
-	retry--;
+        retry--;
       else
-	break;
+        break;
     }
-  
+
   if (fuji_sio_error())
     {
       error(ERROR_OPENING_DIRECTORY);
@@ -184,11 +184,11 @@ void diskulator_select_display_directory_page(Context* context)
       fuji_sio_set_directory_position(pos);
 
       if (fuji_sio_error())
-	retry--;
+        retry--;
       else
-	break;
+        break;
     }
-  
+
   if (fuji_sio_error() && pos!=0)
     {
       error(ERROR_SETTING_DIRECTORY_POSITION);
@@ -196,35 +196,35 @@ void diskulator_select_display_directory_page(Context* context)
       context->state=DISKULATOR_HOSTS;
       return;
     }
-  
+
   for (i=0;i<DIRECTORY_LIST_ENTRIES_PER_PAGE;i++)
     {
       retry=5;
 
       while (retry>0)
-	{
-	  fuji_sio_read_directory(displayed_entry,DIRECTORY_LIST_SCREEN_WIDTH);
+        {
+          fuji_sio_read_directory(displayed_entry,DIRECTORY_LIST_SCREEN_WIDTH);
 
-	  if (fuji_sio_error())
-	    retry--;
-	  else
-	    break;
-	}
-      
+          if (fuji_sio_error())
+            retry--;
+          else
+            break;
+        }
+
       if (fuji_sio_error())
-	{
-	  error(ERROR_READING_DIRECTORY);
-	  wait_a_moment();
-	  context->state=DISKULATOR_HOSTS;
-	  return;
-	}
+        {
+          error(ERROR_READING_DIRECTORY);
+          wait_a_moment();
+          context->state=DISKULATOR_HOSTS;
+          return;
+        }
 
       context->entry_widths[i]=strlen(displayed_entry);
 
       if (!diskulator_select_display_directory_entry(i,displayed_entry,context))
-	break;
+        break;
     }
-    
+
   fuji_sio_close_directory(context->host_slot);
   context->entries_displayed=i;
 
@@ -247,23 +247,23 @@ void diskulator_select_handle_return(unsigned char i, Context* context, SubState
 {
   unsigned short pos;
   unsigned char retry=5;
-  
+
   if (context->entries_displayed==0)
     return;
 
   while (retry>0)
     {
       if (context->filter[0]==0x00)
-	fuji_sio_open_directory(context->host_slot,context->directory);
+        fuji_sio_open_directory(context->host_slot,context->directory);
       else
-	fuji_sio_open_directory(context->host_slot,context->directory_plus_filter);
+        fuji_sio_open_directory(context->host_slot,context->directory_plus_filter);
 
       if (fuji_sio_error())
-	retry--;
+        retry--;
       else
-	break;
+        break;
     }
-  
+
   if (fuji_sio_error())
     {
       error(ERROR_OPENING_DIRECTORY);
@@ -280,11 +280,11 @@ void diskulator_select_handle_return(unsigned char i, Context* context, SubState
     {
       fuji_sio_set_directory_position(pos);
       if (fuji_sio_error())
-	retry--;
+        retry--;
       else
-	break;
+        break;
     }
-  
+
   if (fuji_sio_error() && pos != 0)
     {
       error(ERROR_SETTING_DIRECTORY_POSITION);
@@ -299,11 +299,11 @@ void diskulator_select_handle_return(unsigned char i, Context* context, SubState
     {
       fuji_sio_read_directory(context->filename,DIRECTORY_LIST_FULL_WIDTH);
       if (fuji_sio_error())
-	retry--;
+        retry--;
       else
-	break;
+        break;
     }
-  
+
   if (fuji_sio_error())
     {
       error(ERROR_READING_DIRECTORY);
@@ -313,7 +313,7 @@ void diskulator_select_handle_return(unsigned char i, Context* context, SubState
     }
 
   fuji_sio_close_directory(context->host_slot);
-  
+
   // Handle if this is a directory
   if (context->filename[strlen(context->filename)-1]=='/')
     {
@@ -336,18 +336,18 @@ void diskulator_select_handle_page_nav(unsigned char k, unsigned char i, Context
 {
   if (context->entries_displayed==0)
     return;
-  
+
   switch(k)
     {
     case '-':
     case 0x1C:
       if (i==0 && context->dir_page > 0)
-	*ss=PREV_PAGE;
+        *ss=PREV_PAGE;
       break;
     case '=':
     case 0x1D:
       if (i==DIRECTORY_LIST_ENTRIES_PER_PAGE-1 && context->dir_eof == false)
-	*ss=NEXT_PAGE;
+        *ss=NEXT_PAGE;
       break;
     }
 }
@@ -377,7 +377,7 @@ void diskulator_select_devance_directory(Context* context)
 void diskulator_select_new_disk(Context* context, SubState* ss)
 {
   char tmp_str[8];
-  
+
   screen_clear_line(20);
   screen_clear_line(21);
   screen_dlist_diskulator_select_aux();
@@ -396,16 +396,16 @@ void diskulator_select_new_disk(Context* context, SubState* ss)
 
   screen_clear_line(20);
   screen_clear_line(21);
-  
-  screen_puts(0, 20, "Size?\xD9\x91\x19"
-	      "90K  \xD9\x92\x19"
-	      "130K  \xD9\x93\x19"
-	      "180K  \xD9\x94\x19"
-	      "360K  ");
-  screen_puts(0, 21, "     \xD9\x95\x19"
-	      "720K \xD9\x96\x19"
-	      "1440K \xD9\x97\x19"
-	      "Custom");
+
+  screen_puts(0, 20, "Size?"
+              CH_KEY_LABEL_L CH_INV_1 CH_KEY_LABEL_R "90K  "
+              CH_KEY_LABEL_L CH_INV_2 CH_KEY_LABEL_R "130K  "
+              CH_KEY_LABEL_L CH_INV_3 CH_KEY_LABEL_R "180K  "
+              CH_KEY_LABEL_L CH_INV_4 CH_KEY_LABEL_R "360K  ");
+  screen_puts(5, 21,
+              CH_KEY_LABEL_L CH_INV_5 CH_KEY_LABEL_R "720K "
+              CH_KEY_LABEL_L CH_INV_6 CH_KEY_LABEL_R "1440K "
+              CH_KEY_LABEL_L CH_INV_7 CH_KEY_LABEL_R "Custom");
 
   memset(tmp_str,0,sizeof(tmp_str));
   screen_input(32,21,tmp_str);
@@ -439,7 +439,7 @@ void diskulator_select_new_disk(Context* context, SubState* ss)
     case '7':
       screen_clear_line(20);
       screen_clear_line(21);
-      
+
       memset(tmp_str,0,sizeof(tmp_str));
       screen_puts(0,20,"# Sectors?");
       screen_input(12,20,tmp_str);
@@ -486,16 +486,16 @@ void diskulator_select_show_full_filename(Context *context, unsigned char i)
   while (retry>0)
     {
       if (context->filter[0]!=0x00)
-	fuji_sio_open_directory(context->host_slot,context->directory_plus_filter);
+        fuji_sio_open_directory(context->host_slot,context->directory_plus_filter);
       else
-	fuji_sio_open_directory(context->host_slot,context->directory);
+        fuji_sio_open_directory(context->host_slot,context->directory);
 
       if (fuji_sio_error())
-	retry--;
+        retry--;
       else
-	break;
+        break;
     }
-  
+
   if (fuji_sio_error())
     {
       error(ERROR_OPENING_DIRECTORY);
@@ -511,11 +511,11 @@ void diskulator_select_show_full_filename(Context *context, unsigned char i)
       fuji_sio_set_directory_position((context->dir_page*DIRECTORY_LIST_ENTRIES_PER_PAGE)+i);
 
       if (fuji_sio_error())
-	retry--;
+        retry--;
       else
-	break;
+        break;
     }
-  
+
   if (fuji_sio_error())
     {
       error(ERROR_SETTING_DIRECTORY_POSITION);
@@ -531,11 +531,11 @@ void diskulator_select_show_full_filename(Context *context, unsigned char i)
       fuji_sio_read_directory(context->filename,DIRECTORY_LIST_FULL_WIDTH);
 
       if (fuji_sio_error())
-	retry--;
+        retry--;
       else
-	break;
+        break;
     }
-  
+
   if (fuji_sio_error())
     {
       error(ERROR_READING_DIRECTORY);
@@ -549,7 +549,7 @@ void diskulator_select_show_full_filename(Context *context, unsigned char i)
   screen_clear_line(19);
   screen_clear_line(20);
   screen_clear_line(21);
-  
+
   screen_puts(0,19,context->filename);
 }
 
@@ -561,86 +561,86 @@ void diskulator_select_select_file(Context* context, SubState* ss)
   unsigned char k=0;  // Key to process
   unsigned char i=0;  // cursor on page
   bool long_filename_displayed=false;
-  
+
   diskulator_select_display_directory_page(context);
 
   bar_show(DIRECTORY_LIST_Y_OFFSET+1);
-  
+
   while (*ss==SELECT_FILE)
     {
-      k=input_handle_key(); 
+      k=input_handle_key();
       diskulator_select_handle_page_nav(k,i,context,ss);
-      
+
       if (context->entries_displayed>0)
-	input_handle_nav_keys(k,DIRECTORY_LIST_Y_OFFSET+1,context->entries_displayed,&i);
+        input_handle_nav_keys(k,DIRECTORY_LIST_Y_OFFSET+1,context->entries_displayed,&i);
 
       if (input_handle_console_keys() == 0x03)
-	{
-	  *ss=DONE;
-	  context->state = MOUNT_AND_BOOT;
-	}
+        {
+          *ss=DONE;
+          context->state = MOUNT_AND_BOOT;
+        }
 
       // Clear file area if we move cursor
       if (k>0)
-	diskulator_select_clear_file_area();
-      
+        diskulator_select_clear_file_area();
+
       // See if we need to display a long filename
       if ((context->entry_widths[i]>DIRECTORY_LIST_SCREEN_WIDTH-2) &&
-	  (OS.rtclok[2]>DIRECTORY_LIST_SHOW_FULL_FILENAME_DELAY) &&
-	  (long_filename_displayed==false))
-	{
-	  diskulator_select_clear_file_area();
-	  diskulator_select_show_full_filename(context,i);
-	  long_filename_displayed=true;
-	}
-      
+          (OS.rtclok[2]>DIRECTORY_LIST_SHOW_FULL_FILENAME_DELAY) &&
+          (long_filename_displayed==false))
+        {
+          diskulator_select_clear_file_area();
+          diskulator_select_show_full_filename(context,i);
+          long_filename_displayed=true;
+        }
+
       switch(k)
-	{
-	case '=':
-	case '-':
-	case 0x1C:
-	case 0x1D:
-	  long_filename_displayed=false;
-	  break;
-	case 0x9B:
-	  diskulator_select_handle_return(i,context,ss);
-	  break;
-	case '<':
-	case 0x43: // PgUp
-	  if (context->dir_page > 0)
-	    *ss=PREV_PAGE;
-	  break;
-	case '>': 
-	case 0x44: // PgDn
-	  if (!context->dir_eof)
-	    *ss=NEXT_PAGE;
-	  break;
-	case 0x1B:
-	  *ss=DONE;
-	  context->dir_page=0;
-	  context->state=DISKULATOR_HOSTS;
-	  break;
-	case 0x7E:
-	  *ss=DEVANCE_DIR;
-	  context->dir_page=0;
-	  break;
-	case 'b':
-	case 'B':
-	  *ss=DONE;
-	  context->state = MOUNT_AND_BOOT;
-	  break;
-	case 'N':
-	case 'n':
-	  diskulator_select_new_disk(context,ss);
-	  break;
-	case 'F':
-	case 'f':
-	  diskulator_select_set_filter(context,ss);
-	  break;
-	}
+        {
+        case '=':
+        case '-':
+        case 0x1C:
+        case 0x1D:
+          long_filename_displayed=false;
+          break;
+        case 0x9B:
+          diskulator_select_handle_return(i,context,ss);
+          break;
+        case '<':
+        case 0x43: // PgUp
+          if (context->dir_page > 0)
+            *ss=PREV_PAGE;
+          break;
+        case '>':
+        case 0x44: // PgDn
+          if (!context->dir_eof)
+            *ss=NEXT_PAGE;
+          break;
+        case 0x1B:
+          *ss=DONE;
+          context->dir_page=0;
+          context->state=DISKULATOR_HOSTS;
+          break;
+        case 0x7E:
+          *ss=DEVANCE_DIR;
+          context->dir_page=0;
+          break;
+        case 'b':
+        case 'B':
+          *ss=DONE;
+          context->state = MOUNT_AND_BOOT;
+          break;
+        case 'N':
+        case 'n':
+          diskulator_select_new_disk(context,ss);
+          break;
+        case 'F':
+        case 'f':
+          diskulator_select_set_filter(context,ss);
+          break;
+        }
     }
 }
-  
+
 /**
  * Setup Diskulator Disk Images screen
  */
@@ -654,10 +654,14 @@ void diskulator_select_setup(Context *context)
     strcpy(context->directory,"/");
 
   context->newDisk = false;
-  
+
   screen_puts(4, 0, "DISK IMAGES");
 
-  screen_puts(0,22,"" "\xd9" "\xAE" "\x19" "ew" "\xd9" "\xA6" "\x19" "ilter" "\xd9" "\xA4\xA5\xAC\xA5\xB4\xA5" "\x19" "Up Dir" "\xd9" "\xAF\xB0\xB4\xA9\xAF\xAE" "\x19" "Boot");
+  screen_puts(0,22,
+      CH_KEY_LABEL_L CH_INV_N CH_KEY_LABEL_R "ew"
+      CH_KEY_LABEL_L CH_INV_F CH_KEY_LABEL_R "ilter"
+      CH_KEY_DELETE "Up Dir"
+      CH_KEY_OPTION "Boot");
   diskulator_select_display_directory_path(context);
 }
 
@@ -671,34 +675,34 @@ State diskulator_select(Context *context)
   diskulator_select_setup(context);
 
   while (ss != DONE)
-    {      
+    {
       switch(ss)
-	{
-	case SELECT_FILE:
-	  diskulator_select_select_file(context,&ss);
-	  break;
-	case PREV_PAGE:
-	  context->dir_page--;
-	  ss=SELECT_FILE;
-	  break;
-	case NEXT_PAGE:
-	  context->dir_page++;
-	  ss=SELECT_FILE;
-	  break;
-	case ADVANCE_DIR:
-	  context->dir_page=0;
-	  context->dir_eof=false;
-	  ss=SELECT_FILE;
-	  break;
-	case DEVANCE_DIR:
-	  diskulator_select_devance_directory(context);
-	  diskulator_select_display_directory_path(context);
-	  context->dir_page=0;
-	  context->dir_eof=false;
-	  ss=SELECT_FILE;
-	  break;
-	}
+        {
+        case SELECT_FILE:
+          diskulator_select_select_file(context,&ss);
+          break;
+        case PREV_PAGE:
+          context->dir_page--;
+          ss=SELECT_FILE;
+          break;
+        case NEXT_PAGE:
+          context->dir_page++;
+          ss=SELECT_FILE;
+          break;
+        case ADVANCE_DIR:
+          context->dir_page=0;
+          context->dir_eof=false;
+          ss=SELECT_FILE;
+          break;
+        case DEVANCE_DIR:
+          diskulator_select_devance_directory(context);
+          diskulator_select_display_directory_path(context);
+          context->dir_page=0;
+          context->dir_eof=false;
+          ss=SELECT_FILE;
+          break;
+        }
     }
-  
+
   return context->state;
 }

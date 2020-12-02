@@ -35,14 +35,14 @@ void diskulator_hosts_display_host_slots(HostSlots *hs)
     {
       unsigned char n = i + 1;
       unsigned char ni[2];
-      
+
       utoa(n, ni, 10);
       screen_puts(2, i + 1, ni);
-      
+
       if (hs->host[i][0] != 0x00)
-	screen_puts(5, i + 1, hs->host[i]);
+        screen_puts(5, i + 1, hs->host[i]);
       else
-	screen_puts(5, i + 1, text_empty);
+        screen_puts(5, i + 1, text_empty);
     }
 }
 
@@ -57,29 +57,29 @@ void diskulator_hosts_display_device_slots(unsigned char y, DeviceSlots *ds)
   for (i = 0; i < 8; i++)
     {
       unsigned char d[6];
-      
+
       d[1] = 0x20;
       d[2] = 0x31 + i;
       d[4] = 0x20;
       d[5] = 0x00;
-      
+
       if (ds->slot[i].file[0] != 0x00)
         {
-	  d[0] = ds->slot[i].hostSlot + 0x31;
-	  d[3] = (ds->slot[i].mode == 0x02 ? 'W' : 'R');
+          d[0] = ds->slot[i].hostSlot + 0x31;
+          d[3] = (ds->slot[i].mode == 0x02 ? 'W' : 'R');
         }
       else
         {
-	  d[0] = 0x20;
-	  d[3] = 0x20;
+          d[0] = 0x20;
+          d[3] = 0x20;
         }
-      
+
       screen_puts(0, i + y, d);
-      
+
       if (ds->slot[i].file[0] != 0x00)
-	screen_puts(5,i+y,ds->slot[i].file);
+        screen_puts(5,i+y,ds->slot[i].file);
       else
-	screen_puts(5,i+y,text_empty);
+        screen_puts(5,i+y,text_empty);
     }
 }
 
@@ -90,8 +90,14 @@ void diskulator_hosts_keys_hosts(void)
 {
   screen_clear_line(20);
   screen_clear_line(21);
-  screen_puts(0,20,"\xD9" "\x91\x8d\x98\x19Slot\xD9" "\xA5" "\x19" "dit Slot\xD9\xB2\xA5\xB4\xB5\xB2\xAE\x19Select Files");
-  screen_puts(2,21,"\xD9" "\xA3" "\x19" "onfig" "\xD9" "\xB4\xA1\xA2" "\x19" "Drive Slots" "\xD9" "\xAF\xB0\xB4\xA9\xAF\xAE" "\x19" "Boot");
+  screen_puts(0,20,
+      CH_KEY_1TO8 "Slot"
+      CH_KEY_LABEL_L CH_INV_E CH_KEY_LABEL_R "dit Slot"
+      CH_KEY_RETURN "Select Files");
+  screen_puts(2,21,
+      CH_KEY_LABEL_L CH_INV_C CH_KEY_LABEL_R "onfig"
+      CH_KEY_TAB "Drive Slots"
+      CH_KEY_OPTION "Boot");
 }
 
 /**
@@ -101,8 +107,14 @@ void diskulator_hosts_keys_devices(void)
 {
   screen_clear_line(20);
   screen_clear_line(21);
-  screen_puts(0,20,"\xD9""\x91\x8d\x98\x19Slot\xD9""\xA5\x19ject slot\xD9""\xA3\x19onfiguration");
-  screen_puts(3,21,"\xD9\xB4\xA1\xA2\x19Host Slots \xD9\xB2\x19""ead \xD9\xB7\x19rite");
+  screen_puts(0,20,
+    CH_KEY_1TO8 "Slot"
+    CH_KEY_LABEL_L CH_INV_E CH_KEY_LABEL_R "ject slot"
+    CH_KEY_LABEL_L CH_INV_C CH_KEY_LABEL_R "onfiguration");
+  screen_puts(3,21,
+    CH_KEY_TAB "Host Slots "
+    CH_KEY_LABEL_L CH_INV_R CH_KEY_LABEL_R "ead "
+    CH_KEY_LABEL_L CH_INV_W CH_KEY_LABEL_R "rite");
 }
 
 /**
@@ -111,27 +123,27 @@ void diskulator_hosts_keys_devices(void)
 void diskulator_hosts_setup(HostSlots *hs, DeviceSlots *ds)
 {
   unsigned char retry=5;
-  
+
   screen_dlist_diskulator_hosts();
-  
+
   screen_puts(3, 0, "TNFS HOST LIST");
   screen_puts(24, 9, "DRIVE SLOTS");
 
   while (retry>0)
     {
       fuji_sio_read_host_slots(hs);
-      
+
       if (fuji_sio_error())
-	retry--;
+        retry--;
       else
-	break;
+        break;
     }
 
   if (fuji_sio_error())
     error_fatal(ERROR_READING_HOST_SLOTS);
 
   retry=5;
-  
+
   diskulator_hosts_display_host_slots(hs);
 
   while (retry>0)
@@ -139,18 +151,18 @@ void diskulator_hosts_setup(HostSlots *hs, DeviceSlots *ds)
       fuji_sio_read_device_slots(ds);
 
       if (fuji_sio_error())
-	retry--;
+        retry--;
       else
-	break;
+        break;
     }
-  
+
   if (fuji_sio_error())
     error_fatal(ERROR_READING_DEVICE_SLOTS);
-  
+
   diskulator_hosts_display_device_slots(11,ds);
 
   diskulator_hosts_keys_hosts();
-  
+
   bar_show(2);
 }
 
@@ -181,7 +193,7 @@ void diskulator_hosts_handle_jump_keys(unsigned char k,unsigned char *i, SubStat
 void diskulator_hosts_handle_nav_keys(unsigned char k, unsigned char *i, SubState *new_substate)
 {
   unsigned char o;
-  
+
   if (*new_substate==DEVICES)
     o=ORIGIN_DEVICE_SLOTS;
   else
@@ -216,12 +228,12 @@ void diskulator_hosts_eject_device_slot(unsigned char i, unsigned char pos, Devi
   char tmp[2]={0,0};
 
   tmp[0]=i+'1'; // string denoting now ejected device slot.
-  
+
   fuji_sio_umount_device(i);
   memset(ds->slot[i].file,0,sizeof(ds->slot[i].file));
   ds->slot[i].hostSlot=0xFF;
   fuji_sio_write_device_slots(ds);
-  
+
   screen_clear_line((i+pos-2));
   screen_puts(2,(i+pos-2),tmp);
   screen_puts(5,(i+pos-2),text_empty);
@@ -237,7 +249,7 @@ void diskulator_hosts_set_device_slot_mode(unsigned char i, unsigned char mode, 
   unsigned char *full_path;
 
   full_path=(unsigned char *)malloc(256);
-  
+
   // temporarily stash current values.
   tmp_hostSlot=ds->slot[i].hostSlot;
   memcpy(tmp_file,ds->slot[i].file,FILE_MAXLEN);
@@ -251,7 +263,7 @@ void diskulator_hosts_set_device_slot_mode(unsigned char i, unsigned char mode, 
   ds->slot[i].mode=mode;
   memcpy(ds->slot[i].file,tmp_file,FILE_MAXLEN);
   fuji_sio_set_filename_for_device_slot(i,full_path);
-  
+
   fuji_sio_write_device_slots(ds);
   fuji_sio_mount_device(i,mode);
 
@@ -288,58 +300,58 @@ void diskulator_hosts_hosts(Context *context, SubState *new_substate)
   while (*new_substate==HOSTS)
     {
       if (input_handle_console_keys() == 0x03)
-	{
-	  *new_substate=DONE;
-	  context->state = MOUNT_AND_BOOT;
-	}
+        {
+          *new_substate=DONE;
+          context->state = MOUNT_AND_BOOT;
+        }
 
       k=input_handle_key();
       diskulator_hosts_handle_jump_keys(k,&i,new_substate);
       diskulator_hosts_handle_nav_keys(k,&i,new_substate);
-      
-      switch(k)
-	{
-	case 0x7F:
-	  i=0;
-	  *new_substate = DEVICES;
-	  diskulator_hosts_keys_devices();
-	  bar_show(i+ORIGIN_DEVICE_SLOTS);
-	  break;
-	case 'B':
-	case 'b':
-	  *new_substate=DONE;
-	  context->state = MOUNT_AND_BOOT;
-	  break;
-	case 'C':
-	case 'c':
-	  context->state=DISKULATOR_INFO;
-	  *new_substate=DONE;
-	  break;
-	case 'E':
-	case 'e':
-	  diskulator_hosts_edit_host_slot(i,&context->hostSlots);
-	  break;
-	case 0x9b: // RETURN
-	  if (context->hostSlots.host[i][0]==0x00) // empty host slot?
-	    break; // do nothing
-	  
-	  context->state=DISKULATOR_SELECT;
-	  context->host_slot=i;
-	  fuji_sio_mount_host(context->host_slot,&context->hostSlots);
-	  
-	  if (fuji_sio_error())
-	    {
-	      error(ERROR_MOUNTING_HOST_SLOT);
-	      wait_a_moment();
-	      context->state=CONNECT_WIFI;
-	      *new_substate=DONE;
-	      return;
-	    }
-	  else
-	    *new_substate=DONE;
 
-	  break;
-	}
+      switch(k)
+        {
+        case 0x7F:
+          i=0;
+          *new_substate = DEVICES;
+          diskulator_hosts_keys_devices();
+          bar_show(i+ORIGIN_DEVICE_SLOTS);
+          break;
+        case 'B':
+        case 'b':
+          *new_substate=DONE;
+          context->state = MOUNT_AND_BOOT;
+          break;
+        case 'C':
+        case 'c':
+          context->state=DISKULATOR_INFO;
+          *new_substate=DONE;
+          break;
+        case 'E':
+        case 'e':
+          diskulator_hosts_edit_host_slot(i,&context->hostSlots);
+          break;
+        case 0x9b: // RETURN
+          if (context->hostSlots.host[i][0]==0x00) // empty host slot?
+            break; // do nothing
+
+          context->state=DISKULATOR_SELECT;
+          context->host_slot=i;
+          fuji_sio_mount_host(context->host_slot,&context->hostSlots);
+
+          if (fuji_sio_error())
+            {
+              error(ERROR_MOUNTING_HOST_SLOT);
+              wait_a_moment();
+              context->state=CONNECT_WIFI;
+              *new_substate=DONE;
+              return;
+            }
+          else
+            *new_substate=DONE;
+
+          break;
+        }
     }
 }
 
@@ -354,40 +366,40 @@ void diskulator_hosts_devices(Context *context, SubState *new_substate)
   while (*new_substate==DEVICES)
     {
       if (input_handle_console_keys() == 0x03)
-	{
-	  *new_substate=DONE;
-	  context->state = MOUNT_AND_BOOT;
-	}
+        {
+          *new_substate=DONE;
+          context->state = MOUNT_AND_BOOT;
+        }
       k=input_handle_key();
       diskulator_hosts_handle_jump_keys(k,&i,new_substate);
       diskulator_hosts_handle_nav_keys(k,&i,new_substate);
-      
+
       switch(k)
-	{
-	case 'C':
-	case 'c':
-	  context->state=DISKULATOR_INFO;
-	  *new_substate=DONE;
-	  break;
-	case 'E':
-	case 'e':
-	  diskulator_hosts_eject_device_slot(i,ORIGIN_DEVICE_SLOTS,&context->deviceSlots);
-	  break;
-	case 0x7F:
-	  i=0;
-	  *new_substate = HOSTS;
-	  diskulator_hosts_keys_hosts();
-	  bar_show(i+ORIGIN_HOST_SLOTS);
-	  break;
-	case 'R':
-	case 'r':
-	  diskulator_hosts_set_device_slot_mode(i,MODE_READ,&context->deviceSlots);
-	  break;
-	case 'W':
-	case 'w':
-	  diskulator_hosts_set_device_slot_mode(i,MODE_WRITE,&context->deviceSlots);
-	  break;
-	}
+        {
+        case 'C':
+        case 'c':
+          context->state=DISKULATOR_INFO;
+          *new_substate=DONE;
+          break;
+        case 'E':
+        case 'e':
+          diskulator_hosts_eject_device_slot(i,ORIGIN_DEVICE_SLOTS,&context->deviceSlots);
+          break;
+        case 0x7F:
+          i=0;
+          *new_substate = HOSTS;
+          diskulator_hosts_keys_hosts();
+          bar_show(i+ORIGIN_HOST_SLOTS);
+          break;
+        case 'R':
+        case 'r':
+          diskulator_hosts_set_device_slot_mode(i,MODE_READ,&context->deviceSlots);
+          break;
+        case 'W':
+        case 'w':
+          diskulator_hosts_set_device_slot_mode(i,MODE_WRITE,&context->deviceSlots);
+          break;
+        }
     }
 }
 
@@ -407,22 +419,22 @@ void diskulator_hosts_clear_file_context(Context *context)
 State diskulator_hosts(Context *context)
 {
   SubState ss=HOSTS;
-    
+
   diskulator_hosts_setup(&context->hostSlots,&context->deviceSlots);
   diskulator_hosts_clear_file_context(context);
-  
+
   while (ss != DONE)
     {
       switch(ss)
-      	{
-      	case HOSTS:
-      	  diskulator_hosts_hosts(context,&ss);
-      	  break;
-      	case DEVICES:
-      	  diskulator_hosts_devices(context,&ss);
-      	  break;
-      	}
+              {
+              case HOSTS:
+                diskulator_hosts_hosts(context,&ss);
+                break;
+              case DEVICES:
+                diskulator_hosts_devices(context,&ss);
+                break;
+              }
     }
-  
+
   return context->state;
 }

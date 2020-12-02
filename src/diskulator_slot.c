@@ -28,19 +28,23 @@ typedef enum _substate
  * Setup for Slot screen
  */
 void diskulator_slot_setup(Context* context)
-{  
+{
   screen_dlist_diskulator_slot();
 
-  screen_puts(0,22,"" "\xd9" "\x91\x8d\x98" "\x19" "Slot" "\xd9" "\xB2\xA5\xB4\xB5\xB2\xAE" "\x19" "Select" "\xd9" "\xA5" "\x19" "ject" "\xd9" "\xA5\xB3\xA3" "\x19" "Abort");
+  screen_puts(0,22,
+      CH_KEY_1TO8 "Slot"
+      CH_KEY_RETURN "Select"
+      CH_KEY_LABEL_L CH_INV_E CH_KEY_LABEL_R "ject"
+      CH_KEY_ESC "Abort");
 
   screen_puts(0,19,context->filename);
 
   screen_puts(0,0,"MOUNT TO DRIVE SLOT");
-  
+
   fuji_sio_read_device_slots(&context->deviceSlots);
   if (fuji_sio_error())
     error_fatal(ERROR_READING_DEVICE_SLOTS);
-  
+
   diskulator_hosts_display_device_slots(2,&context->deviceSlots);
   bar_show(3);
 }
@@ -59,32 +63,32 @@ void diskulator_slot_select(Context *context, SubState *ss)
       input_handle_nav_keys(k,3,8,&i);
 
       switch(k)
-	{
-	case 'E':
-	case 'e':
-	  diskulator_hosts_eject_device_slot(i,4,&context->deviceSlots);
-	  break;
-	case 0x1B:
-	  *ss=DONE;
-	  context->state=DISKULATOR_SELECT;
-	  break;
-	case 0x9B:
-	  context->device_slot=i;
-	  *ss=(context->newDisk==true ? CREATE_DISK : SELECT_MODE);
-	  break;
-	case '1':
-	case '2':
-	case '3':
-	case '4':
-	case '5':
-	case '6':
-	case '7':
-	case '8':
-	  i=k-=0x31;
-	  bar_show(i+3);
-	default:
-	  break;
-	}
+        {
+        case 'E':
+        case 'e':
+          diskulator_hosts_eject_device_slot(i,4,&context->deviceSlots);
+          break;
+        case 0x1B:
+          *ss=DONE;
+          context->state=DISKULATOR_SELECT;
+          break;
+        case 0x9B:
+          context->device_slot=i;
+          *ss=(context->newDisk==true ? CREATE_DISK : SELECT_MODE);
+          break;
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case '8':
+          i=k-=0x31;
+          bar_show(i+3);
+        default:
+          break;
+        }
     }
 }
 
@@ -96,11 +100,14 @@ void diskulator_slot_select_mode(Context *context, SubState *ss)
   unsigned char k=0;
   screen_clear_line(21);
 
-  screen_puts(0,22,"" "\xD9" "\xB2\xA5\xB4\xB5\xB2\xAE" "\x19" "Read Only" "\xD9" "\xB7" "\x19" "Read/Write" "\xD9" "\xA5\xB3\xA3" "\x19" "Abort");
-  
+  screen_puts(0,22,
+    CH_KEY_RETURN "Read Only"
+    CH_KEY_LABEL_L CH_INV_W CH_KEY_LABEL_R "Read/Write"
+    CH_KEY_ESC "Abort");
+
   while (k==0)
     k=input_handle_key();
-  
+
   switch (k)
     {
     case 0x1B:
@@ -132,7 +139,7 @@ void diskulator_slot_create_disk(Context *context, SubState *ss)
   strcpy(context->deviceSlots.slot[context->device_slot].file, context->directory);
   strcat(context->deviceSlots.slot[context->device_slot].file, context->filename);
   fuji_sio_new_disk(context->device_slot,context->newDisk_ns,context->newDisk_sz,&context->deviceSlots);
-  
+
   if (fuji_sio_error())
     {
       error(ERROR_CREATING_NEW_DISK);
@@ -140,7 +147,7 @@ void diskulator_slot_create_disk(Context *context, SubState *ss)
       context->state=DISKULATOR_SELECT;
       return;
     }
-  
+
   context->mode = 0x02; // R/W
 
   *ss=COMMIT_SLOT;
@@ -197,24 +204,24 @@ State diskulator_slot(Context *context)
   while (ss != DONE)
     {
       switch(ss)
-	{
-	case SELECT_SLOT:
-	  diskulator_slot_select(context,&ss);
-	  break;
-	case SELECT_MODE:
-	  diskulator_slot_select_mode(context,&ss);
-	  break;
-	case COMMIT_SLOT:
-	  diskulator_slot_commit(context,&ss);
-	  break;
-	case CREATE_DISK:
-	  diskulator_slot_create_disk(context,&ss);
-	  break;
-	case DONE:
-	  context->state = DISKULATOR_HOSTS;
-	  break;
-	}
+        {
+        case SELECT_SLOT:
+          diskulator_slot_select(context,&ss);
+          break;
+        case SELECT_MODE:
+          diskulator_slot_select_mode(context,&ss);
+          break;
+        case COMMIT_SLOT:
+          diskulator_slot_commit(context,&ss);
+          break;
+        case CREATE_DISK:
+          diskulator_slot_create_disk(context,&ss);
+          break;
+        case DONE:
+          context->state = DISKULATOR_HOSTS;
+          break;
+        }
     }
-  
+
   return context->state;
 }
