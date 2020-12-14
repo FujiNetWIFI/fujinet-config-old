@@ -15,6 +15,7 @@
 #include "bar.h"
 
 char text_empty[]="Empty";
+char fn[256];
 
 typedef enum _substate
   {
@@ -52,14 +53,17 @@ void diskulator_hosts_display_host_slots(HostSlots *hs)
 void diskulator_hosts_display_device_slots(unsigned char y, DeviceSlots *ds)
 {
   unsigned char i;
+  unsigned char d[6];
+
+  // Get full filename for device slot 8
+  if (ds->slot[7].file[0]!=0x00)
+    fuji_sio_get_filename_for_device_slot(7,fn);
 
   // Display device slots
   for (i = 0; i < 8; i++)
     {
-      unsigned char d[6];
-
       d[1] = 0x20;
-      d[2] = 0x31 + i;
+      d[2] = (i==7 && strstr(fn,".cas") != NULL) ? 'C' : (0x31 + i);
       d[4] = 0x20;
       d[5] = 0x00;
 
@@ -80,7 +84,7 @@ void diskulator_hosts_display_device_slots(unsigned char y, DeviceSlots *ds)
         screen_puts(5,i+y,ds->slot[i].file);
       else
         screen_puts(5,i+y,text_empty);
-    }
+    }    
 }
 
 /**
