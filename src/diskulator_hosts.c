@@ -250,14 +250,11 @@ void diskulator_hosts_set_device_slot_mode(unsigned char i, unsigned char mode, 
 {
   unsigned char tmp_hostSlot;
   unsigned char tmp_file[FILE_MAXLEN];
-  unsigned char *full_path;
-
-  full_path=(unsigned char *)malloc(256);
-
+ 
   // temporarily stash current values.
   tmp_hostSlot=ds->slot[i].hostSlot;
   memcpy(tmp_file,ds->slot[i].file,FILE_MAXLEN);
-  fuji_sio_get_filename_for_device_slot(i,full_path);
+  fuji_sio_get_filename_for_device_slot(i,fn);
 
   // Unmount slot
   fuji_sio_umount_device(i);
@@ -266,7 +263,7 @@ void diskulator_hosts_set_device_slot_mode(unsigned char i, unsigned char mode, 
   ds->slot[i].hostSlot=tmp_hostSlot;
   ds->slot[i].mode=mode;
   memcpy(ds->slot[i].file,tmp_file,FILE_MAXLEN);
-  fuji_sio_set_filename_for_device_slot(i,full_path);
+  fuji_sio_set_filename_for_device_slot(i,fn);
 
   fuji_sio_write_device_slots(ds);
   fuji_sio_mount_device(i,mode);
@@ -280,7 +277,7 @@ void diskulator_hosts_set_device_slot_mode(unsigned char i, unsigned char mode, 
       ds->slot[i].hostSlot=tmp_hostSlot;
       ds->slot[i].mode=mode;
       memcpy(ds->slot[i].file,tmp_file,FILE_MAXLEN);
-      fuji_sio_set_filename_for_device_slot(i,full_path);
+      fuji_sio_set_filename_for_device_slot(i,fn);
 
       // Try again.
       fuji_sio_write_device_slots(ds);
@@ -289,8 +286,6 @@ void diskulator_hosts_set_device_slot_mode(unsigned char i, unsigned char mode, 
 
   // And update device slot display.
   diskulator_hosts_display_device_slots(11,ds);
-
-  free(full_path);
 }
 
 /**
