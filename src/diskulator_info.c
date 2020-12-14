@@ -30,7 +30,7 @@ State diskulator_info(Context *context)
   screen_puts(0, 4, "  #FUJINET  CONFIG  ");
   screen_puts(7, 15,
           CH_KEY_LABEL_L CH_INV_C CH_KEY_LABEL_R "RECONNECT "
-          CH_KEY_LABEL_L CH_INV_S CH_KEY_LABEL_L "CHANGE SSID");
+          CH_KEY_LABEL_L CH_INV_S CH_KEY_LABEL_R "CHANGE SSID");
   screen_puts(9, 16, "Any other key to return");
   screen_puts(5, 5, "      SSID:");
   screen_puts(5, 6, "  Hostname:");
