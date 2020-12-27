@@ -179,7 +179,7 @@ State set_wifi_select_network(unsigned char numNetworks, Context *context)
   unsigned char k=0;
   unsigned char i=0;
 
-  screen_puts(0,21," SELECT NETWORK, OR "
+  screen_puts(0,21," SELECT NET, S SKIP "
 	           "   ESC TO RE-SCAN   ");
   
   while (true) // Process keys
@@ -187,7 +187,7 @@ State set_wifi_select_network(unsigned char numNetworks, Context *context)
       k=input_handle_key();
       input_handle_nav_keys(k,4,numNetworks,&i);
 
-      if ((k==0x9B) || (k==0x1B))
+      if ((k==0x9B) || (k==0x1B) || (k=='s'))
 	break;
     }
 
@@ -199,6 +199,11 @@ State set_wifi_select_network(unsigned char numNetworks, Context *context)
     {
       // Loop back around again to re-scan.
       new_state = SET_WIFI;
+    }
+  else if (k=='s')
+    {
+      // Skip and go to hosts screen.
+      new_state = DISKULATOR_HOSTS;
     }
   
   return new_state;
