@@ -107,7 +107,7 @@ void diskulator_select_display_clear_page(void)
  */
 void diskulator_select_display_prev_page(void)
 {
-  screen_puts(0,DIRECTORY_LIST_Y_OFFSET-1,CH_KEY_LABEL_L CH_INV_LT CH_KEY_LABEL_R);
+  screen_puts(0,DIRECTORY_LIST_Y_OFFSET-1,CH_KEY_LT);
   screen_puts(3,DIRECTORY_LIST_Y_OFFSET-1,"Previous Page");
 }
 
@@ -116,7 +116,7 @@ void diskulator_select_display_prev_page(void)
  */
 void diskulator_select_display_next_page(void)
 {
-  screen_puts(0,DIRECTORY_LIST_Y_OFFSET+DIRECTORY_LIST_ENTRIES_PER_PAGE,CH_KEY_LABEL_L CH_INV_GT CH_KEY_LABEL_R);
+  screen_puts(0,DIRECTORY_LIST_Y_OFFSET+DIRECTORY_LIST_ENTRIES_PER_PAGE,CH_KEY_GT);
   screen_puts(3,DIRECTORY_LIST_Y_OFFSET+DIRECTORY_LIST_ENTRIES_PER_PAGE,"Next Page");
 }
 
@@ -602,6 +602,7 @@ void diskulator_select_select_file(Context* context, SubState* ss)
         case 0x1D:
           long_filename_displayed=false;
           break;
+	case '*':
         case 0x9B:
           diskulator_select_handle_return(i,context,ss);
           break;
@@ -621,6 +622,7 @@ void diskulator_select_select_file(Context* context, SubState* ss)
           context->state=DISKULATOR_HOSTS;
           break;
         case 0x7E:
+	case '+':
           *ss=DEVANCE_DIR;
           context->dir_page=0;
           break;
@@ -657,11 +659,14 @@ void diskulator_select_setup(Context *context)
 
   screen_puts(4, 0, "DISK IMAGES");
 
+  screen_puts(0,21,
+	      CH_KEY_LEFT CH_KEY_DELETE "Up Dir"
+	      CH_KEY_N "ew"
+	      CH_KEY_F "ilter");
   screen_puts(0,22,
-      CH_KEY_LABEL_L CH_INV_N CH_KEY_LABEL_R "ew"
-      CH_KEY_LABEL_L CH_INV_F CH_KEY_LABEL_R "ilter"
-      CH_KEY_DELETE "Up Dir"
-      CH_KEY_OPTION "Boot");
+      CH_KEY_RIGHT CH_KEY_RETURN "Choose"
+      CH_KEY_OPTION "Boot"
+      CH_KEY_ESC "Abort");
   diskulator_select_display_directory_path(context);
 }
 
