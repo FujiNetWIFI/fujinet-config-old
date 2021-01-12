@@ -84,6 +84,7 @@ State configured(void)
  */
 void setup(Context *context)
 {
+  OS.noclik=0xFF;
   OS.shflok=0;
   OS.color0=0x9f;
   OS.color1=0x0f;
