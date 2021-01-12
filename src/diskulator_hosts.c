@@ -111,14 +111,15 @@ void diskulator_hosts_keys_devices(void)
 {
   screen_clear_line(20);
   screen_clear_line(21);
-  screen_puts(0,20,
+  screen_puts(3,20,
     CH_KEY_1TO8 "Slot"
-    CH_KEY_LABEL_L CH_INV_E CH_KEY_LABEL_R "ject slot"
-    CH_KEY_LABEL_L CH_INV_C CH_KEY_LABEL_R "onfiguration");
+    CH_KEY_LABEL_L CH_INV_E CH_KEY_LABEL_R "ject"
+    CH_KEY_LABEL_L CH_INV_C CH_INV_L CH_INV_E CH_INV_A CH_INV_R CH_KEY_LABEL_R "All Slots");
   screen_puts(3,21,
-    CH_KEY_TAB "Host Slots "
+    CH_KEY_TAB "Hosts"
     CH_KEY_LABEL_L CH_INV_R CH_KEY_LABEL_R "ead "
-    CH_KEY_LABEL_L CH_INV_W CH_KEY_LABEL_R "rite");
+    CH_KEY_LABEL_L CH_INV_W CH_KEY_LABEL_R "rite"
+    CH_KEY_LABEL_L CH_INV_C CH_KEY_LABEL_R "onfig");
 }
 
 /**
