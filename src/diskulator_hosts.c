@@ -331,10 +331,10 @@ void diskulator_hosts_hosts(Context *context, SubState *new_substate)
         case 'e':
           diskulator_hosts_edit_host_slot(i,&context->hostSlots);
           break;
-	case 0x7D: // SHIFT-CLEAR
-	  for (i=0;i<8;i++)
-	    diskulator_hosts_eject_device_slot(i,ORIGIN_DEVICE_SLOTS,&context->deviceSlots);
-	  break;
+        case 0x7D: // SHIFT-CLEAR
+          for (i=0;i<8;i++)
+            diskulator_hosts_eject_device_slot(i,ORIGIN_DEVICE_SLOTS,&context->deviceSlots);
+          break;
         case 0x9b: // RETURN
           if (context->hostSlots.host[i][0]==0x00) // empty host slot?
             break; // do nothing

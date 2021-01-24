@@ -19,6 +19,7 @@
  */
 void connect_wifi_setup(char* ssid)
 {
+  screen_dlist_diskulator_info();
   screen_dlist_wifi();
   screen_puts(0,0,"WELCOME TO #FUJINET! CONNECTING TO NET");
   screen_puts(2,2,ssid);
@@ -37,26 +38,26 @@ State connect_wifi_wait_for_network(NetConfig* n, Context *context)
   rtclr();
 
   while(true)
+  {
+    if ((OS.rtclok[2] & 0x3f) != 0)
+      continue;
+
+    retries++;
+    fuji_sio_get_wifi_status(&wifiStatus);
+
+    if (fuji_sio_error())
+      error_fatal(ERROR_READING_WIFI_STATUS);
+
+    if (retries>40)
     {
-      if ((OS.rtclok[2] & 0x3f) != 0)
-	  continue;
-
-      retries++;
-      fuji_sio_get_wifi_status(&wifiStatus);
-      
-      if (fuji_sio_error())
-	error_fatal(ERROR_READING_WIFI_STATUS);
-
-      if (retries>40)
-	{
-	  wifiStatus=4;
-	  break;
-	}
-      else if (wifiStatus==6) // DISCONNECTED
-	continue;
-      else if (wifiStatus > 0)
-	break;
+      wifiStatus=4;
+      break;
     }
+    else if (wifiStatus==6) // DISCONNECTED
+      continue;
+    else if (wifiStatus > 0)
+      break;
+  }
 
   switch(wifiStatus)
     {
@@ -105,8 +106,16 @@ State connect_wifi(Context *context)
   if (fuji_sio_error())
     error_fatal(ERROR_READING_NET_CONFIG);
   
-  connect_wifi_setup(n.ssid);
-  fuji_sio_set_ssid(false,&n);
+  if (n.ssid[0] == 0)
+  {
+    connect_wifi_setup("NO SSID");
+    return context->state=SET_WIFI;
+  }
+  else
+  {
+    connect_wifi_setup(n.ssid);
+    fuji_sio_set_ssid(false,&n);
+  }
 
   if (fuji_sio_error())
     error_fatal(ERROR_SETTING_SSID);

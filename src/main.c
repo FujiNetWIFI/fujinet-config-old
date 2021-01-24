@@ -28,55 +28,51 @@ unsigned char fontPatch[40]={
 };
 
 void config_dlist=
-  {
-   DL_BLK8,
-   DL_BLK8,
-   DL_BLK8,
-   DL_LMS(DL_CHR20x8x2),
-   DISPLAY_MEMORY,
-
-   DL_CHR20x8x2,
-   DL_CHR40x8x1,
-   DL_CHR40x8x1,
-   DL_CHR40x8x1,
-   DL_CHR40x8x1,
-   DL_CHR40x8x1,
-   DL_CHR40x8x1,
-   DL_CHR40x8x1,
-   DL_CHR40x8x1,
-   DL_CHR40x8x1,
-   DL_CHR40x8x1,
-   DL_CHR40x8x1,
-   DL_CHR40x8x1,
-   DL_CHR40x8x1,
-   DL_CHR40x8x1,
-   DL_CHR40x8x1,
-   DL_CHR40x8x1,
-   DL_CHR40x8x1,
-   DL_CHR40x8x1,
-   DL_CHR40x8x1,
-   DL_CHR40x8x1,
-   DL_CHR20x8x2,
-   DL_CHR20x8x2,   
-   DL_JVB,
-   0x600,
-   0,0,0,0
-  };
+{
+	DL_BLK8,
+	DL_BLK8,
+	DL_BLK8,
+	DL_LMS(DL_CHR20x8x2),
+	DISPLAY_MEMORY,
+	DL_CHR20x8x2,
+	DL_CHR40x8x1,
+	DL_CHR40x8x1,
+	DL_CHR40x8x1,
+	DL_CHR40x8x1,
+	DL_CHR40x8x1,
+	DL_CHR40x8x1,
+	DL_CHR40x8x1,
+	DL_CHR40x8x1,
+	DL_CHR40x8x1,
+	DL_CHR40x8x1,
+	DL_CHR40x8x1,
+	DL_CHR40x8x1,
+	DL_CHR40x8x1,
+	DL_CHR40x8x1,
+	DL_CHR40x8x1,
+	DL_CHR40x8x1,
+	DL_CHR40x8x1,
+	DL_CHR40x8x1,
+	DL_CHR40x8x1,
+	DL_CHR40x8x1,
+	DL_CHR20x8x2,
+	DL_CHR20x8x2,
+	DL_JVB,
+	0x600,
+	0,0,0,0
+};
 
 /**
  * Is device configured?
  */
 State configured(void)
 {
-  NetConfig netConfig;
+	NetConfig netConfig;
 
-  fuji_sio_read_net_config(&netConfig);
+	fuji_sio_read_net_config(&netConfig);
 
-  // WiFi not configured or SELECT to override.
-  if ((GTIA_READ.consol == 5) || netConfig.ssid[0] == '\0')
-    return SET_WIFI;
-  
-  return CONNECT_WIFI;
+	// Skip CONNECT_WIFI and get to the main screen
+	return DISKULATOR_HOSTS;
 }
 
 /**
@@ -84,38 +80,38 @@ State configured(void)
  */
 void setup(Context *context)
 {
-  OS.noclik=0xFF;
-  OS.shflok=0;
-  OS.color0=0x9f;
-  OS.color1=0x0f;
-  OS.color2=0x90;
-  OS.color4=0x90;
-  OS.coldst=1;
-  OS.sdmctl=0; // Turn off screen
-  memcpy((void *)DISPLAY_LIST,&config_dlist,sizeof(config_dlist)); // copy display list to $0600
-  OS.sdlst=(void *)DISPLAY_LIST;                     // and use it.
-  dlist_ptr=(unsigned char *)OS.sdlst;               // Set up the vars for the screen output macros
-  screen_memory=PEEKW(560)+4;
-  video_ptr=(unsigned char*)(PEEKW(screen_memory));
+	OS.noclik=0xFF;
+	OS.shflok=0;
+	OS.color0=0x9f;
+	OS.color1=0x0f;
+	OS.color2=0x90;
+	OS.color4=0x90;
+	OS.coldst=1;
+	OS.sdmctl=0; // Turn off screen
+	memcpy((void *)DISPLAY_LIST,&config_dlist,sizeof(config_dlist)); // copy display list to $0600
+	OS.sdlst=(void *)DISPLAY_LIST;                     // and use it.
+	dlist_ptr=(unsigned char *)OS.sdlst;               // Set up the vars for the screen output macros
+	screen_memory=PEEKW(560)+4;
+	video_ptr=(unsigned char*)(PEEKW(screen_memory));
 
-  // Copy ROM font
-  memcpy((unsigned char *)FONT_MEMORY,(unsigned char *)0xE000,1024);
+	// Copy ROM font
+	memcpy((unsigned char *)FONT_MEMORY,(unsigned char *)0xE000,1024);
 
-  // And patch it.
-  font_ptr=(unsigned char*)FONT_MEMORY;
-  memcpy(&font_ptr[520],&fontPatch,sizeof(fontPatch));
+	// And patch it.
+	font_ptr=(unsigned char*)FONT_MEMORY;
+	memcpy(&font_ptr[520],&fontPatch,sizeof(fontPatch));
 
-  OS.chbas=0x78; // use the charset
-  bar_clear();
-  bar_setup_regs();
-  context_setup(context);
+	OS.chbas=0x78; // use the charset
+	bar_clear();
+	bar_setup_regs();
+	context_setup(context);
 }
 
 void main(void)
 {
-  setup(&context);
+	setup(&context);
 
-  context.state = configured();
-  
-  state(&context); // Never ends.
+	context.state = configured();
+
+	state(&context); // Never ends.
 }

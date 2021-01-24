@@ -40,6 +40,7 @@ void set_wifi_display_mac_address(AdapterConfig *adapterConfig)
  */
 void set_wifi_setup(void)
 {
+  screen_dlist_diskulator_info();
   screen_dlist_wifi();
   screen_puts(0,  0, "WELCOME TO #FUJINET!");
   screen_puts(0, 21, "SCANNING NETWORKS...");
@@ -217,7 +218,7 @@ State set_wifi(Context *context)
   AdapterConfig adapterConfig;
   State new_state = CONNECT_WIFI;
   unsigned char numNetworks;
-  
+
   set_wifi_setup();
   
   fuji_sio_read_adapter_config(&adapterConfig);
