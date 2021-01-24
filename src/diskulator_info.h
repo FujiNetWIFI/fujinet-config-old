@@ -11,6 +11,6 @@
 /**
  * Set wifi State
  */
-State diskulator_info(Context *context);
+State diskulator_info();
 
 #endif /* DISKULATOR_INFO_H */

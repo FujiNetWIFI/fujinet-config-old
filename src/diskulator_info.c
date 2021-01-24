@@ -15,14 +15,14 @@
 /**
  * Connect wifi State
  */
-State diskulator_info(Context *context)
+State diskulator_info(void)
 {
   State new_state = DISKULATOR_HOSTS;
   AdapterConfig ac;
   char k=0;
 
   screen_dlist_diskulator_info();
-
+  
   fuji_sio_read_adapter_config(&ac);
   if (fuji_sio_error())
     error_fatal(ERROR_READING_ADAPTER_CONFIG);

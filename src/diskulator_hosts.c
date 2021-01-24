@@ -27,7 +27,7 @@ typedef enum _substate
 /**
  * Display Hosts Slots
  */
-void diskulator_hosts_display_host_slots(HostSlots *hs)
+void diskulator_hosts_display_host_slots(Context *context)
 {
   unsigned char i;
 
@@ -40,8 +40,8 @@ void diskulator_hosts_display_host_slots(HostSlots *hs)
       utoa(n, ni, 10);
       screen_puts(2, i + 1, ni);
 
-      if (hs->host[i][0] != 0x00)
-        screen_puts(5, i + 1, hs->host[i]);
+      if (context->hostSlots.host[i][0] != 0x00)
+        screen_puts(5, i + 1, context->hostSlots.host[i]);
       else
         screen_puts(5, i + 1, text_empty);
     }
@@ -50,13 +50,13 @@ void diskulator_hosts_display_host_slots(HostSlots *hs)
 /**
  * Display device slots
  */
-void diskulator_hosts_display_device_slots(unsigned char y, DeviceSlots *ds)
+void diskulator_hosts_display_device_slots(unsigned char y, Context *context)
 {
   unsigned char i;
   unsigned char d[6];
 
   // Get full filename for device slot 8
-  if (ds->slot[7].file[0]!=0x00)
+  if (context->deviceSlots.slot[7].file[0]!=0x00)
     fuji_sio_get_filename_for_device_slot(7,fn);
 
   // Display device slots
@@ -67,10 +67,10 @@ void diskulator_hosts_display_device_slots(unsigned char y, DeviceSlots *ds)
       d[4] = 0x20;
       d[5] = 0x00;
 
-      if (ds->slot[i].file[0] != 0x00)
+      if (context->deviceSlots.slot[i].file[0] != 0x00)
         {
-          d[0] = ds->slot[i].hostSlot + 0x31;
-          d[3] = (ds->slot[i].mode == 0x02 ? 'W' : 'R');
+          d[0] = context->deviceSlots.slot[i].hostSlot + 0x31;
+          d[3] = (context->deviceSlots.slot[i].mode == 0x02 ? 'W' : 'R');
         }
       else
         {
@@ -80,8 +80,8 @@ void diskulator_hosts_display_device_slots(unsigned char y, DeviceSlots *ds)
 
       screen_puts(0, i + y, d);
 
-      if (ds->slot[i].file[0] != 0x00)
-        screen_puts(5,i+y,ds->slot[i].file);
+      if (context->deviceSlots.slot[i].file[0] != 0x00)
+        screen_puts(5,i+y,context->deviceSlots.slot[i].file);
       else
         screen_puts(5,i+y,text_empty);
     }    
@@ -125,7 +125,7 @@ void diskulator_hosts_keys_devices(void)
 /**
  * Diskulator hosts setup
  */
-void diskulator_hosts_setup(HostSlots *hs, DeviceSlots *ds)
+void diskulator_hosts_setup(Context *context)
 {
   unsigned char retry=5;
 
@@ -136,7 +136,7 @@ void diskulator_hosts_setup(HostSlots *hs, DeviceSlots *ds)
 
   while (retry>0)
     {
-      fuji_sio_read_host_slots(hs);
+      fuji_sio_read_host_slots(&context->hostSlots);
 
       if (fuji_sio_error())
         retry--;
@@ -149,11 +149,11 @@ void diskulator_hosts_setup(HostSlots *hs, DeviceSlots *ds)
 
   retry=5;
 
-  diskulator_hosts_display_host_slots(hs);
+  diskulator_hosts_display_host_slots(context);
 
   while (retry>0)
     {
-      fuji_sio_read_device_slots(ds);
+      fuji_sio_read_device_slots(&context->deviceSlots);
 
       if (fuji_sio_error())
         retry--;
@@ -164,7 +164,7 @@ void diskulator_hosts_setup(HostSlots *hs, DeviceSlots *ds)
   if (fuji_sio_error())
     error_fatal(ERROR_READING_DEVICE_SLOTS);
 
-  diskulator_hosts_display_device_slots(11,ds);
+  diskulator_hosts_display_device_slots(11,context);
 
   diskulator_hosts_keys_hosts();
 
@@ -210,34 +210,34 @@ void diskulator_hosts_handle_nav_keys(unsigned char k, unsigned char *i, SubStat
 /**
  * Edit a host slot
  */
-void diskulator_hosts_edit_host_slot(unsigned char i, HostSlots* hs)
+void diskulator_hosts_edit_host_slot(unsigned char i, Context *context)
 {
-  if (hs->host[i][0] == 0x00)
+  if (context->hostSlots.host[i][0] == 0x00)
     {
       char tmp[2]={0,0};
       screen_clear_line(i+1);
       tmp[0]=i+0x31;
       screen_puts(2,i+1,tmp);
     }
-  screen_input(4, i+1, hs->host[i]);
-  if (hs->host[i][0] == 0x00)
+  screen_input(4, i+1, context->hostSlots.host[i]);
+  if (context->hostSlots.host[i][0] == 0x00)
     screen_puts(5, i+1, text_empty);
-  fuji_sio_write_host_slots(hs);
+  fuji_sio_write_host_slots(&context->hostSlots);
 }
 
 /**
  * Eject image from device slot
  */
-void diskulator_hosts_eject_device_slot(unsigned char i, unsigned char pos, DeviceSlots* ds)
+void diskulator_hosts_eject_device_slot(unsigned char i, unsigned char pos, Context *context)
 {
   char tmp[2]={0,0};
 
   tmp[0]=i+'1'; // string denoting now ejected device slot.
 
   fuji_sio_umount_device(i);
-  memset(ds->slot[i].file,0,sizeof(ds->slot[i].file));
-  ds->slot[i].hostSlot=0xFF;
-  fuji_sio_write_device_slots(ds);
+  memset(context->deviceSlots.slot[i].file,0,sizeof(context->deviceSlots.slot[i].file));
+  context->deviceSlots.slot[i].hostSlot=0xFF;
+  fuji_sio_write_device_slots(&context->deviceSlots);
 
   screen_clear_line((i+pos-2));
   screen_puts(2,(i+pos-2),tmp);
@@ -247,26 +247,26 @@ void diskulator_hosts_eject_device_slot(unsigned char i, unsigned char pos, Devi
 /**
  * Set device slot to read or write
  */
-void diskulator_hosts_set_device_slot_mode(unsigned char i, unsigned char mode, DeviceSlots* ds)
+void diskulator_hosts_set_device_slot_mode(unsigned char i, unsigned char mode, Context* context)
 {
   unsigned char tmp_hostSlot;
   unsigned char tmp_file[FILE_MAXLEN];
- 
+
   // temporarily stash current values.
-  tmp_hostSlot=ds->slot[i].hostSlot;
-  memcpy(tmp_file,ds->slot[i].file,FILE_MAXLEN);
+  tmp_hostSlot=context->deviceSlots.slot[i].hostSlot;
+  memcpy(tmp_file,context->deviceSlots.slot[i].file,FILE_MAXLEN);
   fuji_sio_get_filename_for_device_slot(i,fn);
 
   // Unmount slot
   fuji_sio_umount_device(i);
 
   // Slot is now wiped, need to re-populate from stash.
-  ds->slot[i].hostSlot=tmp_hostSlot;
-  ds->slot[i].mode=mode;
-  memcpy(ds->slot[i].file,tmp_file,FILE_MAXLEN);
+  context->deviceSlots.slot[i].hostSlot=tmp_hostSlot;
+  context->deviceSlots.slot[i].mode=mode;
+  memcpy(context->deviceSlots.slot[i].file,tmp_file,FILE_MAXLEN);
   fuji_sio_set_filename_for_device_slot(i,fn);
 
-  fuji_sio_write_device_slots(ds);
+  fuji_sio_write_device_slots(&context->deviceSlots);
   fuji_sio_mount_device(i,mode);
 
   // If we couldn't mount read/write, then re-mount again as read-only.
@@ -275,18 +275,18 @@ void diskulator_hosts_set_device_slot_mode(unsigned char i, unsigned char mode, 
       fuji_sio_umount_device(i);
 
       // Slot is now wiped, need to re-populate from stash.
-      ds->slot[i].hostSlot=tmp_hostSlot;
-      ds->slot[i].mode=mode;
-      memcpy(ds->slot[i].file,tmp_file,FILE_MAXLEN);
+      context->deviceSlots.slot[i].hostSlot=tmp_hostSlot;
+      context->deviceSlots.slot[i].mode=mode;
+      memcpy(context->deviceSlots.slot[i].file,tmp_file,FILE_MAXLEN);
       fuji_sio_set_filename_for_device_slot(i,fn);
 
       // Try again.
-      fuji_sio_write_device_slots(ds);
+      fuji_sio_write_device_slots(&context->deviceSlots);
       fuji_sio_mount_device(i,mode);
     }
 
   // And update device slot display.
-  diskulator_hosts_display_device_slots(11,ds);
+  diskulator_hosts_display_device_slots(11,context);
 }
 
 /**
@@ -329,16 +329,16 @@ void diskulator_hosts_hosts(Context *context, SubState *new_substate)
           break;
         case 'E':
         case 'e':
-          diskulator_hosts_edit_host_slot(i,&context->hostSlots);
+          diskulator_hosts_edit_host_slot(i,context);
           break;
 	case 0x7D: // SHIFT-CLEAR
 	  for (i=0;i<8;i++)
-	    diskulator_hosts_eject_device_slot(i,ORIGIN_DEVICE_SLOTS,&context->deviceSlots);
+	    diskulator_hosts_eject_device_slot(i,ORIGIN_DEVICE_SLOTS,context);
 	  break;
         case 0x9b: // RETURN
-          if (context->hostSlots.host[i][0]==0x00) // empty host slot?
+          if (context->hostSlots.host[i][0]==0x00 || (context->net_connected == false && strcmp(context->hostSlots.host[i],"SD") != 0)) // empty host slot?
             break; // do nothing
-
+	  
           context->state=DISKULATOR_SELECT;
           context->host_slot=i;
           fuji_sio_mount_host(context->host_slot,&context->hostSlots);
@@ -353,7 +353,6 @@ void diskulator_hosts_hosts(Context *context, SubState *new_substate)
             }
           else
             *new_substate=DONE;
-
           break;
         }
     }
@@ -387,11 +386,11 @@ void diskulator_hosts_devices(Context *context, SubState *new_substate)
           break;
         case 'E':
         case 'e':
-          diskulator_hosts_eject_device_slot(i,ORIGIN_DEVICE_SLOTS,&context->deviceSlots);
+          diskulator_hosts_eject_device_slot(i,ORIGIN_DEVICE_SLOTS,context);
           break;
 	case 0x7D: // SHIFT-CLEAR
 	  for (i=0;i<8;i++)
-	    diskulator_hosts_eject_device_slot(i,ORIGIN_DEVICE_SLOTS,&context->deviceSlots);
+	    diskulator_hosts_eject_device_slot(i,ORIGIN_DEVICE_SLOTS,context);
 	  break;
         case 0x7F:
           i=0;
@@ -401,11 +400,11 @@ void diskulator_hosts_devices(Context *context, SubState *new_substate)
           break;
         case 'R':
         case 'r':
-          diskulator_hosts_set_device_slot_mode(i,MODE_READ,&context->deviceSlots);
+          diskulator_hosts_set_device_slot_mode(i,MODE_READ,context);
           break;
         case 'W':
         case 'w':
-          diskulator_hosts_set_device_slot_mode(i,MODE_WRITE,&context->deviceSlots);
+          diskulator_hosts_set_device_slot_mode(i,MODE_WRITE,context);
           break;
         }
     }
@@ -428,7 +427,7 @@ State diskulator_hosts(Context *context)
 {
   SubState ss=HOSTS;
 
-  diskulator_hosts_setup(&context->hostSlots,&context->deviceSlots);
+  diskulator_hosts_setup(context);
   diskulator_hosts_clear_file_context(context);
 
   while (ss != DONE)

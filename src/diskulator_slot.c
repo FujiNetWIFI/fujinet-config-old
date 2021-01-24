@@ -45,7 +45,7 @@ void diskulator_slot_setup(Context* context)
   if (fuji_sio_error())
     error_fatal(ERROR_READING_DEVICE_SLOTS);
 
-  diskulator_hosts_display_device_slots(2,&context->deviceSlots);
+  diskulator_hosts_display_device_slots(2,context);
   bar_show(3);
 }
 
@@ -66,7 +66,7 @@ void diskulator_slot_select(Context *context, SubState *ss)
         {
         case 'E':
         case 'e':
-          diskulator_hosts_eject_device_slot(i,4,&context->deviceSlots);
+          diskulator_hosts_eject_device_slot(i,4,context);
           break;
         case 0x1B:
           *ss=DONE;

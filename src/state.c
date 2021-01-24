@@ -22,6 +22,7 @@
  */
 void context_setup(Context* context)
 {
+  context->net_connected = false;
 }
 
 /**

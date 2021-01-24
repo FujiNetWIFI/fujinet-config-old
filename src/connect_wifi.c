@@ -87,6 +87,7 @@ State connect_wifi_wait_for_network(NetConfig* n, Context *context)
       bar_set_color(COLOR_SETTING_SUCCESSFUL);
       fuji_sio_set_ssid(true,n); // and here.
       wait_a_moment();
+      context->net_connected=true;
       new_state = DISKULATOR_HOSTS;
     }
 

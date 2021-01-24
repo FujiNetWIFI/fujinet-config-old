@@ -203,6 +203,7 @@ State set_wifi_select_network(unsigned char numNetworks, Context *context)
   else if (k=='s')
     {
       // Skip and go to hosts screen.
+      context->net_connected = true;
       new_state = DISKULATOR_HOSTS;
     }
   
