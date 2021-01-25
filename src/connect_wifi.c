@@ -19,6 +19,7 @@
  */
 void connect_wifi_setup(char* ssid)
 {
+  screen_dlist_diskulator_info();
   screen_dlist_wifi();
   screen_puts(0,0,"WELCOME TO #FUJINET! CONNECTING TO NET");
   screen_puts(2,2,ssid);
@@ -106,8 +107,16 @@ State connect_wifi(Context *context)
   if (fuji_sio_error())
     error_fatal(ERROR_READING_NET_CONFIG);
   
-  connect_wifi_setup(n.ssid);
-  fuji_sio_set_ssid(false,&n);
+  if (n.ssid[0] == 0)
+  {
+    connect_wifi_setup("NO SSID");
+    return context->state=SET_WIFI;
+  }
+  else
+  {
+    connect_wifi_setup(n.ssid);
+    fuji_sio_set_ssid(false,&n);
+  }
 
   if (fuji_sio_error())
     error_fatal(ERROR_SETTING_SSID);
