@@ -28,7 +28,8 @@ typedef struct _context
   State state;                       // Current program state (state.h)
   char filter[32];                   // filter (wildcard)
   char directory[128];               // Current directory
-  char directory_plus_filter[128]; 
+  char directory_plus_filter[128];
+  char directory_destination[128];
   char filename[128];                // Current filename
   char full_path[256];               // Full path.
   char entry_widths[14];             // Widths of each entry for expansion.
