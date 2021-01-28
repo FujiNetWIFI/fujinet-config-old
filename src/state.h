@@ -23,6 +23,7 @@ typedef enum _state
 
 typedef struct _context
 {
+  bool copyFile;                     // Are we copying file?
   bool net_connected;                // Is network connected?
   State state;                       // Current program state (state.h)
   char filter[32];                   // filter (wildcard)
