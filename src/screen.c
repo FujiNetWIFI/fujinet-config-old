@@ -200,8 +200,7 @@ void screen_dlist_mount_and_boot(void)
  */
 void screen_dlist_diskulator_select(void)
 {
-  dlist_ptr[0x0f] = dlist_ptr[0x10] = 2;
-  dlist_ptr[0x1B] = dlist_ptr[0x1C] = 2;
+  dlist_ptr[0x0a] = dlist_ptr[0x0b] = dlist_ptr[0x0f] = dlist_ptr[0x10] = dlist_ptr[0x1B] = dlist_ptr[0x1C] = 2;
 }
 
 /**
@@ -209,8 +208,7 @@ void screen_dlist_diskulator_select(void)
  */
 void screen_dlist_diskulator_select_aux(void)
 {
-  dlist_ptr[0x0f] = dlist_ptr[0x10] = 2;
-  dlist_ptr[0x1B] = dlist_ptr[0x1C] = 2;
+  dlist_ptr[0x0f] = dlist_ptr[0x10] = dlist_ptr[0x1B] = dlist_ptr[0x1C] = 2;
 }
 
 /**
@@ -226,5 +224,6 @@ void screen_dlist_diskulator_slot(void)
  */
 void screen_dlist_diskulator_copy(void)
 {
-  dlist_ptr[0x0f] = dlist_ptr[0x10] = dlist_ptr[0x1B] = dlist_ptr[0x1C] = 2;  
-}
+  dlist_ptr[0x0f] = dlist_ptr[0x10] = dlist_ptr[0x1B] = dlist_ptr[0x1C] = 2;
+  dlist_ptr[0x0a] = dlist_ptr[0x0b] = 6;
+ }

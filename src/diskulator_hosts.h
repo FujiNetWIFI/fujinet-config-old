@@ -14,7 +14,7 @@
 /**
  * Display Hosts Slots
  */
-void diskulator_hosts_display_host_slots(Context *context);
+void diskulator_hosts_display_host_slots(unsigned char y, Context *context);
 
 /**
  * Display device slots
