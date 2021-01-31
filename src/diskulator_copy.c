@@ -16,19 +16,12 @@
 #include "diskulator_select.h"
 #include "diskulator_hosts.h"
 
-typedef enum _substate
-  {
-   SELECT_SLOT,
-   ABORT,
-   DONE
-  } SubState;
-
-void diskulator_copy_select(Context *context, SubState *ss)
+void diskulator_copy_slot(Context *context)
 {
   unsigned char k=0;
   unsigned char i=0;
 
-  while (*ss==SELECT_SLOT)
+  while (context->copyFile == SELECT_DESTINATION_SLOT)
     {
       k=input_handle_key();
       input_handle_nav_keys(k,7,8,&i);
@@ -36,13 +29,12 @@ void diskulator_copy_select(Context *context, SubState *ss)
       switch(k)
 	{
 	case 0x1b:
-	  *ss=ABORT;
-	  context->copyFile=false;
+	  context->copyFile=DISABLED;
 	  context->state=DISKULATOR_SELECT;
 	  break;
 	case 0x9B:
-	  *ss=DONE;
 	  context->state=DISKULATOR_SELECT;
+	  context->copyFile=SELECT_DESTINATION_DIR;
 	  break;
 	case '1':
 	case '2':
@@ -59,6 +51,11 @@ void diskulator_copy_select(Context *context, SubState *ss)
 	  break;
 	}
     }
+}
+
+void diskulator_copy_do(Context *context)
+{
+  
 }
 
 void diskulator_copy_setup(Context *context)
@@ -87,22 +84,18 @@ void diskulator_copy_setup(Context *context)
 
 State diskulator_copy(Context *context)
 {
-  SubState ss = SELECT_SLOT;
-
   diskulator_copy_setup(context);
   bar_show(7);
 
-  while (ss == SELECT_SLOT)
+  while (context->copyFile != DISABLED)
     {
-      switch(ss)
+      switch(context->copyFile)
 	{
-	case SELECT_SLOT:
-	  diskulator_copy_select(context, &ss);
+	case SELECT_DESTINATION_SLOT:
+	  diskulator_copy_slot (context);
 	  break;
-	case ABORT:
-	  context->copyFile = false;
-	case DONE:
-	  context->state = DISKULATOR_SELECT;
+	case DO_COPY:
+	  diskulator_copy_do(context);
 	  break;
 	}
     }

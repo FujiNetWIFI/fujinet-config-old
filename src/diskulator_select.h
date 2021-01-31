@@ -18,9 +18,4 @@ void diskulator_select_setup(Context *context);
  */
 State diskulator_select(Context *context);
 
-/**
- * Display directory path (and "SD" or TNFS server name)
- */
-void diskulator_select_display_directory_path(Context* context);
-
 #endif /* DISKULATOR_SELECT_H */

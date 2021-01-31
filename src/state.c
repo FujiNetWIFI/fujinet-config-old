@@ -13,7 +13,6 @@
 #include "diskulator_select.h"
 #include "diskulator_slot.h"
 #include "diskulator_info.h"
-#include "diskulator_copy.h"
 #include "bar.h"
 #include "screen.h"
 #include "mount_and_boot.h"
@@ -63,9 +62,6 @@ void state(Context *context)
 	  break;
 	case DISKULATOR_INFO:
 	  context->state = diskulator_info(context);
-	  break;
-	case DISKULATOR_COPY:
-	  context->state = diskulator_copy(context);
 	  break;
 	case MOUNT_AND_BOOT:
 	  context->state = mount_and_boot(context);

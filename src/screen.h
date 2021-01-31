@@ -59,8 +59,6 @@
 #define CH_INV_7 "\x97"
 #define CH_INV_8 "\x98"
 #define CH_INV_9 "\x99"
-#define CH_INV_UP "\xDC"
-#define CH_INV_DOWN "\xDD"
 #define CH_INV_LEFT "\xDE"
 #define CH_INV_RIGHT "\xDF"
 
@@ -68,13 +66,10 @@
 #define CH_KEY_ESC CH_KEY_LABEL_L CH_INV_E CH_INV_S CH_INV_C CH_KEY_LABEL_R
 #define CH_KEY_TAB CH_KEY_LABEL_L CH_INV_T CH_INV_A CH_INV_B CH_KEY_LABEL_R
 #define CH_KEY_DELETE CH_KEY_LABEL_L CH_INV_D CH_INV_E CH_INV_L CH_INV_E CH_INV_T CH_INV_E CH_KEY_LABEL_R
-#define CH_KEY_UP CH_KEY_LABEL_L CH_INV_UP CH_KEY_LABEL_R
-#define CH_KEY_DOWN CH_KEY_LABEL_L CH_INV_DOWN CH_KEY_LABEL_R
 #define CH_KEY_LEFT CH_KEY_LABEL_L CH_INV_LEFT CH_KEY_LABEL_R
 #define CH_KEY_RIGHT CH_KEY_LABEL_L CH_INV_RIGHT CH_KEY_LABEL_R
 #define CH_KEY_RETURN CH_KEY_LABEL_L CH_INV_R CH_INV_E CH_INV_T CH_INV_U CH_INV_R CH_INV_N CH_KEY_LABEL_R
 #define CH_KEY_OPTION CH_KEY_LABEL_L CH_INV_O CH_INV_P CH_INV_T CH_INV_I CH_INV_O CH_INV_N CH_KEY_LABEL_R
-#define CH_KEY_C CH_KEY_LABEL_L CH_INV_C CH_KEY_LABEL_R
 #define CH_KEY_N CH_KEY_LABEL_L CH_INV_N CH_KEY_LABEL_R
 #define CH_KEY_F CH_KEY_LABEL_L CH_INV_F CH_KEY_LABEL_R
 #define CH_KEY_LT CH_KEY_LABEL_L CH_INV_LT CH_KEY_LABEL_R
@@ -145,10 +140,5 @@ void screen_dlist_diskulator_select_aux(void);
  * Patch the dlist for the diskulator slot screen.
  */
 void screen_dlist_diskulator_slot(void);
-
-/**
- * Patch dlist for Diskulator copy to screen
- */
-void screen_dlist_diskulator_copy(void);
 
 #endif /* SCREEN_H */
