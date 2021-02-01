@@ -22,24 +22,60 @@
  */
 void diskulator_copy_destination_host_slot(Context *context)
 {
+  unsigned char k=0;
+  unsigned char i=0;
+  
   screen_dlist_diskulator_copy_destination_host_slot();
 
+  strcat(context->full_path,context->directory);
+  strcat(context->full_path,context->filename);
+  
   screen_puts(0,22,
       CH_KEY_1TO8 "Slot"
       CH_KEY_RETURN "Select"
-      CH_KEY_LABEL_L CH_INV_E CH_KEY_LABEL_R "ject"
       CH_KEY_ESC "Abort");
 
-  screen_puts(0,19,context->filename);
+  screen_puts(0,19,context->full_path);
 
-  screen_puts(0,0,"MOUNT TO DRIVE SLOT");
+  screen_puts(0,0,"COPY TO HOST SLOT");
 
-  fuji_sio_read_device_slots(&context->deviceSlots);
+  fuji_sio_read_host_slots(&context->hostSlots);
   if (fuji_sio_error())
-    error_fatal(ERROR_READING_DEVICE_SLOTS);
+    error_fatal(ERROR_READING_HOST_SLOTS);
 
-  diskulator_hosts_display_device_slots(2,context);
+  diskulator_hosts_display_host_slots(2,context);
   bar_show(3);
+
+  while (context->copySubState == SELECT_HOST_SLOT)
+    {
+      k=input_handle_key();
+      input_handle_nav_keys(k,3,8,&i);
+
+      switch(k)
+	{
+	case 0x1b:
+	  context->copySubState = DISABLED;
+	  context->state = DISKULATOR_SELECT;
+	  break;
+	case 0x9b:
+	  context->copySubState = SELECT_DESTINATION_FOLDER;
+	  context->state = DISKULATOR_SELECT;
+	  context->host_slot_dest=i-0x30;
+	  break;
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case '8':
+          i=k-=0x31;
+          bar_show(i+3);
+        default:
+          break;
+	}
+    }
 }
 
 /**
@@ -47,7 +83,7 @@ void diskulator_copy_destination_host_slot(Context *context)
  */
 State diskulator_copy(Context *context)
 {
-  while (context->state = DISKULATOR_COPY)
+  while (context->state == DISKULATOR_COPY)
     {
       if (context->copySubState == SELECT_HOST_SLOT)
 	  diskulator_copy_destination_host_slot(context);

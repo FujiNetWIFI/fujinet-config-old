@@ -43,6 +43,7 @@ typedef struct _context
   char entry_widths[14];             // Widths of each entry for expansion.
   unsigned char host_slot;           // Current Host slot (0-7)
   unsigned char device_slot;         // Current Device slot (0-7)
+  unsigned char host_slot_dest;      // Destination host slot (1-8)
   unsigned char mode;                // mode for device slot (1 or 2)
   unsigned short dir_page;           // directory page
   bool dir_eof;                      // End of current directory?

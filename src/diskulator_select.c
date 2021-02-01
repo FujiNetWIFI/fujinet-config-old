@@ -8,6 +8,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "diskulator_select.h"
+#include "diskulator_copy.h"
 #include "screen.h"
 #include "fuji_sio.h"
 #include "die.h"
@@ -317,15 +318,30 @@ void diskulator_select_handle_return(unsigned char i, Context* context, SubState
   // Handle if this is a directory
   if (context->filename[strlen(context->filename)-1]=='/')
     {
-      strcat(context->directory,context->filename);
-      memset(context->filename,0,sizeof(context->filename));
-      diskulator_select_display_directory_path(context);
-      *ss=ADVANCE_DIR; // Stay here, go to the new directory.
+      if (context->copySubState == SELECT_HOST_SLOT)
+	{
+	  // Silently fail for now
+	}
+      else
+	{
+	  strcat(context->directory,context->filename);
+	  memset(context->filename,0,sizeof(context->filename));
+	  diskulator_select_display_directory_path(context);
+	  *ss=ADVANCE_DIR; // Stay here, go to the new directory.
+	}
     }
   else
     {
-      *ss=DONE; // We are done with the select screen.
-      context->state=DISKULATOR_SLOT;
+      if (context->copySubState == DISABLED)
+	{
+	  *ss=DONE; // We are done with the select screen.
+	  context->state=DISKULATOR_SLOT;
+	}
+      else
+	{
+	  *ss=DONE;
+	  context->state=DISKULATOR_COPY;
+	}
     }
 }
 
@@ -607,12 +623,10 @@ void diskulator_select_select_file(Context* context, SubState* ss)
           diskulator_select_handle_return(i,context,ss);
           break;
         case '<':
-        case 0x43: // PgUp
           if (context->dir_page > 0)
             *ss=PREV_PAGE;
           break;
         case '>':
-        case 0x44: // PgDn
           if (!context->dir_eof)
             *ss=NEXT_PAGE;
           break;
@@ -631,6 +645,15 @@ void diskulator_select_select_file(Context* context, SubState* ss)
           *ss=DONE;
           context->state = MOUNT_AND_BOOT;
           break;
+	case 'c':
+	case 'C':
+	  context->state = DISKULATOR_COPY;
+	  if (context->copySubState == DISABLED)
+	    context->copySubState = SELECT_HOST_SLOT;
+	  else
+	    context->copySubState = DO_COPY;
+	  diskulator_select_handle_return(i,context,ss);
+	  break;
         case 'N':
         case 'n':
           diskulator_select_new_disk(context,ss);
@@ -663,6 +686,16 @@ void diskulator_select_setup(Context *context)
 	      CH_KEY_LEFT CH_KEY_DELETE "Up Dir"
 	      CH_KEY_N "ew"
 	      CH_KEY_F "ilter");
+
+  if (context->copySubState == SELECT_DESTINATION_FOLDER)
+    {
+      screen_puts(30,21, CH_KEY_C "Do It!");
+    }
+  else
+    {
+      screen_puts(30, 21, CH_KEY_C "opy");
+    }
+  
   screen_puts(0,22,
       CH_KEY_RIGHT CH_KEY_RETURN "Choose"
       CH_KEY_OPTION "Boot"
