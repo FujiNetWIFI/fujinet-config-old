@@ -21,9 +21,18 @@ typedef enum _state
    MOUNT_AND_BOOT
   } State;
 
+typedef enum _copySubState
+  {
+   DISABLED,
+   SELECT_HOST_SLOT,
+   SELECT_DESTINATION_FOLDER,
+   DO_COPY
+  } CopySubState;
+
 typedef struct _context
 {
   bool net_connected;                // Is network connected?
+  CopySubState copySubState;         // Copy Sub State
   State state;                       // Current program state (state.h)
   char filter[32];                   // filter (wildcard)
   char directory[128];               // Current directory
