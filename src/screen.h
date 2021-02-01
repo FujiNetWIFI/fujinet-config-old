@@ -141,4 +141,10 @@ void screen_dlist_diskulator_select_aux(void);
  */
 void screen_dlist_diskulator_slot(void);
 
+/**
+ * Patch the dlist for the diskulator copy host slot screen.
+ */
+void screen_dlist_diskulator_copy_destination_host_slot(void);
+
+
 #endif /* SCREEN_H */

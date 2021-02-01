@@ -220,3 +220,11 @@ void screen_dlist_diskulator_slot(void)
 {
   dlist_ptr[0x0f] = dlist_ptr[0x10] = dlist_ptr[0x1B] = dlist_ptr[0x1C] = 2;
 }
+
+/**
+ * Patch the dlist for the diskulator copy host slot screen.
+ */
+void screen_dlist_diskulator_copy_destination_host_slot(void)
+{
+
+}
