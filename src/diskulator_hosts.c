@@ -24,10 +24,12 @@ typedef enum _substate
    DONE
   } SubState;
 
+#define HOST_SLOTS_Y 1
+
 /**
  * Display Hosts Slots
  */
-void diskulator_hosts_display_host_slots(Context *context)
+void diskulator_hosts_display_host_slots(unsigned char y, Context *context)
 {
   unsigned char i;
 
@@ -38,12 +40,12 @@ void diskulator_hosts_display_host_slots(Context *context)
       unsigned char ni[2];
 
       utoa(n, ni, 10);
-      screen_puts(2, i + 1, ni);
+      screen_puts(2, i + y, ni);
 
       if (context->hostSlots.host[i][0] != 0x00)
-        screen_puts(5, i + 1, context->hostSlots.host[i]);
+        screen_puts(5, i + y, context->hostSlots.host[i]);
       else
-        screen_puts(5, i + 1, text_empty);
+        screen_puts(5, i + y, text_empty);
     }
 }
 
@@ -149,7 +151,7 @@ void diskulator_hosts_setup(Context *context)
 
   retry=5;
 
-  diskulator_hosts_display_host_slots(context);
+  diskulator_hosts_display_host_slots(HOST_SLOTS_Y,context);
 
   while (retry>0)
     {

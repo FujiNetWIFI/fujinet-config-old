@@ -12,6 +12,11 @@
 #include "state.h"
 
 /**
+ * Display Hosts Slots
+ */
+void diskulator_hosts_display_host_slots(unsigned char y, Context *context);
+
+/**
  * Display device slots
  */
 void diskulator_hosts_display_device_slots(unsigned char y, Context *context);
