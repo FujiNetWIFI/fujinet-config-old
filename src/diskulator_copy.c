@@ -26,7 +26,7 @@ void diskulator_copy_do(Context *context)
 
   // Build copyspec to send to fuji_sio_copy
   strcat(context->full_path,"|"); // add delimiter
-  strcat(context->full_path,context->directory_dest);
+  strcat(context->full_path,context->directory);
 
   screen_puts(0,0,"COPYING, PLEASE WAIT");
 
@@ -112,6 +112,8 @@ void diskulator_copy_destination_host_slot(Context *context)
 	  context->host_slot=i;
  	  context->host_slot_dest=i+1;
 	  context->dir_page=0;
+	  memset(context->directory,0,sizeof(context->directory));
+	  strcpy(context->directory, "/");
 	  break;
         case '1':
         case '2':
