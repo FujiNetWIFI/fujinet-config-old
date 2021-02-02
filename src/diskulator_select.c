@@ -250,8 +250,15 @@ void diskulator_select_handle_return(unsigned char i, Context* context, SubState
   unsigned char retry=5;
 
   if (context->entries_displayed==0)
-    return;
-
+    {
+      if (context->copySubState == SELECT_DESTINATION_FOLDER)
+	return;
+      else
+	{
+	  *ss=DONE;
+	  context->state=DISKULATOR_COPY;
+	}
+    }
   while (retry>0)
     {
       if (context->filter[0]==0x00)

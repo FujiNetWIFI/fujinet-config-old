@@ -7,6 +7,7 @@
 #include "diskulator_copy.h"
 #include <atari.h>
 #include <string.h>
+#include <conio.h>
 #include "diskulator_hosts.h"
 #include "diskulator_slot.h"
 #include "fuji_sio.h"
@@ -38,7 +39,7 @@ void diskulator_copy_do(Context *context)
       screen_puts(0,3,"Please wait until the activity light");
       screen_puts(0,4,"is done, before pressing a key");
       screen_puts(0,5,"to continue.");
-      input_handle_key();
+      while (!kbhit()) {}
     }
   else if (OS.dcb.dstats == 144)
     {
@@ -46,7 +47,7 @@ void diskulator_copy_do(Context *context)
       screen_puts(0,3,"You may need to ensure permissions");
       screen_puts(0,4,"Are sufficient, before copying the file again.");
       screen_puts(0,5,"Press any key to continue.");
-      input_handle_key();
+      while (!kbhit()) {}
     }
   
   // Clear the path for next time.
