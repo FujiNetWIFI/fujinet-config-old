@@ -138,4 +138,9 @@ void fuji_sio_set_prefix_for_Device_slot(unsigned char slot, const char *prefix)
  */
 void fuji_sio_set_config_boot(unsigned char b);
 
+/**
+ * Ask fujinet to copy file from source slot to dest slot
+ */
+void fuji_sio_copy(unsigned char source_slot, unsigned char dest_slot, const char* copySpec);
+
 #endif /* FUJINET_SIO_H */

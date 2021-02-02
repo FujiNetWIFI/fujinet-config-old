@@ -423,3 +423,20 @@ void fuji_sio_set_config_boot(unsigned char b)
   OS.dcb.daux1 = b;
   siov();
 }
+
+/**
+ * Ask fujinet to copy file from source slot to dest slot
+ */
+void fuji_sio_copy(unsigned char source_slot, unsigned char dest_slot, const char *copySpec)
+{
+  OS.dcb.ddevic=0x70;
+  OS.dcb.dunit=1;
+  OS.dcb.dcomnd=0xD8;
+  OS.dcb.dstats=0x80;
+  OS.dcb.dbuf=copySpec;
+  OS.dcb.dtimlo=0xFE; // Max timeout
+  OS.dcb.dbyt=256;
+  OS.dcb.daux1=source_slot;
+  OS.dcb.daux2=dest_slot;
+  siov();
+}
