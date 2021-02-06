@@ -569,11 +569,11 @@ void diskulator_select_show_full_filename(Context *context, unsigned char i)
 
   fuji_sio_close_directory(context->host_slot);
 
+  screen_clear_line(18);
   screen_clear_line(19);
   screen_clear_line(20);
-  screen_clear_line(21);
 
-  screen_puts(0,19,context->filename);
+  screen_puts(0,18,context->filename);
 }
 
 /**
