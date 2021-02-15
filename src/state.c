@@ -63,7 +63,7 @@ void state(Context *context)
 	  context->state = diskulator_slot(context);
 	  break;
 	case DISKULATOR_INFO:
-	  context->state = diskulator_info(context);
+	  context->state = diskulator_info();
 	  break;
 	case DISKULATOR_COPY:
 	  context->state = diskulator_copy(context);
