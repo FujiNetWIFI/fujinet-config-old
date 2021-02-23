@@ -9,9 +9,8 @@
 
 #include "state.h"
 
-/**
- * Mount all hosts attached to device slots, and boot.
- */
-State mount_and_boot(Context *context);
+void mount_and_boot_mount_all_hosts(Context *context);
+
+void mount_and_boot_mount_all_devices(Context *context);
 
 #endif /* MOUNT_AND_BOOT_H */

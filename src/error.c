@@ -7,7 +7,6 @@
 #include <stddef.h> // for NULL
 #include "die.h"
 #include "error.h"
-#include "screen.h"
 
 char text_error_reading_adapter_config[] = "ERROR READING ADAPTER CONFIG";
 char text_error_scanning_networks[] = "ERROR SCANNING NETWORKS";
@@ -110,7 +109,6 @@ void error(ErrorMessage msg)
       text = text_error_intentional_stop;
       break;
     }  
-  screen_puts(0,21,text);
 }
 
 /**

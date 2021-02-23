@@ -9,8 +9,6 @@
 #include "sio.h"
 #include "fuji_sio.h"
 
-NewDisk newDisk;
-
 /**
  * Did an error result?
  */
@@ -27,69 +25,18 @@ void set_sio_defaults(void)
 }
 
 /**
- * Return number of networks
+ * Read drive tables
  */
-unsigned char fuji_sio_do_scan(void)
+void fuji_sio_read_device_slots(DeviceSlots* deviceSlots)
 {
-  unsigned char num_networks=0;
-  
-  set_sio_defaults();
-  OS.dcb.dcomnd = 0xFD; // do scan
-  OS.dcb.dstats = 0x40; // Peripheral->Computer
-  OS.dcb.dbuf = &num_networks;
-  OS.dcb.dbyt = 4;      // 4 byte response
-  OS.dcb.daux = 0;
-  siov();
-  
-  return num_networks;
-}
-
-/**
- * Return Network entry from last scan
- */
-unsigned char fuji_sio_scan_result(unsigned char n, SSIDInfo* ssidInfo)
-{
+    // Read Drive Tables
     set_sio_defaults();
-    OS.dcb.dcomnd = 0xFC; // Return scan result
-    OS.dcb.dstats = 0x40; // Peripheral->Computer
-    OS.dcb.dbuf = &ssidInfo->rawData;
-    OS.dcb.dbyt = sizeof(ssidInfo->rawData);
-    OS.dcb.daux1 = n; // get entry #n
+    OS.dcb.dcomnd = 0xF2;
+    OS.dcb.dstats = 0x40;
+    OS.dcb.dbuf = &deviceSlots->rawData;
+    OS.dcb.dbyt = sizeof(deviceSlots->rawData);
+    OS.dcb.daux = 0;
     siov();
-
-    return OS.dcb.dstats;
-}
-
-/**
- * Write desired SSID and password to SIO
- */
-unsigned char fuji_sio_set_ssid(bool save, NetConfig* netConfig)
-{
-    set_sio_defaults();
-    OS.dcb.dcomnd = 0xFB; // Set SSID
-    OS.dcb.dstats = 0x80; // Computer->Peripheral
-    OS.dcb.dbuf = &netConfig->rawData;
-    OS.dcb.dbyt = sizeof(netConfig->rawData);
-    OS.dcb.daux = save ? 1 : 0;
-    siov();
-
-    return OS.dcb.dstats;
-}
-
-/**
- * Get WiFi Network Status
- */
-unsigned char fuji_sio_get_wifi_status(unsigned char* wifiStatus)
-{
-    set_sio_defaults();
-    OS.dcb.dcomnd = 0xFA; // Return wifi status
-    OS.dcb.dstats = 0x40; // Peripheral->Computer
-    OS.dcb.dbuf = wifiStatus;
-    OS.dcb.dbyt = 1;
-    OS.dcb.daux1 = 0;
-    siov();
-
-    return OS.dcb.dstats;
 }
 
 /**
@@ -103,20 +50,6 @@ void fuji_sio_read_host_slots(HostSlots* hostSlots)
     OS.dcb.dstats = 0x40;
     OS.dcb.dbuf = &hostSlots->rawData;
     OS.dcb.dbyt = sizeof(hostSlots->rawData);
-    OS.dcb.daux = 0;
-    siov();
-}
-
-/**
- * Write host slots
- */
-void fuji_sio_write_host_slots(HostSlots* hostSlots)
-{
-    set_sio_defaults();
-    OS.dcb.dcomnd = 0xF3;
-    OS.dcb.dstats = 0x80;
-    OS.dcb.dbuf = &hostSlots->rawData;
-    OS.dcb.dbyt = 256;
     OS.dcb.daux = 0;
     siov();
 }
@@ -139,35 +72,6 @@ void fuji_sio_mount_host(unsigned char c, HostSlots* hostSlots)
 }
 
 /**
- * Read drive tables
- */
-void fuji_sio_read_device_slots(DeviceSlots* deviceSlots)
-{
-    // Read Drive Tables
-    set_sio_defaults();
-    OS.dcb.dcomnd = 0xF2;
-    OS.dcb.dstats = 0x40;
-    OS.dcb.dbuf = &deviceSlots->rawData;
-    OS.dcb.dbyt = sizeof(deviceSlots->rawData);
-    OS.dcb.daux = 0;
-    siov();
-}
-
-/**
- * Write drive tables
- */
-void fuji_sio_write_device_slots(DeviceSlots* deviceSlots)
-{
-    set_sio_defaults();
-    OS.dcb.dcomnd = 0xF1;
-    OS.dcb.dstats = 0x80;
-    OS.dcb.dbuf = &deviceSlots->rawData;
-    OS.dcb.dbyt = sizeof(deviceSlots->rawData);
-    OS.dcb.daux = 0;
-    siov();
-}
-
-/**
  * Mount device slot
  */
 void fuji_sio_mount_device(unsigned char c, unsigned char o)
@@ -180,116 +84,6 @@ void fuji_sio_mount_device(unsigned char c, unsigned char o)
     OS.dcb.dtimlo = 0xFE; // Due to ATX support.
     OS.dcb.daux1 = c;
     OS.dcb.daux2 = o;
-    siov();
-}
-
-/**
- * Mount device slot
- */
-void fuji_sio_umount_device(unsigned char c)
-{
-    set_sio_defaults();
-    OS.dcb.dcomnd = 0xE9;
-    OS.dcb.dstats = 0x00;
-    OS.dcb.dbuf = NULL;
-    OS.dcb.dbyt = 0;
-    OS.dcb.daux = c;
-    siov();
-}
-
-/**
- * Create New Disk
- */
-void fuji_sio_new_disk(unsigned char c, unsigned short ns, unsigned short ss, DeviceSlots* deviceSlots)
-{
-  newDisk.numSectors = ns;
-  newDisk.sectorSize = ss;
-  newDisk.hostSlot = deviceSlots->slot[c].hostSlot;
-  newDisk.deviceSlot = c;
-  strcpy(newDisk.filename, deviceSlots->slot[c].file);
-  deviceSlots->slot[c].mode = 0x02;
-  
-  set_sio_defaults();
-  OS.dcb.dcomnd = 0xE7; // TNFS Create Disk
-  OS.dcb.dstats = 0x80;
-  OS.dcb.dbuf = &newDisk.rawData;
-  OS.dcb.dtimlo = 0xFE;
-  OS.dcb.dbyt = sizeof(newDisk.rawData);
-  OS.dcb.daux = 0;
-  siov();
-}
-
-/**
- * Open Directory
- */
-void fuji_sio_open_directory(unsigned char hs, char *p)
-{
-    // Open Dir
-    set_sio_defaults();
-    OS.dcb.dcomnd = 0xF7;
-    OS.dcb.dstats = 0x80;
-    OS.dcb.dbuf = p;
-    OS.dcb.dbyt = 256;
-    OS.dcb.daux = hs;
-    siov();
-}
-
-/**
- * Read next dir entry
- */
-void fuji_sio_read_directory(char *e, unsigned short len)
-{
-    memset(e, 0, len);
-    e[0] = 0x7f;
-    OS.dcb.dcomnd = 0xF6;
-    OS.dcb.dstats = 0x40;
-    OS.dcb.dbuf = e;
-    OS.dcb.dbyt = len;
-    OS.dcb.daux = len;
-    siov();
-}
-
-/**
- * Get current directory cursor
- */
-DirectoryPosition fuji_sio_get_directory_position(void)
-{
-  DirectoryPosition pos=0;
-  
-  OS.dcb.dcomnd = 0xE5;
-  OS.dcb.dstats = 0x40;
-  OS.dcb.dbuf = &pos;
-  OS.dcb.dbyt = sizeof(pos);
-  OS.dcb.daux = 0;
-  siov();
-  return pos;
-}
-
-/**
- * Set current directory cursor
- */
-void fuji_sio_set_directory_position(DirectoryPosition pos)
-{
-  OS.dcb.dcomnd = 0xE4;
-  OS.dcb.dstats = 0x00;
-  OS.dcb.dbuf = NULL;
-  OS.dcb.dbyt = 0;
-  OS.dcb.daux = pos;
-  siov();
-}
-
-/**
- * Close directory
- */
-void fuji_sio_close_directory(unsigned char hs)
-{
-    // Close dir read
-    OS.dcb.dcomnd = 0xF5;
-    OS.dcb.dstats = 0x00;
-    OS.dcb.dbuf = NULL;
-    OS.dcb.dtimlo = 0x0f;
-    OS.dcb.dbyt = 0;
-    OS.dcb.daux = hs;
     siov();
 }
 
@@ -328,89 +122,6 @@ bool fuji_sio_mount_all_devices(DeviceSlots* deviceSlots)
 }
 
 /**
- * Read #FujiNet SSID configuration
- */
-void fuji_sio_read_net_config(NetConfig* netConfig)
-{
-  OS.dcb.ddevic = 0x70;
-  OS.dcb.dunit = 1;
-  OS.dcb.dcomnd = 0xFE; //get_ssid
-  OS.dcb.dstats = 0x40;
-  OS.dcb.dbuf = netConfig->rawData;
-  OS.dcb.dtimlo = 0x0F; // 15 second timeout
-  OS.dcb.dbyt = sizeof(netConfig->rawData);
-  OS.dcb.daux = 0;
-  siov();
-}
-
-/**
- * Read #FujiNet Adapter configuration
- */
-void fuji_sio_read_adapter_config(AdapterConfig* adapterConfig)
-{
-  OS.dcb.ddevic = 0x70;
-  OS.dcb.dunit = 1;
-  OS.dcb.dcomnd = 0xE8;
-  OS.dcb.dstats = 0x40;
-  OS.dcb.dbuf = adapterConfig->rawData;
-  OS.dcb.dtimlo = 0x0f;
-  OS.dcb.dbyt = sizeof(adapterConfig->rawData);
-  OS.dcb.daux = 0;
-  siov();
-}
-
-/**
- * Set filename for device slot
- */
-void fuji_sio_set_filename_for_device_slot(unsigned char slot, const char* filename)
-{
-  OS.dcb.ddevic=0x70;
-  OS.dcb.dunit=1;
-  OS.dcb.dcomnd=0xE2;
-  OS.dcb.dstats=0x80;
-  OS.dcb.dbuf=filename;
-  OS.dcb.dtimlo=0x0F;
-  OS.dcb.dbyt=256;
-  OS.dcb.daux1=slot;
-  OS.dcb.daux2=0;
-  siov();
-}
-
-/**
- * Get filename for device slot
- */
-void fuji_sio_get_filename_for_device_slot(unsigned char slot, const char* filename)
-{
-  OS.dcb.ddevic=0x70;
-  OS.dcb.dunit=1;
-  OS.dcb.dcomnd=0xDA;
-  OS.dcb.dstats=0x40;
-  OS.dcb.dbuf=filename;
-  OS.dcb.dtimlo=0x0F;
-  OS.dcb.dbyt=256;
-  OS.dcb.daux1=slot;
-  OS.dcb.daux2=0;
-  siov();
-}
-
-/**
- * Set host slot prefix
- */
-void fuji_sio_set_prefix_for_Device_slot(unsigned char slot, const char *prefix)
-{
-  OS.dcb.ddevic=0x70;
-  OS.dcb.dunit=1;
-  OS.dcb.dcomnd=0xE1;
-  OS.dcb.dstats=0x80;
-  OS.dcb.dbuf=prefix;
-  OS.dcb.dtimlo=0x0F;
-  OS.dcb.dbyt=256;
-  OS.dcb.daux1=slot;
-  OS.dcb.daux2=0;
-  siov();
-}
-
-/**
  * Set config boot flag
  */
 void fuji_sio_set_config_boot(unsigned char b)
@@ -421,22 +132,5 @@ void fuji_sio_set_config_boot(unsigned char b)
   OS.dcb.dtimlo = 0x0f;
   OS.dcb.dbyt = 0;
   OS.dcb.daux1 = b;
-  siov();
-}
-
-/**
- * Ask fujinet to copy file from source slot to dest slot
- */
-void fuji_sio_copy(unsigned char source_slot, unsigned char dest_slot, const char *copySpec)
-{
-  OS.dcb.ddevic=0x70;
-  OS.dcb.dunit=1;
-  OS.dcb.dcomnd=0xD8;
-  OS.dcb.dstats=0x80;
-  OS.dcb.dbuf=copySpec;
-  OS.dcb.dtimlo=0xFE; // Max timeout
-  OS.dcb.dbyt=256;
-  OS.dcb.daux1=source_slot;
-  OS.dcb.daux2=dest_slot;
   siov();
 }
