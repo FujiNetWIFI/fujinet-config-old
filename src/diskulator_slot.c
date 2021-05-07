@@ -201,8 +201,7 @@ State diskulator_slot(Context *context)
 
   diskulator_slot_setup(context);
 
-  if ((strstr(context->filename,".cas") != NULL)
-    || (strstr(context->filename,".CAS") != NULL))
+  if (strstr(strlwr(context->filename),".cas") != NULL)
     {
       ss = COMMIT_SLOT;
       context->device_slot = 7;
