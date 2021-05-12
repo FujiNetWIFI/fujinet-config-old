@@ -237,7 +237,10 @@ void diskulator_select_display_directory_page(Context* context)
 
   if (i==0)
     {
-      diskulator_select_display_directory_entry(i,text_empty,context);
+      error(ERROR_EMPTY_SD);
+      wait_a_moment();
+      context->state=DISKULATOR_HOSTS;
+      return;
     }
 }
 
@@ -586,6 +589,12 @@ void diskulator_select_select_file(Context* context, SubState* ss)
   bool long_filename_displayed=false;
 
   diskulator_select_display_directory_page(context);
+
+  if (context->state != DISKULATOR_SELECT)
+  {
+	*ss=DONE;
+	return;
+  }
 
   bar_show(DIRECTORY_LIST_Y_OFFSET+1);
 

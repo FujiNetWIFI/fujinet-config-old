@@ -31,6 +31,7 @@ char text_error_setting_full_path[] = "ERROR SETTING FULL PATH";
 char text_error_writing_device_slots[] = "ERROR WRITING DEVICE SLOTS";
 char text_error_intentional_stop[] = "INTENTIONAL STOP";
 char text_error_creating_new_disk[] = "ERROR CREATING NEW DISK";
+char text_error_empty_sd[] = "SD CARD EMPTY";
 
 /**
  * Display error.
@@ -108,6 +109,9 @@ void error(ErrorMessage msg)
       break;
     case ERROR_INTENTIONAL_STOP:
       text = text_error_intentional_stop;
+      break;
+    case ERROR_EMPTY_SD:
+      text = text_error_empty_sd;
       break;
     }  
   screen_puts(0,21,text);
