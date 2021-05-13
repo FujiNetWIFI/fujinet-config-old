@@ -8,7 +8,8 @@
 #include <string.h>
 #include "bar.h"
 
-unsigned char* bar_pmbase=(unsigned char *)0x7C00;
+#define BAR_PMBASE	0x7c00
+unsigned char* bar_pmbase=(unsigned char *)BAR_PMBASE;
 
 /**
  * Clear bar from screen
@@ -21,41 +22,34 @@ void bar_clear(void)
 /**
  * Show bar at Y position
  */
-void bar_show(unsigned char y)
+void fastcall bar_show(unsigned char y)
 {
-  unsigned char scrpos=((y<<2)+16);
 
+  asm ("asl");
+  asm ("asl");
+  asm ("adc #%b",16);
+ 
+  asm ("pha");
   bar_clear();
-  
+  asm ("pla");
+  asm ("tax");
+  asm ("ldy #%b",4);
+  asm ("lda #%b",-1);
+lab:
   // First the missiles (rightmost portion of bar)
-  bar_pmbase[384+scrpos+0]=0xFF;
-  bar_pmbase[384+scrpos+1]=0xFF;
-  bar_pmbase[384+scrpos+2]=0xFF;
-  bar_pmbase[384+scrpos+3]=0xFF;
-
+  asm ("sta %w,x",BAR_PMBASE+384);
   // Then the players (p0)
-  bar_pmbase[512+scrpos+0]=0xFF;
-  bar_pmbase[512+scrpos+1]=0xFF;
-  bar_pmbase[512+scrpos+2]=0xFF;
-  bar_pmbase[512+scrpos+3]=0xFF;
-
+  asm ("sta %w,x",BAR_PMBASE+512);
   // P1
-  bar_pmbase[640+scrpos+0]=0xFF;
-  bar_pmbase[640+scrpos+1]=0xFF;
-  bar_pmbase[640+scrpos+2]=0xFF;
-  bar_pmbase[640+scrpos+3]=0xFF;
-
+  asm ("sta %w,x",BAR_PMBASE+640);
   // P2
-  bar_pmbase[768+scrpos+0]=0xFF;
-  bar_pmbase[768+scrpos+1]=0xFF;
-  bar_pmbase[768+scrpos+2]=0xFF;
-  bar_pmbase[768+scrpos+3]=0xFF;
-
+  asm ("sta %w,x",BAR_PMBASE+768);
   // P3
-  bar_pmbase[896+scrpos+0]=0xFF;
-  bar_pmbase[896+scrpos+1]=0xFF;
-  bar_pmbase[896+scrpos+2]=0xFF;
-  bar_pmbase[896+scrpos+3]=0xFF;  
+  asm ("sta %w,x",BAR_PMBASE+896);
+  asm ("inx");
+  asm ("dey");
+  asm ("bne %g",lab);
+
 }
 
 /**
