@@ -17,7 +17,6 @@
 Context context;
 
 extern unsigned char* video_ptr;
-extern unsigned char* dlist_ptr;
 extern unsigned short screen_memory;
 extern unsigned char* font_ptr;
 
@@ -111,7 +110,6 @@ void setup(Context *context)
   OS.sdmctl=0; // Turn off screen
   memcpy((void *)DISPLAY_LIST,&config_dlist,sizeof(config_dlist)); // copy display list to $0600
   OS.sdlst=(void *)DISPLAY_LIST;                     // and use it.
-  dlist_ptr=(unsigned char *)OS.sdlst;               // Set up the vars for the screen output macros
   screen_memory=PEEKW(560)+4;
   video_ptr=(unsigned char*)(PEEKW(screen_memory));
 

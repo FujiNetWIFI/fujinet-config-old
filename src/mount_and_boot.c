@@ -13,7 +13,7 @@
 #include "die.h"
 
 char text_mounting_host_slot_X[]="MOUNTING HOST SLOT X";
-char text_mounting_device_slot_X[]="MOUNTING DEV SLOT X";
+char text_mounting_device_slot_X[]="MOUNTING DEV SLOT X ";
 char text_booting[]="SUCCESSFUL! BOOTING ";
 
 /**
