@@ -7,10 +7,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <conio.h>
+#include <peekpoke.h>
 #include "screen.h"
 
 unsigned char* video_ptr;
-unsigned char* dlist_ptr;
 unsigned short screen_memory;
 unsigned char* font_ptr;
 
@@ -27,7 +27,7 @@ void screen_clear_line(unsigned char y)
 /**
  * Print ATASCII string to display memory
  */
-void screen_puts(unsigned char x,unsigned char y,char *s)
+void screen_puts(unsigned char x, unsigned char y, char *s)
 {
   char offset;
   
@@ -131,12 +131,14 @@ void screen_print_ip(unsigned char x, unsigned char y, unsigned char *buf)
 /**
  * Special hex output of numbers under 16, e.g. 9 -> 09, 10 -> 0A
  */
-void itoa_hex(int val, char *buf)
+void itoa_hex(unsigned char val, char *buf)
 {
+
   if (val < 16) {
     *(buf++) = '0';
   }
   itoa(val, buf, 16);
+
 }
 
 /**
@@ -163,8 +165,12 @@ void screen_print_mac(unsigned char x, unsigned char y, unsigned char *buf)
  */
 void screen_dlist_diskulator_hosts(void)
 {
-  dlist_ptr[0x0F] = dlist_ptr[0x10] = 6;
-  dlist_ptr[0x0A] = dlist_ptr[0x0B] = dlist_ptr[0x1B] = dlist_ptr[0x1C] = 2;
+  POKE(DISPLAY_LIST+0x0f,6);
+  POKE(DISPLAY_LIST+0x10,6);
+  POKE(DISPLAY_LIST+0x0a,2);
+  POKE(DISPLAY_LIST+0x0b,2);
+  POKE(DISPLAY_LIST+0x1b,2);
+  POKE(DISPLAY_LIST+0x1c,2);
 }
 
 /**
@@ -172,9 +178,10 @@ void screen_dlist_diskulator_hosts(void)
  */
 void screen_dlist_diskulator_info(void)
 {
-  dlist_ptr[0x0A] = 7;
-  dlist_ptr[0x0B] = 6;
-  dlist_ptr[0x0F] = dlist_ptr[0x10] = 2;
+  POKE(DISPLAY_LIST+0x0a,7);
+  POKE(DISPLAY_LIST+0x0b,6);
+  POKE(DISPLAY_LIST+0x0f,2);
+  POKE(DISPLAY_LIST+0x10,2);
 }
 
 /**
@@ -182,8 +189,10 @@ void screen_dlist_diskulator_info(void)
  */
 void screen_dlist_wifi(void)
 {
-  dlist_ptr[0x0a] = dlist_ptr[0x0b] = 2;
-  dlist_ptr[0x1b] = dlist_ptr[0x1c] = 6;
+  POKE (DISPLAY_LIST+0x0a,2);
+  POKE (DISPLAY_LIST+0x0b,2);
+  POKE (DISPLAY_LIST+0x1b,6);
+  POKE (DISPLAY_LIST+0x1c,6);
 }
 
 /**
@@ -191,8 +200,8 @@ void screen_dlist_wifi(void)
  */
 void screen_dlist_mount_and_boot(void)
 {
-  dlist_ptr[0x0a] = dlist_ptr[0x0b] = 2;
-  dlist_ptr[0x1b] = dlist_ptr[0x1c] = 6;
+  // the same as above
+  screen_dlist_wifi();
 }
 
 /**
@@ -200,8 +209,10 @@ void screen_dlist_mount_and_boot(void)
  */
 void screen_dlist_diskulator_select(void)
 {
-  dlist_ptr[0x0f] = dlist_ptr[0x10] = 2;
-  dlist_ptr[0x1B] = dlist_ptr[0x1C] = 2;
+  POKE(DISPLAY_LIST+0x0f,2);
+  POKE(DISPLAY_LIST+0x10,2);
+  POKE(DISPLAY_LIST+0x1b,2);
+  POKE(DISPLAY_LIST+0x1c,2);
 }
 
 /**
@@ -209,8 +220,7 @@ void screen_dlist_diskulator_select(void)
  */
 void screen_dlist_diskulator_select_aux(void)
 {
-  dlist_ptr[0x0f] = dlist_ptr[0x10] = 2;
-  dlist_ptr[0x1B] = dlist_ptr[0x1C] = 2;
+  screen_dlist_diskulator_select();
 }
 
 /**
@@ -218,7 +228,7 @@ void screen_dlist_diskulator_select_aux(void)
  */
 void screen_dlist_diskulator_slot(void)
 {
-  dlist_ptr[0x0f] = dlist_ptr[0x10] = dlist_ptr[0x1B] = dlist_ptr[0x1C] = 2;
+  screen_dlist_diskulator_select();
 }
 
 /**
