@@ -56,7 +56,7 @@ void screen_puts(unsigned char x, unsigned char y, char *s)
 /**
  * Input a string at x,y
  */
-int screen_input(unsigned char x, unsigned char y, char* s)
+int _screen_input(unsigned char x, unsigned char y, char* s, unsigned char maxlen)
 {
   unsigned char c,k,o;
   unsigned char outc[2]={0,0};
@@ -93,12 +93,15 @@ int screen_input(unsigned char x, unsigned char y, char* s)
 	}
       else if ((k>0x1F) && (k<0x80)) // printable ascii
 	{
-	  SetChar(c+1,y,GetChar(c+1,y)&0x7F);
-	  outc[0]=k;
-	  screen_puts(c+1,y,outc);
-	  SetChar(c+2,y,0x80);
-	  s[o++]=k;
-	  c++;
+	  if (o<maxlen-1)
+            {
+	      SetChar(c+1,y,GetChar(c+1,y)&0x7F);
+	      outc[0]=k;
+	      screen_puts(c+1,y,outc);
+	      SetChar(c+2,y,0x80);
+	      s[o++]=k;
+	      c++;
+            }
 	}
     }
 }
