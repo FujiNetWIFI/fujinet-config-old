@@ -62,18 +62,9 @@ int screen_input(unsigned char x, unsigned char y, char* s)
   unsigned char outc[2]={0,0};
   unsigned char q;
   
-  o=0;
-  c=x;
+  o=strlen(s);
+  c=x+o;
 
-  for (q=0;q<strlen(s);q++)
-    if (s[q]==0x00)
-      break;
-    else
-      {
-	c++;
-	o++;
-      }
-  
   SetChar(c+1,y,0x80); // turn on cursor
 
   k=0;
@@ -85,12 +76,15 @@ int screen_input(unsigned char x, unsigned char y, char* s)
       if ( k== 0x1B ) // ESC key to cancel
         return -1;
 
-      if ((k==0x7E) && (c>x)) // backspace
+      if (k==0x7E) // backspace
 	{
-	  SetChar(c+1,y,0);
-	  s[--o]=0;
-	  c--;
-	  SetChar(c+1,y,0x80);
+	  if (c>x)
+            {
+	      SetChar(c+1,y,0);
+	      s[--o]=0;
+	      --c;
+	      SetChar(c+1,y,0x80);
+            }
 	}
       else if (k==0x9b) // return (EOL)
 	{
