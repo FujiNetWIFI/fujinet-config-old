@@ -144,6 +144,7 @@ void diskulator_slot_create_disk(Context *context, SubState *ss)
     {
       error(ERROR_CREATING_NEW_DISK);
       wait_a_moment();
+      *ss=DONE;
       context->state=DISKULATOR_SELECT;
       return;
     }
@@ -172,9 +173,7 @@ void diskulator_slot_commit(Context *context, SubState *ss)
   if (fuji_sio_error())
     {
       error(ERROR_WRITING_DEVICE_SLOTS);
-      wait_a_moment();
-      context->state=DISKULATOR_HOSTS;
-      return;
+      goto exit_error;
     }
 
   // Write full filename
@@ -182,14 +181,19 @@ void diskulator_slot_commit(Context *context, SubState *ss)
   if (fuji_sio_error())
     {
       error(ERROR_SETTING_FULL_PATH);
-      wait_a_moment();
-      context->state=DISKULATOR_HOSTS;
-      return;
+      goto exit_error;
     }
 
   // And go back to the hosts/slots screen
   *ss=DONE;
   context->state=DISKULATOR_SELECT;
+  return;
+
+exit_error:
+  wait_a_moment();
+  *ss=DONE;
+  context->state=DISKULATOR_HOSTS;
+
 }
 
 /**
