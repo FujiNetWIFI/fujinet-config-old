@@ -7,6 +7,9 @@
 #ifndef ERROR_H
 #define ERROR_H
 
+/* Note: When adding/removing/reordering things in
+   this enum list, be sure to keep `error_texts`
+   char * array in "errors.c" synchronized! */
 typedef enum _errorMessage
   {
    ERROR_READING_ADAPTER_CONFIG,

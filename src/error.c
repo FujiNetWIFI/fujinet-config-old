@@ -9,6 +9,9 @@
 #include "error.h"
 #include "screen.h"
 
+/* Note: These message strings describe the error codes
+   in the `ErrorMessage` enum, found in "errors.h".
+   (This list must be kept synchronized with that list.) */
 char * error_texts[]= {
 "ERROR READING ADAPTER CONFIG",
 "ERROR SCANNING NETWORKS",
