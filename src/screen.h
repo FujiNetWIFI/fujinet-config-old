@@ -95,7 +95,9 @@ void screen_clear(void);
 /**
  * Input a string at x,y
  */
-int screen_input(unsigned char x, unsigned char y, char* s);
+#define screen_input(x,y,s) _screen_input((x),(y),(s),sizeof(s))
+
+int _screen_input(unsigned char x, unsigned char y, char* s, unsigned char maxlen);
 
 /**
  * Print IP address at position
