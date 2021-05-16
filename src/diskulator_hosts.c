@@ -222,7 +222,7 @@ void diskulator_hosts_edit_host_slot(unsigned char i, Context *context)
       tmp[0]=i+0x31;
       screen_puts(2,i+1,tmp);
     }
-  screen_input(4, i+1, context->hostSlots.host[i]);
+  screen_input(5, i+1, context->hostSlots.host[i]);
   if (context->hostSlots.host[i][0] == 0x00)
     screen_puts(5, i+1, text_empty);
   fuji_sio_write_host_slots(&context->hostSlots);

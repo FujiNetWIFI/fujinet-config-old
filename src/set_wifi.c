@@ -151,7 +151,7 @@ State set_wifi_save_network(unsigned char selectedNetwork, unsigned char numNetw
 
       // Clear and get input.
       screen_clear_line((numNetworks-1)+3);
-      screen_input(1,(numNetworks-1)+3,n.ssid);
+      screen_input(2,(numNetworks-1)+3,n.ssid);
     }
 
   screen_clear_line(21);

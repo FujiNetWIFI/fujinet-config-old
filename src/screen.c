@@ -11,6 +11,7 @@
 #include "screen.h"
 
 unsigned char* video_ptr;
+unsigned char* cursor_ptr;
 
 void config_dlist=
   {
@@ -51,41 +52,56 @@ void config_dlist=
 
 void screen_clear()
 {
+  cursor_ptr=video_ptr;
   memset(video_ptr,0,GRAPHICS_0_SCREEN_SIZE);
 }
 
+void set_cursor(unsigned char x, unsigned char y)
+{
+  cursor_ptr=video_ptr+x+y*40;
+}
+
+
 void screen_clear_line(unsigned char y)
 {
-  memset(&video_ptr[(y)*40],0,40);
+  set_cursor(0,y);
+  memset(cursor_ptr,0,40);
 }
 
 /**
  * Print ATASCII string to display memory
  */
-void screen_puts(unsigned char x, unsigned char y, char *s)
+void put_char(char c)
 {
   char offset;
-  
-  do
-    {     
-      if (*s < 32)
-	{
-	  offset=64;
-	}
-      else if (*s<96)
-	{
-	  offset=-32;
-	}
-      else
-	{
-	  offset=0;
-	}
-      
-      SetChar(x++,y,*s+offset);
+  if (c < 32)
+    {
+      offset=64;
+    }
+  else if (c<96)
+    {
+      offset=-32;
+    }
+  else
+    {
+      offset=0;
+    }
+  POKE(cursor_ptr++,c+offset);
+}
 
+void screen_append(char *s)
+{
+  while (*s!=0) 
+    {     
+      put_char(*s);
       ++s;
-      
-    } while(*s!=0);
+    }
+}
+
+void screen_puts(unsigned char x, unsigned char y, char *s)
+{
+  set_cursor(x,y);
+  screen_append(s);
 }
 
 /**
@@ -93,18 +109,17 @@ void screen_puts(unsigned char x, unsigned char y, char *s)
  */
 int _screen_input(unsigned char x, unsigned char y, char* s, unsigned char maxlen)
 {
-  unsigned char c,k,o;
-  unsigned char outc[2]={0,0};
-  unsigned char q;
+  unsigned char k,o;
+  unsigned char * input_start_ptr;
   
   o=strlen(s);
-  c=x+o;
+  set_cursor(x,y);
+  input_start_ptr=cursor_ptr;
+  screen_append(s);
 
-  SetChar(c+1,y,0x80); // turn on cursor
+  POKE(cursor_ptr,0x80); // turn on cursor
 
-  k=0;
-  
-  while (k!=155)
+  do
     {
       k=cgetc();
 
@@ -113,32 +128,23 @@ int _screen_input(unsigned char x, unsigned char y, char* s, unsigned char maxle
 
       if (k==0x7E) // backspace
 	{
-	  if (c>x)
+	  if (cursor_ptr>input_start_ptr)
             {
-	      SetChar(c+1,y,0);
 	      s[--o]=0;
-	      --c;
-	      SetChar(c+1,y,0x80);
+	      POKEW(--cursor_ptr,0x0080);
             }
-	}
-      else if (k==0x9b) // return (EOL)
-	{
-	  SetChar(c+1,y,GetChar(c+1,y)&0x7F);
-	  // exit while.
 	}
       else if ((k>0x1F) && (k<0x80)) // printable ascii
 	{
 	  if (o<maxlen-1)
             {
-	      SetChar(c+1,y,GetChar(c+1,y)&0x7F);
-	      outc[0]=k;
-	      screen_puts(c+1,y,outc);
-	      SetChar(c+2,y,0x80);
+	      put_char(k);
 	      s[o++]=k;
-	      c++;
+	      POKE(cursor_ptr,0x80);
             }
 	}
-    }
+    } while (k!=0x9b);
+  POKE(cursor_ptr,0x00); // clear cursor
 }
 
 /**
@@ -146,17 +152,16 @@ int _screen_input(unsigned char x, unsigned char y, char* s, unsigned char maxle
  */
 void screen_print_ip(unsigned char x, unsigned char y, unsigned char *buf)
 {
-    unsigned char i = 0;
-    unsigned char o = 0;
-    unsigned char tmp[4];
+  unsigned char i = 0;
+  unsigned char tmp[4];
 
-    for (i = 0; i < 4; i++)
+  set_cursor(x,y);
+  for (i = 0; i < 4; i++)
     {
-        itoa(buf[i], tmp, 10);
-        screen_puts(x + o, y, tmp);
-        o += strlen(tmp);
-        if (i < 3)
-            screen_puts(x + (o++), y, ".");
+      itoa(buf[i], tmp, 10);
+      screen_append(tmp);
+      if (i == 3) break;
+      screen_append(".");
     }
 }
 
@@ -178,17 +183,16 @@ void itoa_hex(unsigned char val, char *buf)
  */
 void screen_print_mac(unsigned char x, unsigned char y, unsigned char *buf)
 {
-    unsigned char i = 0;
-    unsigned char o = 0;
-    unsigned char tmp[3];
+  unsigned char i = 0;
+  unsigned char tmp[3];
 
-    for (i = 0; i < 6; i++)
+  set_cursor(x,y);
+  for (i = 0; i < 6; i++)
     {
-        itoa_hex(buf[i], tmp);
-        screen_puts(x + o, y, tmp);
-        o += strlen(tmp);
-        if (i < 5)
-            screen_puts(x + (o++), y, ":");
+      itoa_hex(buf[i], tmp);
+      screen_append(tmp);
+      if (i == 5) break;
+      screen_append(":");
     }
 }
 

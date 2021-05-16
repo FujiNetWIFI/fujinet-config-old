@@ -235,7 +235,7 @@ void diskulator_select_display_directory_page(Context* context)
   if (context->dir_eof == false)
     diskulator_select_display_next_page();
 
-  if (i==0)
+  if (i==0 && context->dir_page==0)
     {
       error(ERROR_EMPTY_SD);
       wait_a_moment();
@@ -409,7 +409,7 @@ void diskulator_select_new_disk(Context* context, SubState* ss)
   screen_dlist_diskulator_select_aux();
 
   memset(context->filename,0,sizeof(context->filename));
-  screen_puts(1,20,"Enter name of new disk image file");
+  screen_puts(0,20,"Enter name of new disk image file");
   screen_input(0,21,context->filename);
 
   if (context->filename[0]==0x00)
@@ -431,10 +431,10 @@ void diskulator_select_new_disk(Context* context, SubState* ss)
   screen_puts(5, 21,
               CH_KEY_LABEL_L CH_INV_5 CH_KEY_LABEL_R "720K "
               CH_KEY_LABEL_L CH_INV_6 CH_KEY_LABEL_R "1440K "
-              CH_KEY_LABEL_L CH_INV_7 CH_KEY_LABEL_R "Custom");
+              CH_KEY_LABEL_L CH_INV_7 CH_KEY_LABEL_R "Custom ?");
 
   memset(tmp_str,0,sizeof(tmp_str));
-  screen_input(32,21,tmp_str);
+  screen_input(34,21,tmp_str);
 
   switch(tmp_str[0])
     {
@@ -468,13 +468,13 @@ void diskulator_select_new_disk(Context* context, SubState* ss)
 
       memset(tmp_str,0,sizeof(tmp_str));
       screen_puts(0,20,"# Sectors?");
-      screen_input(12,20,tmp_str);
+      screen_input(11,20,tmp_str);
       context->newDisk_ns=atoi(tmp_str);
 
       memset(tmp_str,0,sizeof(tmp_str));
       screen_puts(0,21,"Sector Size (128/256)?");
-      screen_input(24,21,tmp_str);
-      context->newDisk_sz=atoi(tmp_str);
+      screen_input(23,21,tmp_str);
+      context->newDisk_sz=tmp_str[0]=='2'?256:128;
       break;
     }
 
@@ -482,7 +482,7 @@ void diskulator_select_new_disk(Context* context, SubState* ss)
   screen_clear_line(20);
   screen_clear_line(21);
   screen_puts(0,20,"Are you sure (Y/N)?");
-  screen_input(21,20,tmp_str);
+  screen_input(20,20,tmp_str);
 
   if (tmp_str[0]=='Y' || tmp_str[0]=='y')
     {
@@ -498,7 +498,7 @@ void diskulator_select_new_disk(Context* context, SubState* ss)
 void diskulator_select_set_filter(Context *context, SubState *ss)
 {
   diskulator_select_display_filter(context);
-  screen_input(21,DIRECTORY_LIST_Y_OFFSET-1,context->filter);
+  screen_input(22,DIRECTORY_LIST_Y_OFFSET-1,context->filter);
   *ss=ADVANCE_DIR;
 }
 
