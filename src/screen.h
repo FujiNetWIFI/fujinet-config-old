@@ -12,7 +12,6 @@
 #define GRAPHICS_0_SCREEN_SIZE (40*25)
 #define DISPLAY_LIST 0x0600
 #define DISPLAY_MEMORY 0x7400
-#define FONT_MEMORY 0x7800
 
 #define CH_FOLDER "\x04"
 
@@ -77,6 +76,10 @@
 #define CH_KEY_GT CH_KEY_LABEL_L CH_INV_GT CH_KEY_LABEL_R
 #define CH_KEY_ESC CH_KEY_LABEL_L CH_INV_E CH_INV_S CH_INV_C CH_KEY_LABEL_R
 
+/**
+ * Main init procedure
+ */
+void screen_init(void);
 /**
  * Print ATASCII string to display memory
  */

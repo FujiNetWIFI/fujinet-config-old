@@ -11,8 +11,43 @@
 #include "screen.h"
 
 unsigned char* video_ptr;
-unsigned short screen_memory;
-unsigned char* font_ptr;
+
+void config_dlist=
+  {
+   DL_BLK8,
+   DL_BLK8,
+   DL_BLK8,
+   DL_LMS(DL_CHR20x8x2),  //0,0x3
+   DISPLAY_MEMORY,
+
+   DL_CHR20x8x2,  //1,0x6
+   DL_CHR40x8x1,  //2
+   DL_CHR40x8x1,  //3
+   DL_CHR40x8x1,  //4
+   DL_CHR40x8x1,  //*5,0xa
+   DL_CHR40x8x1,  //*6,0xb
+   DL_CHR40x8x1,  //7
+   DL_CHR40x8x1,  //8
+   DL_CHR40x8x1,  //9
+   DL_CHR40x8x1,  //*10,0x0f
+   DL_CHR40x8x1,  //*11,0x10
+   DL_CHR40x8x1,  //12
+   DL_CHR40x8x1,  //13
+   DL_CHR40x8x1,  //14
+   DL_CHR40x8x1,  //15,0x14
+   DL_CHR40x8x1,  //16
+   DL_CHR40x8x1,  //17
+   DL_CHR40x8x1,  //18
+   DL_CHR40x8x1,  //19,0x18
+   DL_CHR40x8x1,  //20
+   DL_CHR40x8x1,  //21
+   DL_CHR20x8x2,  //*22,0x1b
+   DL_CHR20x8x2,  //*23,0x1c
+   DL_JVB,	  //0x1d
+   DISPLAY_LIST,  //0x1e,0x1f
+   0,0,0,0
+  };
+
 
 void screen_clear()
 {
@@ -234,4 +269,11 @@ void screen_dlist_diskulator_slot(void)
 void screen_dlist_diskulator_copy_destination_host_slot(void)
 {
 
+}
+
+void screen_init()
+{
+  memcpy((void *)DISPLAY_LIST,&config_dlist,sizeof(config_dlist)); // copy display list to $0600
+  OS.sdlst=(void *)DISPLAY_LIST;                     // and use it.
+  video_ptr=(unsigned char*)(PEEKW(PEEKW(560)+4));
 }

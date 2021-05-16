@@ -8,6 +8,11 @@
 #define BAR_H
 
 /**
+ * Main init procedure
+ */
+void bar_init();
+
+/**
  * Set up all the registers to display the bar
  */
 extern void bar_setup_regs(void);

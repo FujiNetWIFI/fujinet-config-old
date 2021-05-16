@@ -10,6 +10,13 @@
 
 #define BAR_PMBASE	0x7c00
 unsigned char* bar_pmbase=(unsigned char *)BAR_PMBASE;
+/**
+ * Main init procedure
+ */
+void bar_init(){
+  bar_clear();
+  bar_setup_regs();
+}
 
 /**
  * Clear bar from screen
