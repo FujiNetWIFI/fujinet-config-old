@@ -187,15 +187,15 @@ State set_wifi_select_network(unsigned char numNetworks, Context *context)
       k=input_handle_key_ucase();
       input_handle_nav_keys(k,4,numNetworks,&i);
 
-      if ((k==0x9B) || (k==0x1B) || (k=='S'))
+      if ((k==KCODE_RETURN) || (k==KCODE_ESCAPE) || (k=='S'))
 	break;
     }
 
-  if (k==0x9B) // RETURN
+  if (k==KCODE_RETURN) // RETURN
     {
       new_state = set_wifi_save_network(i,numNetworks,context);
     }
-  else if (k==0x1B) // ESC
+  else if (k==KCODE_ESCAPE) // ESC
     {
       // Loop back around again to re-scan.
       new_state = SET_WIFI;

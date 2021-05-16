@@ -36,16 +36,12 @@ void diskulator_hosts_display_host_slots(unsigned char y, Context *context)
   // Display host slots
   for (i = 0; i < 8; i++)
     {
-      unsigned char n = i + 1;
-      unsigned char ni[2];
+      set_cursor(2,i+y);
+      put_char(i+'1');
+      cursor_ptr+=2;
 
-      utoa(n, ni, 10);
-      screen_puts(2, i + y, ni);
-
-      if (context->hostSlots.host[i][0] != 0x00)
-        screen_puts(5, i + y, context->hostSlots.host[i]);
-      else
-        screen_puts(5, i + y, text_empty);
+      screen_append((context->hostSlots.host[i][0] != 0x00)?
+        (char *)context->hostSlots.host[i]: text_empty);
     }
 }
 
@@ -82,10 +78,8 @@ void diskulator_hosts_display_device_slots(unsigned char y, Context *context)
 
       screen_puts(0, i + y, d);
 
-      if (context->deviceSlots.slot[i].file[0] != 0x00)
-        screen_puts(5,i+y,context->deviceSlots.slot[i].file);
-      else
-        screen_puts(5,i+y,text_empty);
+      screen_append(context->deviceSlots.slot[i].file[0] != 0x00?
+        (char *)context->deviceSlots.slot[i].file: text_empty);
     }    
 }
 
@@ -179,19 +173,10 @@ void diskulator_hosts_setup(Context *context)
  */
 void diskulator_hosts_handle_jump_keys(unsigned char k,unsigned char *i, SubState *ss)
 {
-  switch(k)
+  if (k>='1' && k<='8')
     {
-    case '1':
-    case '2':
-    case '3':
-    case '4':
-    case '5':
-    case '6':
-    case '7':
-    case '8':
       *i=k-'1';
       bar_show((*i)+(*ss==DEVICES ? ORIGIN_DEVICE_SLOTS : ORIGIN_HOST_SLOTS));
-      break;
     }
 }
 
@@ -202,10 +187,9 @@ void diskulator_hosts_handle_nav_keys(unsigned char k, unsigned char *i, SubStat
 {
   unsigned char o;
 
-  if (*new_substate==DEVICES)
-    o=ORIGIN_DEVICE_SLOTS;
-  else
-    o=ORIGIN_HOST_SLOTS;
+  o=*new_substate==DEVICES?
+    ORIGIN_DEVICE_SLOTS:
+    ORIGIN_HOST_SLOTS;
 
   input_handle_nav_keys(k,o,8,i);
 }
@@ -335,7 +319,7 @@ void diskulator_hosts_hosts(Context *context, SubState *new_substate)
 	  for (i=0;i<8;i++)
 	    diskulator_hosts_eject_device_slot(i,ORIGIN_DEVICE_SLOTS,context);
 	  break;
-        case 0x9b: // RETURN
+        case KCODE_RETURN: // RETURN
           if (context->hostSlots.host[i][0]==0x00 || (context->net_connected == false && strcmp(context->hostSlots.host[i],"SD") != 0)) // empty host slot?
             break; // do nothing
 	  

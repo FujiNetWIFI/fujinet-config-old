@@ -58,10 +58,10 @@ void diskulator_select_clear_file_area(void)
 void diskulator_select_display_directory_path(Context* context)
 {
   screen_clear_line(DIRECTORY_LIST_HOSTNAME_Y);
-  screen_puts(0,DIRECTORY_LIST_HOSTNAME_Y,context->hostSlots.host[context->host_slot]);
+  screen_append(context->hostSlots.host[context->host_slot]);
 
   screen_clear_line(DIRECTORY_LIST_DIRPATH_Y);
-  screen_puts(0,DIRECTORY_LIST_DIRPATH_Y,context->directory);
+  screen_append(context->directory);
 }
 
 /**
@@ -108,8 +108,7 @@ void diskulator_select_display_clear_page(void)
  */
 void diskulator_select_display_prev_page(void)
 {
-  screen_puts(0,DIRECTORY_LIST_Y_OFFSET-1,CH_KEY_LT);
-  screen_puts(3,DIRECTORY_LIST_Y_OFFSET-1,"Previous Page");
+  screen_puts(0,DIRECTORY_LIST_Y_OFFSET-1,CH_KEY_LT"Previous Page");
 }
 
 /**
@@ -117,8 +116,7 @@ void diskulator_select_display_prev_page(void)
  */
 void diskulator_select_display_next_page(void)
 {
-  screen_puts(0,DIRECTORY_LIST_Y_OFFSET+DIRECTORY_LIST_ENTRIES_PER_PAGE,CH_KEY_GT);
-  screen_puts(3,DIRECTORY_LIST_Y_OFFSET+DIRECTORY_LIST_ENTRIES_PER_PAGE,"Next Page");
+  screen_puts(0,DIRECTORY_LIST_Y_OFFSET+DIRECTORY_LIST_ENTRIES_PER_PAGE,CH_KEY_GT"Next Page");
 }
 
 /**
@@ -193,9 +191,7 @@ void diskulator_select_display_directory_page(Context* context)
   if (fuji_sio_error() && pos!=0)
     {
       error(ERROR_SETTING_DIRECTORY_POSITION);
-      wait_a_moment();
-      context->state=DISKULATOR_HOSTS;
-      return;
+      goto exit_error;
     }
 
   for (i=0;i<DIRECTORY_LIST_ENTRIES_PER_PAGE;i++)
@@ -215,9 +211,7 @@ void diskulator_select_display_directory_page(Context* context)
       if (fuji_sio_error())
         {
           error(ERROR_READING_DIRECTORY);
-          wait_a_moment();
-          context->state=DISKULATOR_HOSTS;
-          return;
+	  goto exit_error;
         }
 
       context->entry_widths[i]=strlen(displayed_entry);
@@ -238,10 +232,17 @@ void diskulator_select_display_directory_page(Context* context)
   if (i==0 && context->dir_page==0)
     {
       error(ERROR_EMPTY_SD);
-      wait_a_moment();
-      context->state=DISKULATOR_HOSTS;
-      return;
+      goto exit_error;
     }
+
+  return;
+
+exit_error:
+
+  wait_a_moment();
+  context->state=DISKULATOR_HOSTS;
+  return;
+
 }
 
 /**
@@ -525,9 +526,7 @@ void diskulator_select_show_full_filename(Context *context, unsigned char i)
   if (fuji_sio_error())
     {
       error(ERROR_OPENING_DIRECTORY);
-      wait_a_moment();
-      context->state=DISKULATOR_HOSTS;
-      return;
+      goto exit_error;
     }
 
   retry=5;
@@ -545,9 +544,7 @@ void diskulator_select_show_full_filename(Context *context, unsigned char i)
   if (fuji_sio_error())
     {
       error(ERROR_SETTING_DIRECTORY_POSITION);
-      wait_a_moment();
-      context->state=DISKULATOR_HOSTS;
-      return;
+      goto exit_error;
     }
 
   retry=5;
@@ -565,9 +562,7 @@ void diskulator_select_show_full_filename(Context *context, unsigned char i)
   if (fuji_sio_error())
     {
       error(ERROR_READING_DIRECTORY);
-      wait_a_moment();
-      context->state=DISKULATOR_HOSTS;
-      return;
+      goto exit_error;
     }
 
   fuji_sio_close_directory(context->host_slot);
@@ -577,6 +572,12 @@ void diskulator_select_show_full_filename(Context *context, unsigned char i)
   screen_clear_line(20);
 
   screen_puts(0,18,context->filename);
+  return;
+exit_error:
+
+      wait_a_moment();
+      context->state=DISKULATOR_HOSTS;
+      return;
 }
 
 /**
@@ -634,8 +635,8 @@ void diskulator_select_select_file(Context* context, SubState* ss)
         case 0x1D:
           long_filename_displayed=false;
           break;
-	case '*':
-        case 0x9B:
+        case '*': // right arrow
+        case KCODE_RETURN:
           diskulator_select_handle_return(i,context,ss);
           break;
         case '<':
@@ -646,13 +647,13 @@ void diskulator_select_select_file(Context* context, SubState* ss)
           if (!context->dir_eof)
             *ss=NEXT_PAGE;
           break;
-        case 0x1B:
+        case KCODE_ESCAPE:
           *ss=DONE;
           context->dir_page=0;
           context->state=DISKULATOR_HOSTS;
           break;
-        case 0x7E:
-	case '+':
+        case KCODE_BACKSP:
+        case '+': // left arrow
           *ss=DEVANCE_DIR;
           context->dir_page=0;
           break;
@@ -660,14 +661,12 @@ void diskulator_select_select_file(Context* context, SubState* ss)
           *ss=DONE;
           context->state = MOUNT_AND_BOOT;
           break;
-	case 'C':
-	  context->state = DISKULATOR_COPY;
-	  if (context->copySubState == DISABLED)
-	    context->copySubState = SELECT_HOST_SLOT;
-	  else
-	    context->copySubState = DO_COPY;
-	  diskulator_select_handle_return(i,context,ss);
-	  break;
+        case 'C':
+          context->state = DISKULATOR_COPY;
+          context->copySubState = context->copySubState == DISABLED?
+            SELECT_HOST_SLOT:DO_COPY;
+          diskulator_select_handle_return(i,context,ss);
+          break;
         case 'N':
           diskulator_select_new_disk(context,ss);
           break;
@@ -695,9 +694,9 @@ void diskulator_select_setup(Context *context)
   screen_puts(4, 0, "DISK IMAGES");
 
   screen_puts(0,21,
-	      CH_KEY_LEFT CH_KEY_DELETE "Up Dir"
-	      CH_KEY_N "ew"
-	      CH_KEY_F "ilter");
+        CH_KEY_LEFT CH_KEY_DELETE "Up Dir"
+        CH_KEY_N "ew"
+        CH_KEY_F "ilter");
 
   if (context->copySubState == SELECT_DESTINATION_FOLDER)
     {

@@ -7,6 +7,7 @@
 #ifndef SCREEN_H
 #define SCREEN_H
 
+extern unsigned char* cursor_ptr;
 #define GRAPHICS_0_SCREEN_SIZE (40*25)
 #define DISPLAY_LIST 0x0600
 #define DISPLAY_MEMORY 0x7400
@@ -74,6 +75,9 @@
 #define CH_KEY_GT CH_KEY_LABEL_L CH_INV_GT CH_KEY_LABEL_R
 #define CH_KEY_ESC CH_KEY_LABEL_L CH_INV_E CH_INV_S CH_INV_C CH_KEY_LABEL_R
 
+#define KCODE_RETURN  0x9B
+#define KCODE_ESCAPE  0x1B
+#define KCODE_BACKSP  0x7E
 /**
  * Main init procedure
  */
@@ -82,6 +86,11 @@ void screen_init(void);
  * Print ATASCII string to display memory
  */
 void screen_puts(unsigned char x,unsigned char y,char *s);
+
+/**
+ * Append ATASCII string to display memory
+ */
+void screen_append(char *s);
 
 /**
  * Clear a line
@@ -150,5 +159,13 @@ void screen_dlist_diskulator_slot(void);
  */
 void screen_dlist_diskulator_copy_destination_host_slot(void);
 
+/**
+ *  sets the cursor at x,y for further operations
+ */
+void set_cursor(unsigned char x, unsigned char y);
 
+/**
+ * Print ATASCII string to display memory
+ */
+void put_char(char c);
 #endif /* SCREEN_H */

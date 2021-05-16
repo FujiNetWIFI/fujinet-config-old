@@ -123,10 +123,10 @@ int _screen_input(unsigned char x, unsigned char y, char* s, unsigned char maxle
     {
       k=cgetc();
 
-      if ( k== 0x1B ) // ESC key to cancel
+      if ( k== KCODE_ESCAPE ) // ESC key to cancel
         return -1;
 
-      if (k==0x7E) // backspace
+      if (k==KCODE_BACKSP) // backspace
 	{
 	  if (cursor_ptr>input_start_ptr)
             {
@@ -143,7 +143,7 @@ int _screen_input(unsigned char x, unsigned char y, char* s, unsigned char maxle
 	      POKE(cursor_ptr,0x80);
             }
 	}
-    } while (k!=0x9b);
+    } while (k!=KCODE_RETURN);
   POKE(cursor_ptr,0x00); // clear cursor
 }
 
@@ -279,5 +279,5 @@ void screen_init()
 {
   memcpy((void *)DISPLAY_LIST,&config_dlist,sizeof(config_dlist)); // copy display list to $0600
   OS.sdlst=(void *)DISPLAY_LIST;                     // and use it.
-  video_ptr=(unsigned char*)(PEEKW(PEEKW(560)+4));
+  video_ptr=(unsigned char*)(DISPLAY_MEMORY);
 }

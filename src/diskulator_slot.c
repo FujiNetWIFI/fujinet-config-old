@@ -62,32 +62,25 @@ void diskulator_slot_select(Context *context, SubState *ss)
       k=input_handle_key_ucase();
       input_handle_nav_keys(k,3,8,&i);
 
+      if (k>='1' && k<='8')
+	{
+          i=k-=0x31;
+          bar_show(i+3);
+	}
       switch(k)
         {
         case 'E':
           diskulator_hosts_eject_device_slot(i,4,context);
           break;
-        case 0x1B:
+        case KCODE_ESCAPE:
           *ss=DONE;
           context->state=DISKULATOR_SELECT;
           break;
-        case 0x9B:
+        case KCODE_RETURN:
           context->device_slot=i;
           *ss=(context->newDisk==true ? CREATE_DISK : SELECT_MODE);
           break;
-        case '1':
-        case '2':
-        case '3':
-        case '4':
-        case '5':
-        case '6':
-        case '7':
-        case '8':
-          i=k-=0x31;
-          bar_show(i+3);
-        default:
-          break;
-        }
+      }
     }
 }
 
@@ -107,19 +100,13 @@ void diskulator_slot_select_mode(Context *context, SubState *ss)
   while (k==0)
     k=input_handle_key_ucase();
 
-  switch (k)
+  if (k==KCODE_ESCAPE)
     {
-    case 0x1B:
       *ss=DONE;
-      break;
-    case 'W':
-      context->mode = 2;
-      break;
-    default:
-      context->mode = 1;
-      break;
+      return;
     }
 
+  context->mode = 1+(k=='W');
   *ss=COMMIT_SLOT;
 }
 
@@ -131,7 +118,7 @@ void diskulator_slot_create_disk(Context *context, SubState *ss)
   screen_clear_line(20);
   screen_clear_line(21);
 
-  screen_puts(0,21,"CREATING NEW DISK");
+  screen_append("CREATING NEW DISK");
 
   context->deviceSlots.slot[context->device_slot].hostSlot = context->host_slot;
   strcpy(context->deviceSlots.slot[context->device_slot].file, context->directory);
@@ -191,7 +178,7 @@ exit_error:
   wait_a_moment();
   *ss=DONE;
   context->state=DISKULATOR_HOSTS;
-
+  return;
 }
 
 /**

@@ -90,13 +90,19 @@ void diskulator_copy_destination_host_slot(Context *context)
       k=input_handle_key_ucase();
       input_handle_nav_keys(k,3,8,&i);
       
+      if (k>='1' && k<='8')
+	{
+          i=k-=0x31;
+          bar_show(i+3);
+	}
+
       switch(k)
 	{
-	case 0x1b:
+	case KCODE_ESCAPE:
 	  context->copySubState = DISABLED;
 	  context->state = DISKULATOR_SELECT;
 	  break;
-	case 0x9b:	  
+	case KCODE_RETURN:
           fuji_sio_mount_host(i,&context->hostSlots);
 
           if (fuji_sio_error())
@@ -116,19 +122,7 @@ void diskulator_copy_destination_host_slot(Context *context)
 	  memset(context->directory,0,sizeof(context->directory));
 	  strcpy(context->directory, "/");
 	  break;
-        case '1':
-        case '2':
-        case '3':
-        case '4':
-        case '5':
-        case '6':
-        case '7':
-        case '8':
-          i=k-=0x31;
-          bar_show(i+3);
-        default:
-          break;
-	}
+      }
     }
  }
 
