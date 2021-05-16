@@ -58,9 +58,9 @@ void config_dlist=
    DL_CHR40x8x1,
    DL_CHR40x8x1,
    DL_CHR20x8x2,
-   DL_CHR20x8x2,   
+   DL_CHR20x8x2,
    DL_JVB,
-   0x600,
+   DISPLAY_LIST,
    0,0,0,0
   };
 
@@ -76,7 +76,9 @@ State configured(Context *context)
 
     // WiFi not configured or SELECT to override.
   if ((GTIA_READ.consol == 5) || netConfig.ssid[0] == '\0')
-    return SET_WIFI;  
+    {
+      return SET_WIFI;
+    }
   else if (netConfig.ssid[0] != '\0')
     {
       if (fuji_sio_get_wifi_status(&status) != 1)
@@ -89,7 +91,9 @@ State configured(Context *context)
 	  return DISKULATOR_HOSTS;
 	}
       else
-	return CONNECT_WIFI;
+        {
+          return CONNECT_WIFI;
+        }
     }
     
   return DISKULATOR_HOSTS;

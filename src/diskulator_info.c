@@ -53,16 +53,14 @@ State diskulator_info(void)
   screen_puts(17,13, ac.fn_version);
 
   while (k==0)
-    k=input_handle_key();
+    k=input_handle_key_ucase();
 
   switch(k)
     {
     case 'C':
-    case 'c':
       new_state = CONNECT_WIFI;
       break;
     case 'S':
-    case 's':
       new_state = SET_WIFI;
       break;
     }

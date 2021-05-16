@@ -113,6 +113,7 @@ void diskulator_hosts_keys_devices(void)
 {
   screen_clear_line(20);
   screen_clear_line(21);
+
   screen_puts(3,20,
     CH_KEY_1TO8 "Slot"
     CH_KEY_LABEL_L CH_INV_E CH_KEY_LABEL_R "ject"
@@ -307,7 +308,7 @@ void diskulator_hosts_hosts(Context *context, SubState *new_substate)
           context->state = MOUNT_AND_BOOT;
         }
 
-      k=input_handle_key();
+      k=input_handle_key_ucase();
       diskulator_hosts_handle_jump_keys(k,&i,new_substate);
       diskulator_hosts_handle_nav_keys(k,&i,new_substate);
 
@@ -320,17 +321,14 @@ void diskulator_hosts_hosts(Context *context, SubState *new_substate)
           bar_show(i+ORIGIN_DEVICE_SLOTS);
           break;
         case 'B':
-        case 'b':
           *new_substate=DONE;
           context->state = MOUNT_AND_BOOT;
           break;
         case 'C':
-        case 'c':
           context->state=DISKULATOR_INFO;
           *new_substate=DONE;
           break;
         case 'E':
-        case 'e':
           diskulator_hosts_edit_host_slot(i,context);
           break;
 	case 0x7D: // SHIFT-CLEAR
@@ -375,19 +373,17 @@ void diskulator_hosts_devices(Context *context, SubState *new_substate)
           *new_substate=DONE;
           context->state = MOUNT_AND_BOOT;
         }
-      k=input_handle_key();
+      k=input_handle_key_ucase();
       diskulator_hosts_handle_jump_keys(k,&i,new_substate);
       diskulator_hosts_handle_nav_keys(k,&i,new_substate);
 
       switch(k)
         {
         case 'C':
-        case 'c':
           context->state=DISKULATOR_INFO;
           *new_substate=DONE;
           break;
         case 'E':
-        case 'e':
           diskulator_hosts_eject_device_slot(i,ORIGIN_DEVICE_SLOTS,context);
           break;
 	case 0x7D: // SHIFT-CLEAR
@@ -401,11 +397,9 @@ void diskulator_hosts_devices(Context *context, SubState *new_substate)
           bar_show(i+ORIGIN_HOST_SLOTS);
           break;
         case 'R':
-        case 'r':
           diskulator_hosts_set_device_slot_mode(i,MODE_READ,context);
           break;
         case 'W':
-        case 'w':
           diskulator_hosts_set_device_slot_mode(i,MODE_WRITE,context);
           break;
         }

@@ -87,7 +87,7 @@ void diskulator_copy_destination_host_slot(Context *context)
   
   while (context->copySubState == SELECT_HOST_SLOT)
     {
-      k=input_handle_key();
+      k=input_handle_key_ucase();
       input_handle_nav_keys(k,3,8,&i);
       
       switch(k)

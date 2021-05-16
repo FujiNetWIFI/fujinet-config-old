@@ -95,3 +95,11 @@ unsigned char input_handle_key(void)
   else
     return input_handle_joystick();
 }
+
+unsigned char input_handle_key_ucase(void)
+{
+  unsigned char c = input_handle_key();
+  if ((c>='a') && (c<='z')) c&=~32;
+  return c;
+}
+	

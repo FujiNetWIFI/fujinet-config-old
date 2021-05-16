@@ -24,4 +24,5 @@ void wait_a_moment(void)
 {
   rtclr();
   while (OS.rtclok[2]<128) { }
+  if (kbhit()) cgetc();
 }

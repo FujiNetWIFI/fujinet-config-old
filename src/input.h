@@ -25,5 +25,6 @@ unsigned char input_handle_console_keys(void);
  * Returns an 'atascii key' regardless of input
  */
 unsigned char input_handle_key(void);
+unsigned char input_handle_key_ucase(void);
 
 #endif /* INPUT_H */

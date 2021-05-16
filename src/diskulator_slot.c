@@ -59,13 +59,12 @@ void diskulator_slot_select(Context *context, SubState *ss)
 
   while (*ss==SELECT_SLOT)
     {
-      k=input_handle_key();
+      k=input_handle_key_ucase();
       input_handle_nav_keys(k,3,8,&i);
 
       switch(k)
         {
         case 'E':
-        case 'e':
           diskulator_hosts_eject_device_slot(i,4,context);
           break;
         case 0x1B:
@@ -106,7 +105,7 @@ void diskulator_slot_select_mode(Context *context, SubState *ss)
     CH_KEY_ESC "Abort");
 
   while (k==0)
-    k=input_handle_key();
+    k=input_handle_key_ucase();
 
   switch (k)
     {
@@ -114,7 +113,6 @@ void diskulator_slot_select_mode(Context *context, SubState *ss)
       *ss=DONE;
       break;
     case 'W':
-    case 'w':
       context->mode = 2;
       break;
     default:

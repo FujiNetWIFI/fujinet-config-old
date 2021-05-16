@@ -600,7 +600,7 @@ void diskulator_select_select_file(Context* context, SubState* ss)
 
   while (*ss==SELECT_FILE)
     {
-      k=input_handle_key();
+      k=input_handle_key_ucase();
       diskulator_select_handle_page_nav(k,i,context,ss);
 
       if (context->entries_displayed>0)
@@ -656,12 +656,10 @@ void diskulator_select_select_file(Context* context, SubState* ss)
           *ss=DEVANCE_DIR;
           context->dir_page=0;
           break;
-        case 'b':
         case 'B':
           *ss=DONE;
           context->state = MOUNT_AND_BOOT;
           break;
-	case 'c':
 	case 'C':
 	  context->state = DISKULATOR_COPY;
 	  if (context->copySubState == DISABLED)
@@ -671,11 +669,9 @@ void diskulator_select_select_file(Context* context, SubState* ss)
 	  diskulator_select_handle_return(i,context,ss);
 	  break;
         case 'N':
-        case 'n':
           diskulator_select_new_disk(context,ss);
           break;
         case 'F':
-        case 'f':
           diskulator_select_set_filter(context,ss);
           break;
         }

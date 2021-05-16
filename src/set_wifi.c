@@ -184,10 +184,10 @@ State set_wifi_select_network(unsigned char numNetworks, Context *context)
   
   while (true) // Process keys
     {
-      k=input_handle_key();
+      k=input_handle_key_ucase();
       input_handle_nav_keys(k,4,numNetworks,&i);
 
-      if ((k==0x9B) || (k==0x1B) || (k=='s'))
+      if ((k==0x9B) || (k==0x1B) || (k=='S'))
 	break;
     }
 
@@ -200,7 +200,7 @@ State set_wifi_select_network(unsigned char numNetworks, Context *context)
       // Loop back around again to re-scan.
       new_state = SET_WIFI;
     }
-  else if (k=='s')
+  else if (k=='S')
     {
       // Skip and go to hosts screen.
       context->net_connected = true;
