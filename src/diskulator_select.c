@@ -230,11 +230,8 @@ void diskulator_select_display_directory_page(Context* context)
     diskulator_select_display_next_page();
 
   if (i==0 && context->dir_page==0)
-    {
-      error(ERROR_EMPTY_SD);
-      goto exit_error;
-    }
-
+      screen_puts(2,DIRECTORY_LIST_Y_OFFSET,"--Empty--");
+  
   return;
 
 exit_error:
