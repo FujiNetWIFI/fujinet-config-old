@@ -41,6 +41,8 @@ extern char text_empty[];
 #define DIRECTORY_LIST_FULL_WIDTH 128
 #define DIRECTORY_LIST_SHOW_FULL_FILENAME_DELAY 24
 
+bool files_present=false;
+
 /**
  * Clear full filename area
  */
@@ -69,6 +71,8 @@ void diskulator_select_display_directory_path(Context* context)
  */
 bool diskulator_select_display_directory_entry(unsigned char i, char* entry, Context *context)
 {
+  files_present=true;
+  
   if (entry[0]==0x7F)
     {
       context->dir_eof=true;
@@ -230,7 +234,10 @@ void diskulator_select_display_directory_page(Context* context)
     diskulator_select_display_next_page();
 
   if (i==0 && context->dir_page==0)
+    {
+      files_present = false;
       screen_puts(2,DIRECTORY_LIST_Y_OFFSET,"--Empty--");
+    }
   
   return;
 
@@ -634,7 +641,8 @@ void diskulator_select_select_file(Context* context, SubState* ss)
           break;
         case '*': // right arrow
         case KCODE_RETURN:
-          diskulator_select_handle_return(i,context,ss);
+	  if (files_present==true)
+	    diskulator_select_handle_return(i,context,ss);
           break;
         case '<':
           if (context->dir_page > 0)
