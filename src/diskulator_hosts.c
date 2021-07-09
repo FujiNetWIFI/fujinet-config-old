@@ -298,6 +298,10 @@ void diskulator_hosts_hosts(Context *context, SubState *new_substate)
 
       switch(k)
         {
+        case '!':
+          *new_substate=DONE;
+          context->state = MOUNT_AND_BOOT;
+          break;
         case 0x7F:
           i=0;
           *new_substate = DEVICES;
@@ -363,6 +367,10 @@ void diskulator_hosts_devices(Context *context, SubState *new_substate)
 
       switch(k)
         {
+        case '!':
+          *new_substate=DONE;
+          context->state = MOUNT_AND_BOOT;
+          break;
         case 'C':
           context->state=DISKULATOR_INFO;
           *new_substate=DONE;

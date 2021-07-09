@@ -58,17 +58,23 @@ unsigned char input_handle_joystick(void)
       switch(OS.stick0)
 	{
 	case 14:
-	  return 0x1C;
+        if (OS.strig0 == 1) 
+	      return 0x1C;
+        else
+          return '^'; //joy up and fire 
 	case 13:
 	  return 0x1D;
 	case 11:
-	  return '<';
+        if (OS.strig0 == 1) 
+ 	      return '<';
+        else 
+          return '!'; //joy left and fire
 	case 7:
-	  return '>';
+	 return '>';
 	}
     }
   else if (OS.strig0 == 0)
-    return 0x9B;
+      return 0x9B;
   else
     return 0;
 }

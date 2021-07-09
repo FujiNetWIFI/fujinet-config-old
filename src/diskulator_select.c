@@ -644,15 +644,22 @@ void diskulator_select_select_file(Context* context, SubState* ss)
 	  if (files_present==true)
 	    diskulator_select_handle_return(i,context,ss);
           break;
+        case '!': //joy left + fire
+          *ss=DONE;
+          context->state = MOUNT_AND_BOOT;
+          break;
         case '<':
           if (context->dir_page > 0)
             *ss=PREV_PAGE;
+          else
+            *ss=DEVANCE_DIR;
           break;
         case '>':
           if (!context->dir_eof)
             *ss=NEXT_PAGE;
           break;
         case KCODE_ESCAPE:
+        case '^': // joy up + fire
           *ss=DONE;
           context->dir_page=0;
           context->state=DISKULATOR_HOSTS;
