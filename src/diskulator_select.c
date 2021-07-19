@@ -477,9 +477,17 @@ void diskulator_select_new_disk(Context* context, SubState* ss)
       context->newDisk_ns=atoi(tmp_str);
 
       memset(tmp_str,0,sizeof(tmp_str));
-      screen_puts(0,21,"Sector Size (128/256)?");
-      screen_input(23,21,tmp_str);
-      context->newDisk_sz=tmp_str[0]=='2'?256:128;
+      while (tmp_str[0]!='1' && tmp_str[0]!='2' && tmp_str[0]!='5')
+      {
+        screen_puts(0,21,"Sector Size (128/256/512)?");
+        screen_input(27,21,tmp_str);
+      }
+      switch (tmp_str[0])
+      {
+        case '1': context->newDisk_sz=128;
+        case '2': context->newDisk_sz=256;
+        case '5': context->newDisk_sz=512;
+      }
       break;
     }
 
