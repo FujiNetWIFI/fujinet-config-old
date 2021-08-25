@@ -221,7 +221,6 @@ void screen_print_mac(unsigned char x, unsigned char y, unsigned char *buf)
 }
 /**
  * A set of functions to support custom screen formating to support different sections in the config program.
-/**
  * The Patch the dlist for the hosts screen
  */
 void screen_dlist_diskulator_hosts(void)
