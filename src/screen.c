@@ -15,7 +15,7 @@
  #include "screen.h"        // Local header file for the screen defines 
 
  unsigned char* video_ptr;  // a pointer to the memory address containing the screen contents
- unsigned char* cursor_ptr  // a pointer to the current cursor position on the screen
+ unsigned char* cursor_ptr;  // a pointer to the current cursor position on the screen
 
  // Setup the screen display dimensions for the program to be able to draw items on the screen
 void config_dlist=
