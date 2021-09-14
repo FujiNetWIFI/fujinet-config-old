@@ -1,22 +1,26 @@
 /**
  * FujiNet Configuration Program
  *
- * Screen macros
+ * Screen macros for defining character display attribtues for a select set of keys, variables and functions. 
  */
 
 #ifndef SCREEN_H
 #define SCREEN_H
 
 extern unsigned char* cursor_ptr;
-#define GRAPHICS_0_SCREEN_SIZE (40*25)
-#define DISPLAY_LIST 0x0600
-#define DISPLAY_MEMORY 0x7400
+#define GRAPHICS_0_SCREEN_SIZE (40*25)  // Defines the memory size in bytes
+#define DISPLAY_LIST 0x0600             // Memory address to store DISPLAY_LIST.  0x0600 is the first address available for user space memory (1)
+#define DISPLAY_MEMORY 0x7400           // Memory address to store DISPLAY_MEMORY.
 
-#define CH_FOLDER "\x04"
+/**
+ * The following defines assign an Atari internal code (2) character to specific labels used for display.  
+ **/
 
-#define CH_KEY_LABEL_L "\xD9"
-#define CH_KEY_LABEL_R "\x19"
+#define CH_FOLDER "\x04"               // Set the character folder to # 
+#define CH_KEY_LABEL_L "\xD9"          // Left arrow on the keyboard 
+#define CH_KEY_LABEL_R "\x19"          // Right arrow on the keyboard 
 
+// Inverse of internal character codes
 #define CH_INV_MINUS "\x8d"
 #define CH_INV_LT "\x9C"
 #define CH_INV_GT "\x9E"
@@ -75,7 +79,10 @@ extern unsigned char* cursor_ptr;
 #define CH_KEY_GT CH_KEY_LABEL_L CH_INV_GT CH_KEY_LABEL_R
 #define CH_KEY_ESC CH_KEY_LABEL_L CH_INV_E CH_INV_S CH_INV_C CH_KEY_LABEL_R
 
-#define KCODE_RETURN  0x9B
+/**
+ * Define key code to detect during keyboard capture
+ */
+#define KCODE_RETURN  0x9B  // is the ATASCI equivlant of 155 End Of Line (return)
 #define KCODE_ESCAPE  0x1B
 #define KCODE_BACKSP  0x7E
 /**
@@ -169,3 +176,9 @@ void set_cursor(unsigned char x, unsigned char y);
  */
 void put_char(char c);
 #endif /* SCREEN_H */
+
+/**
+ * Reference
+ * 1. Mapping the Atari, pg. 91.   Often to referred to as Page Six.
+ * 2. Mapping the Atari, pg. 180. Appendix 10 ATASCII And Internal Character Code Values
+ **/
