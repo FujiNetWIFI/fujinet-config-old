@@ -360,8 +360,6 @@ void diskulator_select_handle_return(unsigned char i, Context* context, SubState
 	  
 	  context->state=DISKULATOR_SELECT;
 	  context->host_slot = 7;
-	  strcpy(context->directory,"/");
-	  strcpy(context->filename,"");
 	  
 	  fuji_sio_mount_host(context->host_slot,&context->hostSlots);
 	  if (fuji_sio_error())
