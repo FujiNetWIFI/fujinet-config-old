@@ -82,11 +82,17 @@ bool diskulator_select_display_directory_entry(unsigned char i, char* entry, Con
   context->dir_eof=false;
 
   // Display filename
-  screen_puts(2,DIRECTORY_LIST_Y_OFFSET+i,entry);
+  if (entry[0]=='+')
+    screen_puts(2,DIRECTORY_LIST_Y_OFFSET+i,entry+1);
+  else
+    screen_puts(2,DIRECTORY_LIST_Y_OFFSET+i,entry);
 
   // Display folder icon if directory.
   if (entry[strlen(entry)-1]=='/')
     screen_puts(0,DIRECTORY_LIST_Y_OFFSET+i,CH_FOLDER);
+  else if (entry[0]=='+') 
+    screen_puts(0,DIRECTORY_LIST_Y_OFFSET+i,CH_SERVER);
+ 
 
   return true;
 }

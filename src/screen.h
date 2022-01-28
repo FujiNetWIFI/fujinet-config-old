@@ -17,6 +17,7 @@ extern unsigned char* cursor_ptr;
  **/
 
 #define CH_FOLDER "\x04"               // Set the character folder to # 
+#define CH_SERVER "\x06"               // Set the server folder to atari heart.
 #define CH_KEY_LABEL_L "\xD9"          // Left arrow on the keyboard 
 #define CH_KEY_LABEL_R "\x19"          // Right arrow on the keyboard 
 

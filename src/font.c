@@ -10,12 +10,13 @@
 
 
 
-unsigned char fontPatch[40]={
+unsigned char fontPatch[48]={
 			 0,0,0,0,0,0,3,51,
 			 0,0,3,3,51,51,51,51,
 			 48,48,48,48,48,48,48,48,
 			 0,120,135,255,255,255,255,0,
-			 0x00, 0x78, 0x87, 0xff, 0xff, 0xff, 0xff, 0x00
+			 0x00, 0x78, 0x87, 0xff, 0xff, 0xff, 0xff, 0x00,
+			 0,56,120,255,255,120,56,0			 
 };
 
 void font_init()
