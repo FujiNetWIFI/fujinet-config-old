@@ -345,6 +345,28 @@ void diskulator_select_handle_return(unsigned char i, Context* context, SubState
 	  *ss=ADVANCE_DIR; // Stay here, go to the new directory.
 	}
     }
+  // Handle if this is a new host.
+  else if (context->filename[0]=='+')
+    {
+	  // copy the host to slot 8, set the context to slot 8, open
+	  strcpy(context->hostSlots.host[7], context->filename+1);
+      fuji_sio_write_host_slots(&context->hostSlots);
+	  
+	  context->state=DISKULATOR_SELECT;
+	  context->host_slot = 7;
+	  strcpy(context->directory,"/");
+	  strcpy(context->filename,"");
+	  
+	  fuji_sio_mount_host(context->host_slot,&context->hostSlots);
+	  if (fuji_sio_error())
+		{
+		  error(ERROR_MOUNTING_HOST_SLOT);
+		  wait_a_moment();
+		  context->state=CONNECT_WIFI;
+		}
+	  
+	  *ss=DONE;
+    }
   else
     {
       if (context->copySubState == DISABLED)
