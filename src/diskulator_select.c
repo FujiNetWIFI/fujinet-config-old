@@ -60,7 +60,7 @@ void diskulator_select_clear_file_area(void)
 void diskulator_select_display_directory_path(Context* context)
 {
   screen_clear_line(DIRECTORY_LIST_HOSTNAME_Y);
-  screen_append(context->hostSlots.host[context->host_slot]);
+  screen_append(context->host);
 
   screen_clear_line(DIRECTORY_LIST_DIRPATH_Y);
   screen_append(context->directory);
@@ -353,22 +353,23 @@ void diskulator_select_handle_return(unsigned char i, Context* context, SubState
     }
   // Handle if this is a new host.
   else if (context->filename[0]=='+')
-    {
-	  // copy the host to slot 8, set the context to slot 8, open
+    { 
+	  // set slot index to 7 and copy new host to hostSlots
 	  strcpy(context->hostSlots.host[7], context->filename+1);
+	  context->host_slot = 7;
       fuji_sio_write_host_slots(&context->hostSlots);
 	  
+	  // mount the new host.
 	  context->state=DISKULATOR_SELECT;
-	  context->host_slot = 7;
-	  
 	  fuji_sio_mount_host(context->host_slot,&context->hostSlots);
+	  
 	  if (fuji_sio_error())
 		{
 		  error(ERROR_MOUNTING_HOST_SLOT);
 		  wait_a_moment();
 		  context->state=CONNECT_WIFI;
 		}
-	  
+
 	  *ss=DONE;
     }
   else

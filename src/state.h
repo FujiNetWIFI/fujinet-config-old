@@ -36,6 +36,7 @@ typedef struct _context
   CopySubState copySubState;         // Copy Sub State
   State state;                       // Current program state (state.h)
   char filter[32];                   // filter (wildcard)
+  char host[32];                     // Current host.
   char directory[128];               // Current directory
   char directory_plus_filter[128]; 
   char filename[128];                // Current filename
