@@ -329,7 +329,7 @@ void diskulator_hosts_hosts(Context *context, SubState *new_substate)
 	  
           context->state=DISKULATOR_SELECT;
           context->host_slot=i;
-          strcpy(context->host, context->hostSlots.host[context->host_slot]);
+          strcpy(context->host, context->hostSlots.host[i]);
           fuji_sio_mount_host(context->host_slot,&context->hostSlots);
 
           if (fuji_sio_error())

@@ -60,6 +60,7 @@ void diskulator_select_clear_file_area(void)
 void diskulator_select_display_directory_path(Context* context)
 {
   screen_clear_line(DIRECTORY_LIST_HOSTNAME_Y);
+  //screen_append(context->hostSlots.host[context->host_slot]);
   screen_append(context->host);
 
   screen_clear_line(DIRECTORY_LIST_DIRPATH_Y);
@@ -351,15 +352,21 @@ void diskulator_select_handle_return(unsigned char i, Context* context, SubState
 	  *ss=ADVANCE_DIR; // Stay here, go to the new directory.
 	}
     }
-  // Handle if this is a new host.
+  // Handle if the selection is a TNFS host
   else if (context->filename[0]=='+')
     { 
-	  // set slot index to 7 and copy new host to hostSlots
-	  strcpy(context->hostSlots.host[7], context->filename+1);
+	  // set the current host context and replace host_slot 8 with the 
+	  // selected TNFS host.
+	  strcpy(context->host, context->filename+1);
+	  strcpy(context->hostSlots.host[7], context->host);	  
 	  context->host_slot = 7;
       fuji_sio_write_host_slots(&context->hostSlots);
 	  
-	  // mount the new host.
+      // update directory to point root and clear the filename
+	  strcpy(context->directory, "/");
+	  strcpy(context->filename, "");
+	  
+	  // mount the selected host
 	  context->state=DISKULATOR_SELECT;
 	  fuji_sio_mount_host(context->host_slot,&context->hostSlots);
 	  
