@@ -60,7 +60,6 @@ void diskulator_select_clear_file_area(void)
 void diskulator_select_display_directory_path(Context* context)
 {
   screen_clear_line(DIRECTORY_LIST_HOSTNAME_Y);
-  //screen_append(context->hostSlots.host[context->host_slot]);
   screen_append(context->host);
 
   screen_clear_line(DIRECTORY_LIST_DIRPATH_Y);
