@@ -221,7 +221,7 @@ void diskulator_select_display_directory_page(Context* context)
       if (fuji_sio_error())
         {
           error(ERROR_READING_DIRECTORY);
-	  goto exit_error;
+      goto exit_error;
         }
 
       context->entry_widths[i]=strlen(displayed_entry);
@@ -266,12 +266,12 @@ void diskulator_select_handle_return(unsigned char i, Context* context, SubState
   if (context->entries_displayed==0)
     {
       if (context->copySubState == SELECT_DESTINATION_FOLDER)
-	return;
+    return;
       else
-	{
-	  *ss=DONE;
-	  context->state=DISKULATOR_COPY;
-	}
+    {
+      *ss=DONE;
+      context->state=DISKULATOR_COPY;
+    }
     }
   while (retry>0)
     {
@@ -340,56 +340,56 @@ void diskulator_select_handle_return(unsigned char i, Context* context, SubState
   if (context->filename[strlen(context->filename)-1]=='/')
     {
       if (context->copySubState == SELECT_HOST_SLOT)
-	{
-	  // Silently fail for now
-	}
+    {
+      // Silently fail for now
+    }
       else
-	{
-	  strcat(context->directory,context->filename);
-	  memset(context->filename,0,sizeof(context->filename));
-	  diskulator_select_display_directory_path(context);
-	  *ss=ADVANCE_DIR; // Stay here, go to the new directory.
-	}
+    {
+      strcat(context->directory,context->filename);
+      memset(context->filename,0,sizeof(context->filename));
+      diskulator_select_display_directory_path(context);
+      *ss=ADVANCE_DIR; // Stay here, go to the new directory.
+    }
     }
   // Handle if the selection is a TNFS host
   else if (context->filename[0]=='+')
-    { 
-	  // set the current host context and replace host_slot 8 with the 
-	  // selected TNFS host.
-	  strcpy(context->host, context->filename+1);
-	  strcpy(context->hostSlots.host[7], context->host);	  
-	  context->host_slot = 7;
+    {
+      // set the current host context and replace host_slot 8 with the 
+      // selected TNFS host.
+      strcpy(context->host, context->filename+1);
+      strcpy(context->hostSlots.host[7], context->host);      
+      context->host_slot = 7;
       fuji_sio_write_host_slots(&context->hostSlots);
-	  
+      
       // update directory to point root and clear the filename
-	  strcpy(context->directory, "/");
-	  strcpy(context->filename, "");
-	  
-	  // mount the selected host
-	  context->state=DISKULATOR_SELECT;
-	  fuji_sio_mount_host(context->host_slot,&context->hostSlots);
-	  
-	  if (fuji_sio_error())
-		{
-		  error(ERROR_MOUNTING_HOST_SLOT);
-		  wait_a_moment();
-		  context->state=CONNECT_WIFI;
-		}
+      strcpy(context->directory, "/");
+      memset(context->filename,0,sizeof(context->filename));
+      
+      // mount the selected host
+      context->state=DISKULATOR_SELECT;
+      fuji_sio_mount_host(context->host_slot,&context->hostSlots);
+      
+      if (fuji_sio_error())
+        {
+          error(ERROR_MOUNTING_HOST_SLOT);
+          wait_a_moment();
+          context->state=CONNECT_WIFI;
+        }
 
-	  *ss=DONE;
+      *ss=DONE;
     }
   else
     {
       if (context->copySubState == DISABLED)
-	{
-	  *ss=DONE; // We are done with the select screen.
-	  context->state=DISKULATOR_SLOT;
-	}
+    {
+      *ss=DONE; // We are done with the select screen.
+      context->state=DISKULATOR_SLOT;
+    }
       else
-	{
-	  *ss=DONE;
-	  context->state=DISKULATOR_COPY;
-	}
+    {
+      *ss=DONE;
+      context->state=DISKULATOR_COPY;
+    }
     }
 }
 
@@ -638,8 +638,8 @@ void diskulator_select_select_file(Context* context, SubState* ss)
 
   if (context->state != DISKULATOR_SELECT)
   {
-	*ss=DONE;
-	return;
+    *ss=DONE;
+    return;
   }
 
   bar_show(DIRECTORY_LIST_Y_OFFSET+1);
@@ -682,8 +682,8 @@ void diskulator_select_select_file(Context* context, SubState* ss)
           break;
         case '*': // right arrow
         case KCODE_RETURN:
-	  if (files_present==true)
-	    diskulator_select_handle_return(i,context,ss);
+      if (files_present==true)
+        diskulator_select_handle_return(i,context,ss);
           break;
         case '!': //joy left + fire
           *ss=DONE;
