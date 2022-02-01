@@ -82,7 +82,7 @@ bool diskulator_select_display_directory_entry(unsigned char i, char* entry, Con
   context->dir_eof=false;
 
   // Display filename
-  if (entry[0]=='+')
+  if (entry[0]=='=')
     screen_puts(2,DIRECTORY_LIST_Y_OFFSET+i,entry+1);
   else
     screen_puts(2,DIRECTORY_LIST_Y_OFFSET+i,entry);
@@ -90,7 +90,7 @@ bool diskulator_select_display_directory_entry(unsigned char i, char* entry, Con
   // Display folder icon if directory.
   if (entry[strlen(entry)-1]=='/')
     screen_puts(0,DIRECTORY_LIST_Y_OFFSET+i,CH_FOLDER);
-  else if (entry[0]=='+') 
+  else if (entry[0]=='=') 
     screen_puts(0,DIRECTORY_LIST_Y_OFFSET+i,CH_SERVER);
  
 
@@ -221,7 +221,7 @@ void diskulator_select_display_directory_page(Context* context)
       if (fuji_sio_error())
         {
           error(ERROR_READING_DIRECTORY);
-      goto exit_error;
+	  goto exit_error;
         }
 
       context->entry_widths[i]=strlen(displayed_entry);
@@ -266,12 +266,12 @@ void diskulator_select_handle_return(unsigned char i, Context* context, SubState
   if (context->entries_displayed==0)
     {
       if (context->copySubState == SELECT_DESTINATION_FOLDER)
-    return;
+	return;
       else
-    {
-      *ss=DONE;
-      context->state=DISKULATOR_COPY;
-    }
+	{
+	  *ss=DONE;
+	  context->state=DISKULATOR_COPY;
+	}
     }
   while (retry>0)
     {
@@ -340,16 +340,16 @@ void diskulator_select_handle_return(unsigned char i, Context* context, SubState
   if (context->filename[strlen(context->filename)-1]=='/')
     {
       if (context->copySubState == SELECT_HOST_SLOT)
-    {
-      // Silently fail for now
-    }
+	{
+	  // Silently fail for now
+	}
       else
-    {
-      strcat(context->directory,context->filename);
-      memset(context->filename,0,sizeof(context->filename));
-      diskulator_select_display_directory_path(context);
-      *ss=ADVANCE_DIR; // Stay here, go to the new directory.
-    }
+	{
+	  strcat(context->directory,context->filename);
+	  memset(context->filename,0,sizeof(context->filename));
+	  diskulator_select_display_directory_path(context);
+	  *ss=ADVANCE_DIR; // Stay here, go to the new directory.
+	}
     }
   // Handle if the selection is a TNFS host
   else if (context->filename[0]=='+')
