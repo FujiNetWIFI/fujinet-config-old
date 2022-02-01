@@ -92,7 +92,6 @@ bool diskulator_select_display_directory_entry(unsigned char i, char* entry, Con
     screen_puts(0,DIRECTORY_LIST_Y_OFFSET+i,CH_FOLDER);
   else if (entry[0]=='=') 
     screen_puts(0,DIRECTORY_LIST_Y_OFFSET+i,CH_SERVER);
- 
 
   return true;
 }
@@ -381,15 +380,15 @@ void diskulator_select_handle_return(unsigned char i, Context* context, SubState
   else
     {
       if (context->copySubState == DISABLED)
-    {
-      *ss=DONE; // We are done with the select screen.
-      context->state=DISKULATOR_SLOT;
-    }
+	{
+	  *ss=DONE; // We are done with the select screen.
+	  context->state=DISKULATOR_SLOT;
+	}
       else
-    {
-      *ss=DONE;
-      context->state=DISKULATOR_COPY;
-    }
+	{
+	  *ss=DONE;
+	  context->state=DISKULATOR_COPY;
+	}
     }
 }
 
@@ -638,8 +637,8 @@ void diskulator_select_select_file(Context* context, SubState* ss)
 
   if (context->state != DISKULATOR_SELECT)
   {
-    *ss=DONE;
-    return;
+	*ss=DONE;
+	return;
   }
 
   bar_show(DIRECTORY_LIST_Y_OFFSET+1);
@@ -682,8 +681,8 @@ void diskulator_select_select_file(Context* context, SubState* ss)
           break;
         case '*': // right arrow
         case KCODE_RETURN:
-      if (files_present==true)
-        diskulator_select_handle_return(i,context,ss);
+	  if (files_present==true)
+	    diskulator_select_handle_return(i,context,ss);
           break;
         case '!': //joy left + fire
           *ss=DONE;
