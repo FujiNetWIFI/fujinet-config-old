@@ -113,19 +113,25 @@ void diskulator_select_display_clear_page(void)
 }
 
 /**
- * Display previous page
+ * Display/hide previous page
  */
-void diskulator_select_display_prev_page(void)
+void diskulator_select_display_prev_page(bool show)
 {
-  screen_puts(0,DIRECTORY_LIST_Y_OFFSET-1,CH_KEY_LT"Previous Page");
+  if (show)
+    screen_puts(0,DIRECTORY_LIST_Y_OFFSET-1,CH_KEY_LT"Previous Page");
+  else
+    screen_clear_line(DIRECTORY_LIST_Y_OFFSET-1);
 }
 
 /**
- * Display previous page
+ * Display/hide next page
  */
-void diskulator_select_display_next_page(void)
+void diskulator_select_display_next_page(bool show)
 {
-  screen_puts(0,DIRECTORY_LIST_Y_OFFSET+DIRECTORY_LIST_ENTRIES_PER_PAGE,CH_KEY_GT"Next Page");
+  if (show) 
+    screen_puts(0,DIRECTORY_LIST_Y_OFFSET+DIRECTORY_LIST_ENTRIES_PER_PAGE,CH_KEY_GT"Next Page");
+  else
+    screen_clear_line(DIRECTORY_LIST_Y_OFFSET+DIRECTORY_LIST_ENTRIES_PER_PAGE);
 }
 
 /**
@@ -233,10 +239,14 @@ void diskulator_select_display_directory_page(Context* context)
   context->entries_displayed=i;
 
   if (context->dir_page > 0)
-    diskulator_select_display_prev_page();
+    diskulator_select_display_prev_page(true);
+  else
+    diskulator_select_display_prev_page(false);
 
   if (context->dir_eof == false)
-    diskulator_select_display_next_page();
+    diskulator_select_display_next_page(true);
+  else
+    diskulator_select_display_next_page(false);
 
   if (i==0 && context->dir_page==0)
     {
