@@ -318,8 +318,8 @@ test: $(PROGRAM)
 
 dist: $(PROGRAM)
 	mkdir -p dist
-	cp ../fujinet-config-tools/dist/*.COM dist/ || true
-	cp ../fujinet-config-tools/dist/*.com dist/ || true
+	cp ../fujinet-config-tools/atari/dist/*.COM dist/ || true
+	cp ../fujinet-config-tools/atari/dist/*.com dist/ || true
 	cp $(PROGRAM) dist/
 	dir2atr -m -S -B picoboot.bin autorun.atr dist/
 
