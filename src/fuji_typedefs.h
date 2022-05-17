@@ -19,10 +19,10 @@ typedef unsigned short DirectoryPosition;
 typedef union {
   struct
   {
-    char ssid[32];
+    char ssid[33];
     signed char rssi;
   };
-  unsigned char rawData[33];
+  unsigned char rawData[34];
 } SSIDInfo;
 
 /**
@@ -31,10 +31,10 @@ typedef union {
 typedef union {
   struct
   {
-    char ssid[32];
+    char ssid[33];
     char password[64];
   };
-  unsigned char rawData[96];
+  unsigned char rawData[97];
 } NetConfig;
 
 /**
@@ -43,7 +43,7 @@ typedef union {
 typedef union {
   struct
   {
-    char ssid[32];
+    char ssid[33];
     char hostname[64];
     unsigned char localIP[4];
     unsigned char gateway[4];
@@ -53,7 +53,7 @@ typedef union {
     unsigned char bssid[6];
     char fn_version[15];
   };
-  unsigned char rawData[139];
+  unsigned char rawData[140];
 } AdapterConfig;
 
 typedef union {
