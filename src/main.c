@@ -24,6 +24,9 @@ State configured(Context *context)
 {
   NetConfig netConfig;
   unsigned char status;
+
+  if (fuji_sio_get_wifi_enabled() == false)
+	  return DISKULATOR_HOSTS;
   
   fuji_sio_read_net_config(&netConfig);
 

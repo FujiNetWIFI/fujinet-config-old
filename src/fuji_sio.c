@@ -27,6 +27,27 @@ void set_sio_defaults(void)
 }
 
 /**
+ * Get WiFi Enabled Status
+ */
+bool fuji_sio_get_wifi_enabled(void)
+{
+	unsigned char wifiEnabled;
+
+    set_sio_defaults();
+    OS.dcb.dcomnd = 0xEA; // Return wifi status
+    OS.dcb.dstats = 0x40; // Peripheral->Computer
+    OS.dcb.dbuf = &wifiEnabled;
+    OS.dcb.dbyt = 1;
+    OS.dcb.daux1 = 0;
+    siov();
+
+	if (wifiEnabled == 1)
+		return true;
+	else
+		return false;
+}
+
+/**
  * Return number of networks
  */
 unsigned char fuji_sio_do_scan(void)

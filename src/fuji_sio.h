@@ -14,6 +14,11 @@
 bool fuji_sio_error(void);
 
 /**
+ * Get WiFi Enabled Status
+ */
+bool fuji_sio_get_wifi_enabled(void);
+
+/**
  * Return number of networks
  */
 unsigned char fuji_sio_do_scan(void);
